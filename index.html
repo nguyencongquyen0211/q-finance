@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q · Quản lý Tài chính Cá nhân</title>
+<meta name="description" content="Ứng dụng quản lý danh mục đầu tư cá nhân - Chứng khoán & Crypto">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #131823;
+  --bg-tertiary: #1a2030;
+  --bg-elevated: #232b3d;
+  --border-subtle: #2a3344;
+  --border-strong: #3d4860;
+  --text-primary: #e8ecf3;
+  --text-secondary: #9ba8bd;
+  --text-tertiary: #6b7684;
+  --accent-gold: #d4a574;
+  --accent-gold-bright: #e8b885;
+  --success: #4ade80;
+  --success-bg: rgba(74, 222, 128, 0.1);
+  --danger: #f87171;
+  --danger-bg: rgba(248, 113, 113, 0.1);
+  --warning: #fbbf24;
+  --warning-bg: rgba(251, 191, 36, 0.1);
+  --info: #60a5fa;
+  --info-bg: rgba(96, 165, 250, 0.1);
+  --crypto: #f7931a;
+  --stock: #4ade80;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: 
+    radial-gradient(ellipse at top right, rgba(212, 165, 116, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom left, rgba(96, 165, 250, 0.03) 0%, transparent 50%),
+    var(--bg-primary);
+  background-attachment: fixed;
+}
+
+.mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: 'tnum'; }
+.serif { font-family: 'Fraunces', serif; }
+
+/* Layout */
+.app {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 32px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-mark {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-bright) 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--bg-primary);
+  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+}
+
+.logo-text {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.logo-text small {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-tertiary);
+  display: block;
+  font-weight: 400;
+  margin-top: -2px;
+}
+
+.header-stats {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.header-stat {
+  text-align: right;
+}
+
+.header-stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-tertiary);
+  margin-bottom: 2px;
+}
+
+.header-stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--success);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+  margin-right: 6px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: 12px 20px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.tab:hover { color: var(--text-primary); }
+
+.tab.active {
+  color: var(--accent-gold);
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-gold);
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-2-1 { grid-template-columns: 2fr 1fr; }
+
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-2-1 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .grid-4 { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .header-stats { display: none; }
+  .app { padding: 0 16px; }
+}
+
+/* Cards */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+
+.card:hover { border-color: var(--border-strong); }
+
+.card-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.card-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+
+.card-change {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.positive { color: var(--success); }
+.negative { color: var(--danger); }
+.neutral { color: var(--text-secondary); }
+
+.card-large {
+  padding: 24px;
+}
+
+.card-large .card-value {
+  font-size: 32px;
+}
+
+/* Section heading */
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 32px 0 16px;
+  padding-bottom: 8px;
+}
+
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.section-subtitle {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* Tables */
+.table-wrap {
+  overflow-x: auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead th {
+  background: var(--bg-tertiary);
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+
+td.mono, th.mono { font-family: 'JetBrains Mono', monospace; }
+td.right, th.right { text-align: right; }
+
+.asset-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.asset-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.asset-icon.crypto-btc { background: linear-gradient(135deg, #f7931a, #ffb84d); color: #000; }
+.asset-icon.crypto-eth { background: linear-gradient(135deg, #627eea, #8aa3ff); color: #fff; }
+.asset-icon.stock { background: var(--bg-elevated); color: var(--accent-gold); }
+
+.asset-name {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.asset-sub {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-buy { background: var(--success-bg); color: var(--success); }
+.badge-sell { background: var(--danger-bg); color: var(--danger); }
+.badge-hold { background: var(--warning-bg); color: var(--warning); }
+.badge-stock { background: rgba(74, 222, 128, 0.1); color: var(--success); }
+.badge-crypto { background: rgba(247, 147, 26, 0.15); color: var(--crypto); }
+
+/* Buttons */
+.btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn:hover {
+  background: var(--border-strong);
+  border-color: var(--accent-gold);
+}
+
+.btn-primary {
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: var(--bg-primary);
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: var(--accent-gold-bright);
+  border-color: var(--accent-gold-bright);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  justify-content: center;
+}
+
+/* Form */
+.form-row {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.form-grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.form-input, .form-select {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+}
+
+.form-select {
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+/* Allocation bar */
+.alloc-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-tertiary);
+  margin: 8px 0;
+}
+
+.alloc-segment {
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+.alloc-stock { background: var(--success); }
+.alloc-crypto { background: var(--crypto); }
+.alloc-cash { background: var(--info); }
+
+.alloc-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.alloc-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Alert */
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border-left: 3px solid;
+  font-size: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.alert-success { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+.alert-warning { background: var(--warning-bg); border-color: var(--warning); color: var(--warning); }
+.alert-info { background: var(--info-bg); border-color: var(--info); color: var(--info); }
+.alert-danger { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+
+.alert-icon {
+  font-size: 16px;
+  margin-top: 1px;
+}
+
+.alert-content { flex: 1; color: var(--text-primary); }
+.alert-title { font-weight: 600; margin-bottom: 2px; font-size: 13px; }
+.alert-text { font-size: 12px; color: var(--text-secondary); }
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-tertiary);
+}
+
+.empty-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 24px;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal-title {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  padding: 4px;
+}
+
+/* Footer */
+footer {
+  margin-top: 64px;
+  padding: 24px 0;
+  border-top: 1px solid var(--border-subtle);
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+footer .serif { color: var(--text-secondary); }
+
+/* Chart container */
+.chart-wrap {
+  position: relative;
+  height: 240px;
+}
+
+.chart-wrap-sm { height: 160px; }
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.toolbar-actions { display: flex; gap: 8px; }
+
+/* Goal progress */
+.progress {
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-bright));
+  transition: width 0.6s ease;
+}
+
+/* Loading */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-subtle);
+  border-top-color: var(--accent-gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Refresh badge */
+.refresh-info {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-mark">Q</div>
+      <div class="logo-text">
+        Quản lý Tài chính
+        <small>Personal Investment Dashboard</small>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="header-stat">
+        <div class="header-stat-label">VN-Index</div>
+        <div class="header-stat-value" id="hdr-vnindex">—</div>
+      </div>
+      <div class="header-stat">
+        <div class="header-stat-label">BTC/USD</div>
+        <div class="header-stat-value" id="hdr-btc">—</div>
+      </div>
+      <div class="header-stat">
+        <div class="header-stat-label">ETH/USD</div>
+        <div class="header-stat-value" id="hdr-eth">—</div>
+      </div>
+      <div class="header-stat">
+        <div class="header-stat-label"><span class="live-dot"></span>Live</div>
+        <div class="header-stat-value" id="hdr-time" style="font-size: 12px;">—</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <nav class="tabs">
+    <button class="tab active" data-tab="dashboard">Tổng quan</button>
+    <button class="tab" data-tab="transactions">Giao dịch</button>
+    <button class="tab" data-tab="dca">Lịch DCA</button>
+    <button class="tab" data-tab="alerts">Cảnh báo</button>
+    <button class="tab" data-tab="plan">Kế hoạch</button>
+    <button class="tab" data-tab="settings">Cài đặt</button>
+  </nav>
+
+  <!-- DASHBOARD TAB -->
+  <section class="tab-content active" id="tab-dashboard">
+    <!-- Top stats -->
+    <div class="grid grid-4" style="margin-bottom: 24px;">
+      <div class="card card-large">
+        <div class="card-title">Tổng giá trị</div>
+        <div class="card-value mono" id="stat-total">0 ₫</div>
+        <div class="card-change" id="stat-total-change">—</div>
+      </div>
+      <div class="card card-large">
+        <div class="card-title">Tổng vốn đầu tư</div>
+        <div class="card-value mono" id="stat-invested">0 ₫</div>
+        <div class="card-change neutral" id="stat-invested-sub">—</div>
+      </div>
+      <div class="card card-large">
+        <div class="card-title">Lãi/Lỗ chưa thực hiện</div>
+        <div class="card-value mono" id="stat-pnl">0 ₫</div>
+        <div class="card-change" id="stat-pnl-pct">—</div>
+      </div>
+      <div class="card card-large">
+        <div class="card-title">Tiền mặt khả dụng</div>
+        <div class="card-value mono" id="stat-cash">0 ₫</div>
+        <div class="card-change neutral">Quỹ săn đáy</div>
+      </div>
+    </div>
+
+    <!-- Allocation -->
+    <div class="grid grid-2-1">
+      <div class="card">
+        <div class="card-title">Phân bổ danh mục</div>
+        <div style="margin-top: 12px;">
+          <div class="alloc-bar" id="alloc-bar"></div>
+          <div class="alloc-legend" id="alloc-legend"></div>
+        </div>
+        <div class="chart-wrap" style="margin-top: 16px;">
+          <canvas id="chart-alloc"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Mục tiêu tài chính</div>
+        <div style="margin-top: 12px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span class="serif" style="font-size: 14px;">300 triệu (1-2 năm)</span>
+            <span class="mono" id="goal-1-pct">0%</span>
+          </div>
+          <div class="progress"><div class="progress-fill" id="goal-1-fill"></div></div>
+          <div style="font-size: 11px; color: var(--text-tertiary);" id="goal-1-detail">—</div>
+        </div>
+        <div style="margin-top: 16px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span class="serif" style="font-size: 14px;">1 tỷ (3-5 năm)</span>
+            <span class="mono" id="goal-2-pct">0%</span>
+          </div>
+          <div class="progress"><div class="progress-fill" id="goal-2-fill"></div></div>
+          <div style="font-size: 11px; color: var(--text-tertiary);" id="goal-2-detail">—</div>
+        </div>
+        <div style="margin-top: 16px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span class="serif" style="font-size: 14px;">3 tỷ (7-10 năm)</span>
+            <span class="mono" id="goal-3-pct">0%</span>
+          </div>
+          <div class="progress"><div class="progress-fill" id="goal-3-fill"></div></div>
+          <div style="font-size: 11px; color: var(--text-tertiary);" id="goal-3-detail">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Holdings -->
+    <div class="section-heading">
+      <h2 class="section-title">Danh mục đang nắm giữ</h2>
+      <div class="refresh-info">
+        <span class="live-dot"></span>
+        Cập nhật: <span id="last-update">—</span>
+        <button class="btn btn-sm" onclick="refreshPrices()" style="margin-left: 8px;">↻ Làm mới</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="holdings-table">
+        <thead>
+          <tr>
+            <th>Tài sản</th>
+            <th class="right">Khối lượng</th>
+            <th class="right">Giá vốn TB</th>
+            <th class="right">Giá hiện tại</th>
+            <th class="right">Giá trị</th>
+            <th class="right">Lãi/Lỗ</th>
+            <th class="right">% Danh mục</th>
+          </tr>
+        </thead>
+        <tbody id="holdings-body">
+          <tr><td colspan="7" class="empty">Chưa có dữ liệu. Thêm giao dịch ở tab "Giao dịch"</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TRANSACTIONS TAB -->
+  <section class="tab-content" id="tab-transactions">
+    <div class="toolbar">
+      <h2 class="section-title">Lịch sử giao dịch</h2>
+      <div class="toolbar-actions">
+        <button class="btn btn-primary" onclick="openTxModal()">+ Thêm giao dịch</button>
+        <button class="btn" onclick="exportData()">Xuất JSON</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ngày</th>
+            <th>Loại</th>
+            <th>Tài sản</th>
+            <th>Hành động</th>
+            <th class="right">Khối lượng</th>
+            <th class="right">Giá</th>
+            <th class="right">Tổng tiền</th>
+            <th>Ghi chú</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tx-body">
+          <tr><td colspan="9" class="empty">Chưa có giao dịch nào</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- DCA TAB -->
+  <section class="tab-content" id="tab-dca">
+    <div class="toolbar">
+      <h2 class="section-title">Lịch đầu tư định kỳ (DCA)</h2>
+      <div class="refresh-info">Phân bổ 10tr/tháng theo Asymmetric DCA</div>
+    </div>
+
+    <div class="grid grid-3" style="margin-bottom: 24px;">
+      <div class="card">
+        <div class="card-title">Ngày 1 hàng tháng</div>
+        <div class="card-value mono" style="font-size: 18px; color: var(--success);">4.000.000 ₫</div>
+        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+          • ETF VN30: 2tr<br>
+          • BTC: 1.5tr<br>
+          • ETH: 0.5tr
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Ngày 10 hàng tháng</div>
+        <div class="card-value mono" style="font-size: 18px; color: var(--info);">3.000.000 ₫</div>
+        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+          • Cổ phiếu (HPG/VCB): 2tr<br>
+          • BTC: 1tr
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Ngày 20 hàng tháng</div>
+        <div class="card-value mono" style="font-size: 18px; color: var(--warning);">3.000.000 ₫</div>
+        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+          • Cổ phiếu (theo grid): 2tr<br>
+          • Quỹ săn đáy: 1tr
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Lịch DCA 12 tháng tới</div>
+      <div class="table-wrap" style="margin-top: 12px; border: none;">
+        <table id="dca-schedule">
+          <thead>
+            <tr>
+              <th>Tháng</th>
+              <th>Ngày 1</th>
+              <th>Ngày 10</th>
+              <th>Ngày 20</th>
+              <th class="right">Tổng</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody id="dca-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <div class="card-title">Quy tắc Asymmetric DCA</div>
+      <div style="margin-top: 12px; font-size: 13px; line-height: 1.7;">
+        <strong style="color: var(--success);">Kịch bản A (mặc định):</strong> Thị trường ổn định → CK 60% / Crypto 30% / Phòng thủ 10%<br>
+        <strong style="color: var(--warning);">Kịch bản B:</strong> BTC giảm > 20% → CK 40% / Crypto 50% / Phòng thủ 10% <em>(săn đáy crypto)</em><br>
+        <strong style="color: var(--info);">Kịch bản C:</strong> VN-Index giảm > 10% → CK 70% / Crypto 20% / Phòng thủ 10% <em>(săn đáy chứng khoán)</em>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALERTS TAB -->
+  <section class="tab-content" id="tab-alerts">
+    <h2 class="section-title" style="margin-bottom: 16px;">Cảnh báo & Tín hiệu</h2>
+
+    <div id="alerts-list">
+      <!-- Auto generated -->
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <div class="card-title">Ngưỡng cảnh báo đã thiết lập</div>
+      <div class="grid grid-2" style="margin-top: 12px; gap: 12px;">
+        <div>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">BTC quỹ săn đáy</div>
+          <div class="mono" style="font-size: 13px;">
+            ▼ -15% → mua 4tr<br>
+            ▼ -25% → mua 6tr<br>
+            ▼ -40% → mua 5tr (all-in)
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">VN-Index quỹ săn đáy</div>
+          <div class="mono" style="font-size: 13px;">
+            VNI 1.750 → mua ETF VN30 3tr<br>
+            VNI 1.650 → mua HPG/MBB 5tr<br>
+            VNI 1.500 → all-in còn lại
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">BTC chốt lời</div>
+          <div class="mono" style="font-size: 13px;">
+            $130k → bán 15%<br>
+            $160k → bán 20%<br>
+            $200k → bán 25%<br>
+            $250k+ → bán 20%, giữ 20% dài hạn
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Rebalance</div>
+          <div class="mono" style="font-size: 13px;">
+            Lệch tỷ trọng > 10% → cân lại<br>
+            Crypto > 45% → giảm về 35%<br>
+            Tiền mặt < 10% → bổ sung
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAN TAB -->
+  <section class="tab-content" id="tab-plan">
+    <h2 class="section-title" style="margin-bottom: 16px;">Investment Policy Statement (IPS)</h2>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-title">Phân bổ vốn mục tiêu</div>
+        <div class="chart-wrap" style="margin-top: 12px;">
+          <canvas id="chart-target"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Hồ sơ rủi ro</div>
+        <div style="margin-top: 16px; font-size: 13px; line-height: 1.8;">
+          ✓ Quỹ khẩn cấp ≥ 6 tháng chi tiêu<br>
+          ✓ Không có nợ tiêu dùng<br>
+          ✓ Chịu được drawdown -50%<br>
+          ✓ Theo dõi hằng ngày<br>
+          ✓ Khẩu vị: <strong style="color: var(--accent-gold);">Cân bằng</strong><br>
+          ✓ Khung thời gian: <strong style="color: var(--accent-gold);">5-10 năm</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <div class="card-title">Nguyên tắc bất di bất dịch</div>
+      <div style="margin-top: 12px; font-size: 13px; line-height: 1.9;">
+        1. <strong>KHÔNG dùng tiền vay</strong> (margin, nợ tiêu dùng) để đầu tư<br>
+        2. <strong>KHÔNG all-in một kênh</strong> – tỷ trọng tối đa 1 kênh: 50%, 1 cổ phiếu: 15%<br>
+        3. <strong>KHÔNG bán cắt lỗ vì hoảng loạn</strong> – chỉ theo Stop Loss đã định<br>
+        4. <strong>KHÔNG chạy theo "phím hàng"</strong> từ MXH, hội nhóm<br>
+        5. <strong>LUÔN giữ ≥ 10% danh mục bằng tiền mặt</strong> (quỹ săn đáy)<br>
+        6. <strong>LUÔN review tỷ trọng mỗi quý</strong> – rebalance nếu lệch > 10%
+      </div>
+    </div>
+
+    <div class="grid grid-3" style="margin-top: 16px;">
+      <div class="card">
+        <div class="card-title">📅 Hằng ngày</div>
+        <div style="font-size: 12px; margin-top: 8px; line-height: 1.7;">
+          Theo dõi giá<br>
+          Đặt lệnh grid trading<br>
+          15-30 phút sáng
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Hằng tuần</div>
+        <div style="font-size: 12px; margin-top: 8px; line-height: 1.7;">
+          Cập nhật danh mục<br>
+          Đọc báo cáo CTCK<br>
+          1 giờ Chủ Nhật
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔄 Hằng quý</div>
+        <div style="font-size: 12px; margin-top: 8px; line-height: 1.7;">
+          Rebalance nếu cần<br>
+          Đánh giá IPS<br>
+          4 giờ
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS TAB -->
+  <section class="tab-content" id="tab-settings">
+    <h2 class="section-title" style="margin-bottom: 16px;">Cài đặt</h2>
+
+    <div class="card">
+      <div class="card-title">Quản lý dữ liệu</div>
+      <div style="margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn" onclick="exportData()">📥 Xuất dữ liệu (JSON)</button>
+        <button class="btn" onclick="document.getElementById('import-file').click()">📤 Nhập dữ liệu</button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+        <button class="btn" onclick="seedData()">🌱 Tạo dữ liệu mẫu</button>
+        <button class="btn" style="border-color: var(--danger); color: var(--danger);" onclick="resetData()">🗑 Xóa toàn bộ</button>
+      </div>
+      <div style="margin-top: 12px; font-size: 12px; color: var(--text-tertiary);">
+        💡 Dữ liệu được lưu trên trình duyệt của bạn (localStorage). Hãy xuất file JSON định kỳ để sao lưu.
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <div class="card-title">Tỷ giá USD/VND</div>
+      <div class="form-row form-grid" style="margin-top: 12px;">
+        <div class="form-group">
+          <label class="form-label">Tỷ giá quy đổi</label>
+          <input type="number" class="form-input" id="setting-fx" value="25500" onchange="saveSettings()">
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <div class="card-title">Về ứng dụng</div>
+      <div style="margin-top: 12px; font-size: 13px; line-height: 1.8; color: var(--text-secondary);">
+        <strong style="color: var(--text-primary);">Q · Quản lý Tài chính v1.0</strong><br>
+        Ứng dụng quản lý danh mục đầu tư cá nhân theo Investment Policy Statement.<br>
+        Giá BTC/ETH cập nhật real-time qua CoinGecko API (miễn phí).<br>
+        <em style="color: var(--text-tertiary);">Lưu ý: Không phải lời khuyên đầu tư. Mọi quyết định là của bạn.</em>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <span class="serif" style="font-size: 16px;">Q</span> · 
+      Quản lý Tài chính Cá nhân · 
+      Dữ liệu lưu cục bộ trên trình duyệt
+    </div>
+    <div style="margin-top: 4px; font-size: 11px;">
+      Powered by CoinGecko API · Built for the disciplined investor
+    </div>
+  </footer>
+</div>
+
+<!-- Transaction Modal -->
+<div class="modal-overlay" id="tx-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Thêm giao dịch</div>
+      <button class="modal-close" onclick="closeTxModal()">×</button>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Loại tài sản</label>
+        <select class="form-select" id="tx-type">
+          <option value="stock">Chứng khoán</option>
+          <option value="crypto">Crypto</option>
+          <option value="cash">Tiền mặt / Quỹ</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row form-grid">
+      <div class="form-group">
+        <label class="form-label">Mã / Symbol</label>
+        <input type="text" class="form-input" id="tx-symbol" placeholder="HPG, BTC, ETH...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hành động</label>
+        <select class="form-select" id="tx-action">
+          <option value="buy">Mua</option>
+          <option value="sell">Bán</option>
+          <option value="deposit">Nạp tiền (cash)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row form-grid">
+      <div class="form-group">
+        <label class="form-label">Khối lượng</label>
+        <input type="number" step="any" class="form-input" id="tx-qty" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Giá / 1 đơn vị</label>
+        <input type="number" step="any" class="form-input" id="tx-price" placeholder="0">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Ngày</label>
+        <input type="date" class="form-input" id="tx-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ghi chú (tùy chọn)</label>
+        <input type="text" class="form-input" id="tx-note" placeholder="VD: DCA tháng 5">
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end;">
+      <button class="btn" onclick="closeTxModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="saveTx()">Lưu giao dịch</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============= STATE & STORAGE =============
+const STATE = {
+  transactions: [],
+  prices: {
+    BTC: { usd: 82305, vnd: null },
+    ETH: { usd: 2412, vnd: null },
+    'VN-INDEX': 1891.20,
+    HPG: 28000,
+    VCB: 76000,
+    MBB: 25850,
+    SSI: 28500,
+    FUEVFVND: 35000,
+    E1VFVN30: 32000
+  },
+  settings: { fx: 25500 },
+  lastUpdate: null
+};
+
+const STORAGE_KEY = 'q_finance_v1';
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    transactions: STATE.transactions,
+    settings: STATE.settings
+  }));
+}
+
+function loadState() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (data) {
+      STATE.transactions = data.transactions || [];
+      STATE.settings = { ...STATE.settings, ...(data.settings || {}) };
+    }
+  } catch (e) { console.warn('Load state failed:', e); }
+}
+
+// ============= UTILITIES =============
+function fmt(n, d = 0) {
+  if (n == null || isNaN(n)) return '—';
+  return new Intl.NumberFormat('vi-VN', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
+}
+
+function fmtVND(n) { return fmt(Math.round(n)) + ' ₫'; }
+function fmtUSD(n) { return '$' + fmt(n, n < 100 ? 2 : 0); }
+function fmtPct(n) { return (n >= 0 ? '+' : '') + fmt(n, 2) + '%'; }
+
+function fmtDate(d) {
+  const dt = new Date(d);
+  return dt.toLocaleDateString('vi-VN');
+}
+
+function isoToday() {
+  return new Date().toISOString().split('T')[0];
+}
+
+// ============= PRICE FETCHING =============
+async function fetchCryptoPrices() {
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd,vnd&include_24hr_change=true');
+    const data = await res.json();
+    if (data.bitcoin) {
+      STATE.prices.BTC = { usd: data.bitcoin.usd, vnd: data.bitcoin.vnd, change: data.bitcoin.usd_24h_change };
+    }
+    if (data.ethereum) {
+      STATE.prices.ETH = { usd: data.ethereum.usd, vnd: data.ethereum.vnd, change: data.ethereum.usd_24h_change };
+    }
+    return true;
+  } catch (e) {
+    console.warn('Fetch crypto failed:', e);
+    return false;
+  }
+}
+
+async function refreshPrices() {
+  const btn = document.querySelector('.refresh-info button');
+  if (btn) btn.innerHTML = '<span class="spinner"></span> Đang cập nhật...';
+  
+  await fetchCryptoPrices();
+  STATE.lastUpdate = new Date();
+  
+  updateHeader();
+  renderAll();
+  
+  if (btn) btn.innerHTML = '↻ Làm mới';
+}
+
+function updateHeader() {
+  const btc = STATE.prices.BTC;
+  const eth = STATE.prices.ETH;
+  
+  document.getElementById('hdr-vnindex').textContent = fmt(STATE.prices['VN-INDEX'], 2);
+  
+  const btcEl = document.getElementById('hdr-btc');
+  btcEl.textContent = fmtUSD(btc.usd);
+  if (btc.change !== undefined) {
+    btcEl.style.color = btc.change >= 0 ? 'var(--success)' : 'var(--danger)';
+  }
+  
+  const ethEl = document.getElementById('hdr-eth');
+  ethEl.textContent = fmtUSD(eth.usd);
+  if (eth.change !== undefined) {
+    ethEl.style.color = eth.change >= 0 ? 'var(--success)' : 'var(--danger)';
+  }
+  
+  const now = new Date();
+  document.getElementById('hdr-time').textContent = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  
+  const lu = document.getElementById('last-update');
+  if (lu) lu.textContent = STATE.lastUpdate ? STATE.lastUpdate.toLocaleTimeString('vi-VN') : 'Chưa cập nhật';
+}
+
+// ============= PORTFOLIO CALCULATIONS =============
+function getCurrentPriceVND(symbol, type) {
+  if (type === 'crypto') {
+    const sym = symbol.toUpperCase();
+    if (STATE.prices[sym] && STATE.prices[sym].vnd) return STATE.prices[sym].vnd;
+    if (STATE.prices[sym] && STATE.prices[sym].usd) return STATE.prices[sym].usd * STATE.settings.fx;
+    return 0;
+  }
+  if (type === 'stock') {
+    return STATE.prices[symbol.toUpperCase()] || 0;
+  }
+  return 1; // cash
+}
+
+function calcHoldings() {
+  const map = {};
+  
+  STATE.transactions.forEach(tx => {
+    const key = `${tx.type}:${tx.symbol.toUpperCase()}`;
+    if (!map[key]) {
+      map[key] = {
+        type: tx.type,
+        symbol: tx.symbol.toUpperCase(),
+        qty: 0,
+        invested: 0,
+        realized: 0
+      };
+    }
+    const h = map[key];
+    
+    if (tx.action === 'buy' || tx.action === 'deposit') {
+      h.qty += tx.qty;
+      h.invested += tx.qty * tx.price;
+    } else if (tx.action === 'sell') {
+      const avgCost = h.qty > 0 ? h.invested / h.qty : 0;
+      h.qty -= tx.qty;
+      h.invested -= tx.qty * avgCost;
+      h.realized += tx.qty * (tx.price - avgCost);
+    }
+  });
+  
+  return Object.values(map).filter(h => Math.abs(h.qty) > 0.0000001);
+}
+
+function calcTotals() {
+  const holdings = calcHoldings();
+  let totalValue = 0;
+  let totalInvested = 0;
+  let cash = 0;
+  let stockValue = 0;
+  let cryptoValue = 0;
+  
+  holdings.forEach(h => {
+    const price = getCurrentPriceVND(h.symbol, h.type);
+    const value = h.qty * price;
+    h.currentPrice = price;
+    h.value = value;
+    h.avgCost = h.qty > 0 ? h.invested / h.qty : 0;
+    h.pnl = value - h.invested;
+    h.pnlPct = h.invested > 0 ? (h.pnl / h.invested * 100) : 0;
+    
+    totalValue += value;
+    totalInvested += h.invested;
+    
+    if (h.type === 'cash') cash += value;
+    else if (h.type === 'stock') stockValue += value;
+    else if (h.type === 'crypto') cryptoValue += value;
+  });
+  
+  return {
+    holdings,
+    totalValue,
+    totalInvested,
+    cash,
+    stockValue,
+    cryptoValue,
+    pnl: totalValue - totalInvested,
+    pnlPct: totalInvested > 0 ? ((totalValue - totalInvested) / totalInvested * 100) : 0
+  };
+}
+
+// ============= RENDER =============
+let chartAlloc = null;
+let chartTarget = null;
+
+function renderDashboard() {
+  const t = calcTotals();
+  
+  document.getElementById('stat-total').textContent = fmtVND(t.totalValue);
+  document.getElementById('stat-invested').textContent = fmtVND(t.totalInvested);
+  document.getElementById('stat-cash').textContent = fmtVND(t.cash);
+  
+  const pnlEl = document.getElementById('stat-pnl');
+  const pnlPctEl = document.getElementById('stat-pnl-pct');
+  pnlEl.textContent = (t.pnl >= 0 ? '+' : '') + fmtVND(t.pnl);
+  pnlEl.className = 'card-value mono ' + (t.pnl >= 0 ? 'positive' : 'negative');
+  pnlPctEl.textContent = fmtPct(t.pnlPct);
+  pnlPctEl.className = 'card-change ' + (t.pnl >= 0 ? 'positive' : 'negative');
+  
+  const totalChange = document.getElementById('stat-total-change');
+  totalChange.textContent = `${fmtPct(t.pnlPct)} so với vốn`;
+  totalChange.className = 'card-change ' + (t.pnl >= 0 ? 'positive' : 'negative');
+  
+  // Allocation bar
+  const total = t.totalValue;
+  const stockPct = total > 0 ? (t.stockValue / total * 100) : 0;
+  const cryptoPct = total > 0 ? (t.cryptoValue / total * 100) : 0;
+  const cashPct = total > 0 ? (t.cash / total * 100) : 0;
+  
+  document.getElementById('alloc-bar').innerHTML = `
+    <div class="alloc-segment alloc-stock" style="width: ${stockPct}%"></div>
+    <div class="alloc-segment alloc-crypto" style="width: ${cryptoPct}%"></div>
+    <div class="alloc-segment alloc-cash" style="width: ${cashPct}%"></div>
+  `;
+  
+  document.getElementById('alloc-legend').innerHTML = `
+    <span><span class="alloc-dot alloc-stock"></span>Chứng khoán ${fmt(stockPct, 1)}% (${fmtVND(t.stockValue)})</span>
+    <span><span class="alloc-dot alloc-crypto"></span>Crypto ${fmt(cryptoPct, 1)}% (${fmtVND(t.cryptoValue)})</span>
+    <span><span class="alloc-dot alloc-cash"></span>Tiền mặt ${fmt(cashPct, 1)}% (${fmtVND(t.cash)})</span>
+  `;
+  
+  // Holdings table
+  const tbody = document.getElementById('holdings-body');
+  if (t.holdings.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty"><div class="empty-icon">📊</div>Chưa có dữ liệu. Thêm giao dịch ở tab "Giao dịch"</td></tr>';
+  } else {
+    tbody.innerHTML = t.holdings
+      .sort((a, b) => b.value - a.value)
+      .map(h => {
+        const pct = total > 0 ? (h.value / total * 100) : 0;
+        const iconClass = h.type === 'crypto' 
+          ? (h.symbol === 'BTC' ? 'crypto-btc' : 'crypto-eth')
+          : 'stock';
+        const badge = h.type === 'crypto' ? 'badge-crypto' : 'badge-stock';
+        const typeName = h.type === 'crypto' ? 'Crypto' : (h.type === 'stock' ? 'Cổ phiếu' : 'Cash');
+        
+        return `
+          <tr>
+            <td>
+              <div class="asset-cell">
+                <div class="asset-icon ${iconClass}">${h.symbol.substring(0, 2)}</div>
+                <div>
+                  <div class="asset-name">${h.symbol}</div>
+                  <div class="asset-sub"><span class="badge ${badge}">${typeName}</span></div>
+                </div>
+              </div>
+            </td>
+            <td class="right mono">${fmt(h.qty, h.type === 'crypto' ? 6 : 0)}</td>
+            <td class="right mono">${h.type === 'crypto' && h.symbol !== 'USDT' ? fmtVND(h.avgCost) : fmtVND(h.avgCost)}</td>
+            <td class="right mono">${fmtVND(h.currentPrice)}</td>
+            <td class="right mono"><strong>${fmtVND(h.value)}</strong></td>
+            <td class="right mono ${h.pnl >= 0 ? 'positive' : 'negative'}">
+              ${(h.pnl >= 0 ? '+' : '')}${fmtVND(h.pnl)}<br>
+              <span style="font-size: 11px;">${fmtPct(h.pnlPct)}</span>
+            </td>
+            <td class="right mono">${fmt(pct, 1)}%</td>
+          </tr>
+        `;
+      }).join('');
+  }
+  
+  // Goals
+  const goal1 = 300_000_000;
+  const goal2 = 1_000_000_000;
+  const goal3 = 3_000_000_000;
+  
+  const p1 = Math.min(t.totalValue / goal1 * 100, 100);
+  const p2 = Math.min(t.totalValue / goal2 * 100, 100);
+  const p3 = Math.min(t.totalValue / goal3 * 100, 100);
+  
+  document.getElementById('goal-1-pct').textContent = fmt(p1, 1) + '%';
+  document.getElementById('goal-1-fill').style.width = p1 + '%';
+  document.getElementById('goal-1-detail').textContent = `${fmtVND(t.totalValue)} / ${fmtVND(goal1)} · còn ${fmtVND(Math.max(goal1 - t.totalValue, 0))}`;
+  
+  document.getElementById('goal-2-pct').textContent = fmt(p2, 1) + '%';
+  document.getElementById('goal-2-fill').style.width = p2 + '%';
+  document.getElementById('goal-2-detail').textContent = `${fmtVND(t.totalValue)} / ${fmtVND(goal2)}`;
+  
+  document.getElementById('goal-3-pct').textContent = fmt(p3, 1) + '%';
+  document.getElementById('goal-3-fill').style.width = p3 + '%';
+  document.getElementById('goal-3-detail').textContent = `${fmtVND(t.totalValue)} / ${fmtVND(goal3)}`;
+  
+  // Allocation chart
+  const ctx = document.getElementById('chart-alloc').getContext('2d');
+  const data = {
+    labels: ['Chứng khoán', 'Crypto', 'Tiền mặt'],
+    datasets: [{
+      data: [t.stockValue, t.cryptoValue, t.cash],
+      backgroundColor: ['#4ade80', '#f7931a', '#60a5fa'],
+      borderColor: '#131823',
+      borderWidth: 3
+    }]
+  };
+  if (chartAlloc) chartAlloc.destroy();
+  chartAlloc = new Chart(ctx, {
+    type: 'doughnut',
+    data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      cutout: '70%'
+    }
+  });
+}
+
+function renderTransactions() {
+  const tbody = document.getElementById('tx-body');
+  if (STATE.transactions.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" class="empty"><div class="empty-icon">📝</div>Chưa có giao dịch nào. Bấm "Thêm giao dịch" để bắt đầu.</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = STATE.transactions
+    .slice()
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .map(tx => {
+      const typeName = { stock: 'Cổ phiếu', crypto: 'Crypto', cash: 'Cash' }[tx.type];
+      const actionName = { buy: 'MUA', sell: 'BÁN', deposit: 'NẠP' }[tx.action];
+      const badge = tx.action === 'buy' ? 'badge-buy' : (tx.action === 'sell' ? 'badge-sell' : 'badge-hold');
+      const total = tx.qty * tx.price;
+      
+      return `
+        <tr>
+          <td>${fmtDate(tx.date)}</td>
+          <td><span class="badge ${tx.type === 'crypto' ? 'badge-crypto' : 'badge-stock'}">${typeName}</span></td>
+          <td><strong>${tx.symbol.toUpperCase()}</strong></td>
+          <td><span class="badge ${badge}">${actionName}</span></td>
+          <td class="right mono">${fmt(tx.qty, tx.type === 'crypto' ? 6 : 0)}</td>
+          <td class="right mono">${fmtVND(tx.price)}</td>
+          <td class="right mono"><strong>${fmtVND(total)}</strong></td>
+          <td><span style="color: var(--text-tertiary); font-size: 12px;">${tx.note || '—'}</span></td>
+          <td><button class="btn btn-sm" style="border-color: var(--danger); color: var(--danger);" onclick="deleteTx('${tx.id}')">×</button></td>
+        </tr>
+      `;
+    }).join('');
+}
+
+function renderDCA() {
+  const tbody = document.getElementById('dca-body');
+  const months = [];
+  const today = new Date();
+  
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+    months.push(d);
+  }
+  
+  tbody.innerHTML = months.map(m => {
+    const monthStr = `${m.getMonth() + 1}/${m.getFullYear()}`;
+    const isPast = m < new Date(today.getFullYear(), today.getMonth(), 1);
+    const isCurrent = m.getMonth() === today.getMonth() && m.getFullYear() === today.getFullYear();
+    
+    let statusBadge;
+    if (isPast) statusBadge = '<span class="badge badge-buy">✓ Đã hoàn thành</span>';
+    else if (isCurrent) statusBadge = '<span class="badge badge-hold">● Đang thực hiện</span>';
+    else statusBadge = '<span class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-tertiary);">Sắp tới</span>';
+    
+    return `
+      <tr>
+        <td><strong>${monthStr}</strong></td>
+        <td class="mono">4.000.000 ₫</td>
+        <td class="mono">3.000.000 ₫</td>
+        <td class="mono">3.000.000 ₫</td>
+        <td class="right mono"><strong>10.000.000 ₫</strong></td>
+        <td>${statusBadge}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderAlerts() {
+  const t = calcTotals();
+  const alerts = [];
+  
+  // Check BTC drawdown
+  const btcAth = 126198;
+  const btcCurrent = STATE.prices.BTC.usd;
+  const btcDrawdown = (btcCurrent - btcAth) / btcAth * 100;
+  
+  if (btcDrawdown < -40) {
+    alerts.push({
+      type: 'danger',
+      icon: '⚠️',
+      title: `BTC giảm ${fmt(btcDrawdown, 1)}% từ ATH - KÍCH HOẠT QUỸ SĂN ĐÁY`,
+      text: `Mua đợt all-in: 5tr. Giá hiện tại $${fmt(btcCurrent)}.`
+    });
+  } else if (btcDrawdown < -25) {
+    alerts.push({
+      type: 'warning',
+      icon: '🔔',
+      title: `BTC giảm ${fmt(btcDrawdown, 1)}% từ ATH - Mua đợt 2`,
+      text: `Khuyến nghị mua thêm 6tr BTC. Giá hiện tại $${fmt(btcCurrent)}.`
+    });
+  } else if (btcDrawdown < -15) {
+    alerts.push({
+      type: 'info',
+      icon: '💡',
+      title: `BTC giảm ${fmt(btcDrawdown, 1)}% từ ATH - Mua đợt 1`,
+      text: `Có thể mua thêm 4tr BTC từ quỹ săn đáy. Giá hiện tại $${fmt(btcCurrent)}.`
+    });
+  }
+  
+  // Check BTC chốt lời
+  if (btcCurrent >= 250000) {
+    alerts.push({ type: 'success', icon: '🎯', title: 'BTC vượt $250k - CHỐT LỜI', text: 'Bán 20% danh mục BTC theo kế hoạch.' });
+  } else if (btcCurrent >= 200000) {
+    alerts.push({ type: 'success', icon: '🎯', title: 'BTC vượt $200k - CHỐT LỜI', text: 'Bán 25% danh mục BTC.' });
+  } else if (btcCurrent >= 130000) {
+    alerts.push({ type: 'success', icon: '🎯', title: 'BTC vượt $130k - CHỐT LỜI một phần', text: 'Bán 15% danh mục BTC.' });
+  }
+  
+  // Check VN-Index
+  const vni = STATE.prices['VN-INDEX'];
+  if (vni < 1500) {
+    alerts.push({ type: 'danger', icon: '🛒', title: 'VN-Index dưới 1.500 - SĂN ĐÁY MẠNH', text: 'All-in quỹ săn đáy còn lại vào ETF VN30 + cổ phiếu cơ bản.' });
+  } else if (vni < 1650) {
+    alerts.push({ type: 'warning', icon: '🛒', title: 'VN-Index dưới 1.650 - Mua thêm', text: 'Khuyến nghị mua HPG/MBB 5tr.' });
+  } else if (vni < 1750) {
+    alerts.push({ type: 'info', icon: '🛒', title: 'VN-Index dưới 1.750 - Cơ hội ETF VN30', text: 'Mua thêm ETF VN30 3tr.' });
+  }
+  
+  // Rebalance check
+  if (t.totalValue > 0) {
+    const cryptoPct = t.cryptoValue / t.totalValue * 100;
+    const stockPct = t.stockValue / t.totalValue * 100;
+    
+    if (cryptoPct > 45) {
+      alerts.push({ type: 'warning', icon: '⚖️', title: `Crypto chiếm ${fmt(cryptoPct, 1)}% danh mục`, text: 'Vượt ngưỡng 45%. Cân nhắc chốt lời một phần để rebalance.' });
+    }
+    if (stockPct < 35 && t.totalValue > 50_000_000) {
+      alerts.push({ type: 'info', icon: '⚖️', title: `Chứng khoán chỉ ${fmt(stockPct, 1)}% danh mục`, text: 'Dưới mục tiêu 50%. Cân nhắc tăng tỷ trọng.' });
+    }
+  }
+  
+  // Default if no alerts
+  if (alerts.length === 0) {
+    alerts.push({ type: 'success', icon: '✓', title: 'Không có cảnh báo nào', text: 'Danh mục đang ổn định, các ngưỡng chưa được kích hoạt.' });
+  }
+  
+  document.getElementById('alerts-list').innerHTML = alerts.map(a => `
+    <div class="alert alert-${a.type}">
+      <div class="alert-icon">${a.icon}</div>
+      <div class="alert-content">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-text">${a.text}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTargetChart() {
+  const ctx = document.getElementById('chart-target');
+  if (!ctx) return;
+  
+  if (chartTarget) chartTarget.destroy();
+  chartTarget = new Chart(ctx.getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Chứng khoán (50%)', 'Crypto (35%)', 'Quỹ phòng thủ (15%)'],
+      datasets: [{
+        data: [50, 35, 15],
+        backgroundColor: ['#4ade80', '#f7931a', '#60a5fa'],
+        borderColor: '#131823',
+        borderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { 
+          position: 'bottom',
+          labels: { color: '#9ba8bd', font: { size: 11, family: 'IBM Plex Sans' }, padding: 12 }
+        }
+      },
+      cutout: '60%'
+    }
+  });
+}
+
+function renderAll() {
+  renderDashboard();
+  renderTransactions();
+  renderDCA();
+  renderAlerts();
+  renderTargetChart();
+}
+
+// ============= TRANSACTIONS =============
+function openTxModal() {
+  document.getElementById('tx-modal').classList.add('active');
+  document.getElementById('tx-date').value = isoToday();
+}
+
+function closeTxModal() {
+  document.getElementById('tx-modal').classList.remove('active');
+  ['tx-symbol', 'tx-qty', 'tx-price', 'tx-note'].forEach(id => document.getElementById(id).value = '');
+}
+
+function saveTx() {
+  const tx = {
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+    type: document.getElementById('tx-type').value,
+    symbol: document.getElementById('tx-symbol').value.trim(),
+    action: document.getElementById('tx-action').value,
+    qty: parseFloat(document.getElementById('tx-qty').value),
+    price: parseFloat(document.getElementById('tx-price').value),
+    date: document.getElementById('tx-date').value,
+    note: document.getElementById('tx-note').value.trim()
+  };
+  
+  if (!tx.symbol || isNaN(tx.qty) || isNaN(tx.price) || !tx.date) {
+    alert('Vui lòng điền đầy đủ thông tin');
+    return;
+  }
+  
+  STATE.transactions.push(tx);
+  saveState();
+  closeTxModal();
+  renderAll();
+}
+
+function deleteTx(id) {
+  if (!confirm('Xóa giao dịch này?')) return;
+  STATE.transactions = STATE.transactions.filter(tx => tx.id !== id);
+  saveState();
+  renderAll();
+}
+
+// ============= DATA MANAGEMENT =============
+function exportData() {
+  const data = {
+    version: '1.0',
+    exportDate: new Date().toISOString(),
+    transactions: STATE.transactions,
+    settings: STATE.settings
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `q-finance-backup-${isoToday()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.transactions) {
+        if (confirm(`Nhập ${data.transactions.length} giao dịch? Dữ liệu hiện tại sẽ bị thay thế.`)) {
+          STATE.transactions = data.transactions;
+          if (data.settings) STATE.settings = { ...STATE.settings, ...data.settings };
+          saveState();
+          renderAll();
+          alert('Nhập dữ liệu thành công!');
+        }
+      }
+    } catch (err) { alert('File không hợp lệ: ' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
+function resetData() {
+  if (!confirm('XÓA TOÀN BỘ dữ liệu? Hành động này không thể hoàn tác.')) return;
+  if (!confirm('Bạn chắc chắn chứ?')) return;
+  STATE.transactions = [];
+  saveState();
+  renderAll();
+}
+
+function seedData() {
+  if (STATE.transactions.length > 0 && !confirm('Đã có dữ liệu. Thay thế bằng dữ liệu mẫu?')) return;
+  
+  const today = isoToday();
+  STATE.transactions = [
+    { id: 's1', type: 'cash', symbol: 'CASH', action: 'deposit', qty: 100000000, price: 1, date: '2026-05-01', note: 'Vốn ban đầu' },
+    { id: 's2', type: 'stock', symbol: 'FUEVFVND', action: 'buy', qty: 571, price: 35000, date: '2026-05-02', note: 'ETF VN30 đợt 1' },
+    { id: 's3', type: 'stock', symbol: 'HPG', action: 'buy', qty: 268, price: 28000, date: '2026-05-02', note: 'Mua HPG đợt 1' },
+    { id: 's4', type: 'stock', symbol: 'VCB', action: 'buy', qty: 197, price: 76000, date: '2026-05-03', note: 'Mua VCB đợt 1' },
+    { id: 's5', type: 'crypto', symbol: 'BTC', action: 'buy', qty: 0.0044, price: 2098000000, date: '2026-05-04', note: 'BTC đợt 1' },
+    { id: 's6', type: 'crypto', symbol: 'ETH', action: 'buy', qty: 0.073, price: 61500000, date: '2026-05-04', note: 'ETH đợt 1' }
+  ];
+  saveState();
+  renderAll();
+}
+
+function saveSettings() {
+  STATE.settings.fx = parseFloat(document.getElementById('setting-fx').value) || 25500;
+  saveState();
+  renderAll();
+}
+
+// ============= TABS =============
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ============= INIT =============
+async function init() {
+  loadState();
+  document.getElementById('setting-fx').value = STATE.settings.fx;
+  
+  // Initial render with cached prices
+  renderAll();
+  updateHeader();
+  
+  // Fetch live prices
+  await refreshPrices();
+  
+  // Auto refresh every 5 minutes
+  setInterval(refreshPrices, 5 * 60 * 1000);
+  
+  // Update time every minute
+  setInterval(updateHeader, 60 * 1000);
+}
+
+init();
+</script>
+</body>
+</html>

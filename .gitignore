@@ -1,0 +1,24 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary
+*.tmp
+*.bak
+~*
+
+# Personal data backups (KHÔNG commit lên GitHub)
+backups/
+*.backup.json
+my-data*.json
