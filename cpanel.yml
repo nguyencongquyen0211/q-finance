@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/iplrrsaw/q.giaoducstem.com/
+    - /bin/cp -f index.html $DEPLOYPATH
+    - /bin/cp -f _headers $DEPLOYPATH
+    - /bin/cp -f README.md $DEPLOYPATH
