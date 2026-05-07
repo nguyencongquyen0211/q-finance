@@ -729,6 +729,7 @@ footer .serif { color: var(--text-secondary); }
   <nav class="tabs">
     <button class="tab active" data-tab="dashboard">Tổng quan</button>
     <button class="tab" data-tab="transactions">Giao dịch</button>
+    <button class="tab" data-tab="coins">Coin</button>
     <button class="tab" data-tab="dca">Lịch DCA</button>
     <button class="tab" data-tab="alerts">Cảnh báo</button>
     <button class="tab" data-tab="plan">Kế hoạch</button>
@@ -1040,6 +1041,67 @@ footer .serif { color: var(--text-secondary); }
   </section>
 
   <!-- SETTINGS TAB -->
+  <section class="tab-content" id="tab-coins">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h2 class="section-title" style="margin-bottom: 4px;">Top Coin biến động</h2>
+        <div style="font-size: 12px; color: var(--text-tertiary);">
+          Real-time từ Binance · Tự refresh mỗi 30 giây · Khung 1 phút
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <select class="form-input" id="coins-filter" style="width: auto; padding: 6px 10px;" onchange="renderCoins()">
+          <option value="gainers">Top tăng 24h</option>
+          <option value="losers">Top giảm 24h</option>
+          <option value="volume">Top khối lượng</option>
+          <option value="momentum">Pump 5 phút</option>
+        </select>
+        <select class="form-input" id="coins-limit" style="width: auto; padding: 6px 10px;" onchange="renderCoins()">
+          <option value="20">Top 20</option>
+          <option value="30" selected>Top 30</option>
+          <option value="50">Top 50</option>
+        </select>
+        <button class="btn" onclick="refreshCoins()" id="coins-refresh-btn">↻ Làm mới</button>
+      </div>
+    </div>
+
+    <div id="coins-status" style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 8px;"></div>
+
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div style="overflow-x: auto;">
+        <table class="data-table" id="coins-table">
+          <thead>
+            <tr>
+              <th class="right" style="width: 36px;">#</th>
+              <th>Symbol</th>
+              <th class="right">Giá USDT</th>
+              <th class="right">% 24h</th>
+              <th class="right" title="% biến động 5 phút gần nhất">% 5m</th>
+              <th class="right" title="Đỉnh trong 5 phút">Đỉnh 5m</th>
+              <th class="right" title="Khoảng cách từ giá hiện tại đến đỉnh 5m">Δ Đỉnh</th>
+              <th class="right" title="Relative Strength Index 14 (timeframe 1m)">RSI(14)</th>
+              <th class="right">KL 24h ($M)</th>
+            </tr>
+          </thead>
+          <tbody id="coins-tbody">
+            <tr><td colspan="9" style="text-align: center; padding: 24px; color: var(--text-tertiary);">Đang tải dữ liệu từ Binance...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 16px;">
+      <div class="card-title">Cách đọc bảng</div>
+      <div style="margin-top: 8px; font-size: 12px; color: var(--text-secondary); line-height: 1.7;">
+        <strong style="color: var(--text-primary);">% 5m:</strong> Biến động giá trong 5 phút gần nhất. Số dương lớn → coin đang pump.<br>
+        <strong style="color: var(--text-primary);">Đỉnh 5m:</strong> Giá cao nhất trong 5 nến 1 phút gần nhất.<br>
+        <strong style="color: var(--text-primary);">Δ Đỉnh:</strong> Khoảng cách từ giá hiện tại đến đỉnh 5m. Số 0% nghĩa là đang ở đỉnh.<br>
+        <strong style="color: var(--text-primary);">RSI(14):</strong> Momentum oscillator. <span style="color: var(--danger);">>70 quá mua</span>, <span style="color: var(--success);">&lt;30 quá bán</span>, 50 trung tính. Tính trên timeframe 1 phút.<br>
+        <em style="color: var(--text-tertiary);">⚠️ Lưu ý: Coin pump nhanh dễ bị xả nhanh. RSI cao + đỉnh = rủi ro cao. Không phải lời khuyên đầu tư.</em>
+      </div>
+    </div>
+  </section>
+
   <section class="tab-content" id="tab-settings">
     <h2 class="section-title" style="margin-bottom: 16px;">Cài đặt</h2>
 
@@ -1228,11 +1290,82 @@ async function fetchCryptoPrices() {
   }
 }
 
+// Lấy danh sách mã VN duy nhất user đang sở hữu (từ transactions)
+function getOwnedVNTickers() {
+  const tickers = new Set();
+  (STATE.transactions || []).forEach(t => {
+    if (t.type === 'stock' && t.symbol) {
+      tickers.add(t.symbol.toUpperCase());
+    }
+  });
+  return Array.from(tickers);
+}
+
+// Fetch VN-Index từ TCBS (giống TCInvest đang dùng)
+async function fetchVNIndex() {
+  try {
+    const to = Math.floor(Date.now() / 1000);
+    const from = to - 7 * 24 * 3600; // 7 ngày
+    const url = `https://apipubaws.tcbs.com.vn/stock-insight/v2/stock/bars-long-term?ticker=VNINDEX&type=index&resolution=D&from=${from}&to=${to}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data && data.data && data.data.length > 0) {
+      const latest = data.data[data.data.length - 1];
+      const prev = data.data.length > 1 ? data.data[data.data.length - 2] : null;
+      const close = latest.close;
+      const change = prev ? ((close - prev.close) / prev.close * 100) : 0;
+      STATE.prices['VN-INDEX'] = close;
+      STATE.prices['VN-INDEX_change'] = change;
+      return true;
+    }
+  } catch (e) {
+    console.warn('Fetch VN-Index failed:', e);
+  }
+  return false;
+}
+
+// Fetch giá real-time của các mã cổ phiếu VN từ TCBS
+async function fetchVNStockPrices(tickers) {
+  if (!tickers || tickers.length === 0) return true;
+  try {
+    const tickersStr = tickers.join(',');
+    const url = `https://apipubaws.tcbs.com.vn/stock-insight/v1/stock/second-tc-price?tickers=${tickersStr}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data && data.data) {
+      data.data.forEach(item => {
+        const ticker = item.t || item.ticker;
+        const cp = item.cp || item.close || item.price; // current price (giá hiện tại, nghìn VND trên TCBS)
+        const acp = item.acp || item.refPrice; // giá tham chiếu phiên trước
+        if (ticker && cp) {
+          // TCBS trả giá theo nghìn VND, *1000 để ra VND
+          const priceVND = cp * 1000;
+          const refVND = acp ? acp * 1000 : priceVND;
+          const change = refVND > 0 ? ((priceVND - refVND) / refVND * 100) : 0;
+          STATE.prices[ticker.toUpperCase()] = priceVND;
+          STATE.prices[ticker.toUpperCase() + '_change'] = change;
+        }
+      });
+      return true;
+    }
+  } catch (e) {
+    console.warn('Fetch VN stocks failed:', e);
+  }
+  return false;
+}
+
 async function refreshPrices() {
   const btn = document.querySelector('.refresh-info button');
   if (btn) btn.innerHTML = '<span class="spinner"></span> Đang cập nhật...';
   
-  await fetchCryptoPrices();
+  // Fetch song song để nhanh
+  const ownedTickers = getOwnedVNTickers();
+  await Promise.all([
+    fetchCryptoPrices(),
+    fetchVNIndex(),
+    fetchVNStockPrices(ownedTickers)
+  ]);
+  
   STATE.lastUpdate = new Date();
   
   updateHeader();
@@ -1245,7 +1378,12 @@ function updateHeader() {
   const btc = STATE.prices.BTC;
   const eth = STATE.prices.ETH;
   
-  document.getElementById('hdr-vnindex').textContent = fmt(STATE.prices['VN-INDEX'], 2);
+  const vniEl = document.getElementById('hdr-vnindex');
+  vniEl.textContent = fmt(STATE.prices['VN-INDEX'], 2);
+  const vniChange = STATE.prices['VN-INDEX_change'];
+  if (vniChange !== undefined && vniChange !== null) {
+    vniEl.style.color = vniChange >= 0 ? 'var(--success)' : 'var(--danger)';
+  }
   
   const btcEl = document.getElementById('hdr-btc');
   btcEl.textContent = fmtUSD(btc.usd);
@@ -1688,6 +1826,18 @@ function saveTx() {
   STATE.transactions.push(tx);
   saveState();
   closeTxModal();
+  
+  // Nếu thêm mã VN mới chưa có trong cache → fetch giá ngay
+  if (tx.type === 'stock' && tx.symbol) {
+    const sym = tx.symbol.toUpperCase();
+    if (!STATE.prices[sym]) {
+      fetchVNStockPrices([sym]).then(() => {
+        renderAll();
+        updateHeader();
+      });
+    }
+  }
+  
   renderAll();
 }
 
@@ -1696,6 +1846,235 @@ function deleteTx(id) {
   STATE.transactions = STATE.transactions.filter(tx => tx.id !== id);
   saveState();
   renderAll();
+}
+
+// ============= COIN TRACKER (Binance API) =============
+const COIN_STATE = {
+  data: [],          // Raw 24hr ticker data
+  details: {},       // { SYMBOL: { rsi, high5m, change5m } }
+  lastUpdate: null,
+  loading: false
+};
+
+// Tính RSI(14) từ mảng giá đóng cửa
+function calcRSI(closes, period = 14) {
+  if (closes.length < period + 1) return null;
+  let gains = 0, losses = 0;
+  // Trung bình ban đầu
+  for (let i = 1; i <= period; i++) {
+    const diff = closes[i] - closes[i - 1];
+    if (diff >= 0) gains += diff;
+    else losses += Math.abs(diff);
+  }
+  let avgGain = gains / period;
+  let avgLoss = losses / period;
+  // Smoothing cho các giá trị tiếp theo
+  for (let i = period + 1; i < closes.length; i++) {
+    const diff = closes[i] - closes[i - 1];
+    const gain = diff >= 0 ? diff : 0;
+    const loss = diff < 0 ? Math.abs(diff) : 0;
+    avgGain = (avgGain * (period - 1) + gain) / period;
+    avgLoss = (avgLoss * (period - 1) + loss) / period;
+  }
+  if (avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return 100 - (100 / (1 + rs));
+}
+
+// Fetch top tickers 24h từ Binance
+async function fetchBinanceTickers() {
+  try {
+    const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+    const data = await res.json();
+    // Chỉ lấy cặp USDT, loại stablecoins/leveraged tokens
+    const filtered = data.filter(t => {
+      if (!t.symbol.endsWith('USDT')) return false;
+      const base = t.symbol.replace('USDT', '');
+      // Loại stablecoin và token đòn bẩy
+      const blacklist = ['USDC', 'BUSD', 'TUSD', 'FDUSD', 'DAI', 'USDP', 'USTC'];
+      if (blacklist.includes(base)) return false;
+      if (/UP$|DOWN$|BULL$|BEAR$/.test(base)) return false; // leveraged
+      if (parseFloat(t.quoteVolume) < 1000000) return false; // KL < 1M USDT bỏ
+      return true;
+    });
+    COIN_STATE.data = filtered.map(t => ({
+      symbol: t.symbol,
+      base: t.symbol.replace('USDT', ''),
+      price: parseFloat(t.lastPrice),
+      change24h: parseFloat(t.priceChangePercent),
+      volume24h: parseFloat(t.quoteVolume),
+      high24h: parseFloat(t.highPrice),
+      low24h: parseFloat(t.lowPrice)
+    }));
+    return true;
+  } catch (e) {
+    console.warn('Binance ticker fetch failed:', e);
+    return false;
+  }
+}
+
+// Fetch klines 1m cho 1 coin (15 nến để tính RSI(14) + đỉnh 5 phút)
+async function fetchCoinDetails(symbol) {
+  try {
+    const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1m&limit=20`);
+    const klines = await res.json();
+    if (!Array.isArray(klines) || klines.length < 15) return null;
+    
+    // Kline format: [openTime, open, high, low, close, volume, ...]
+    const closes = klines.map(k => parseFloat(k[4]));
+    const highs = klines.map(k => parseFloat(k[2]));
+    
+    // RSI(14) trên timeframe 1m
+    const rsi = calcRSI(closes, 14);
+    
+    // Đỉnh trong 5 phút gần nhất
+    const last5Highs = highs.slice(-5);
+    const high5m = Math.max(...last5Highs);
+    
+    // % biến động 5 phút (giá hiện tại vs giá đầu 5 phút)
+    const last5Closes = closes.slice(-6); // 6 điểm = 5 khoảng
+    const change5m = last5Closes.length >= 2 
+      ? ((last5Closes[last5Closes.length - 1] - last5Closes[0]) / last5Closes[0]) * 100
+      : 0;
+    
+    return { rsi, high5m, change5m };
+  } catch (e) {
+    return null;
+  }
+}
+
+// Lọc và sort coin theo filter người dùng chọn
+function getFilteredCoins() {
+  const filter = document.getElementById('coins-filter')?.value || 'gainers';
+  const limit = parseInt(document.getElementById('coins-limit')?.value || '30');
+  
+  let arr = [...COIN_STATE.data];
+  
+  if (filter === 'gainers') {
+    arr.sort((a, b) => b.change24h - a.change24h);
+  } else if (filter === 'losers') {
+    arr.sort((a, b) => a.change24h - b.change24h);
+  } else if (filter === 'volume') {
+    arr.sort((a, b) => b.volume24h - a.volume24h);
+  } else if (filter === 'momentum') {
+    // Sort theo % 5m (cần details đã fetch)
+    arr.sort((a, b) => {
+      const ca = COIN_STATE.details[a.symbol]?.change5m ?? -999;
+      const cb = COIN_STATE.details[b.symbol]?.change5m ?? -999;
+      return cb - ca;
+    });
+  }
+  
+  return arr.slice(0, limit);
+}
+
+function fmtPrice(p) {
+  if (p >= 1000) return p.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  if (p >= 1) return p.toFixed(3);
+  if (p >= 0.01) return p.toFixed(4);
+  if (p >= 0.0001) return p.toFixed(6);
+  return p.toFixed(8);
+}
+
+function renderCoins() {
+  const tbody = document.getElementById('coins-tbody');
+  if (!tbody) return;
+  
+  const coins = getFilteredCoins();
+  if (coins.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 24px; color: var(--text-tertiary);">Đang tải...</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = coins.map((c, i) => {
+    const det = COIN_STATE.details[c.symbol];
+    const change24h = c.change24h;
+    const colorChange = change24h >= 0 ? 'var(--success)' : 'var(--danger)';
+    
+    let rsiHtml = '<span style="color: var(--text-tertiary);">...</span>';
+    let high5mHtml = '<span style="color: var(--text-tertiary);">...</span>';
+    let change5mHtml = '<span style="color: var(--text-tertiary);">...</span>';
+    let deltaHtml = '<span style="color: var(--text-tertiary);">...</span>';
+    
+    if (det) {
+      // RSI
+      let rsiColor = 'var(--text-secondary)';
+      if (det.rsi >= 70) rsiColor = 'var(--danger)';
+      else if (det.rsi <= 30) rsiColor = 'var(--success)';
+      rsiHtml = `<span style="color: ${rsiColor}; font-weight: 600;">${det.rsi.toFixed(1)}</span>`;
+      
+      // High 5m
+      high5mHtml = `<span class="mono">${fmtPrice(det.high5m)}</span>`;
+      
+      // Change 5m
+      const c5Color = det.change5m >= 0 ? 'var(--success)' : 'var(--danger)';
+      change5mHtml = `<span style="color: ${c5Color}; font-weight: 600;">${det.change5m >= 0 ? '+' : ''}${det.change5m.toFixed(2)}%</span>`;
+      
+      // Delta to high5m
+      const delta = det.high5m > 0 ? ((c.price - det.high5m) / det.high5m) * 100 : 0;
+      const deltaColor = delta >= -0.1 ? 'var(--warning)' : 'var(--text-secondary)';
+      deltaHtml = `<span style="color: ${deltaColor};">${delta.toFixed(2)}%</span>`;
+    }
+    
+    const volM = (c.volume24h / 1e6).toFixed(1);
+    const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${c.symbol}`;
+    
+    return `
+      <tr>
+        <td class="right" style="color: var(--text-tertiary);">${i + 1}</td>
+        <td><a href="${tradingViewUrl}" target="_blank" style="color: var(--text-primary); font-weight: 600; text-decoration: none;">${c.base}</a></td>
+        <td class="right mono">${fmtPrice(c.price)}</td>
+        <td class="right" style="color: ${colorChange}; font-weight: 600;">${change24h >= 0 ? '+' : ''}${change24h.toFixed(2)}%</td>
+        <td class="right">${change5mHtml}</td>
+        <td class="right">${high5mHtml}</td>
+        <td class="right">${deltaHtml}</td>
+        <td class="right">${rsiHtml}</td>
+        <td class="right mono" style="color: var(--text-secondary);">${volM}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function refreshCoins() {
+  if (COIN_STATE.loading) return;
+  COIN_STATE.loading = true;
+  
+  const btn = document.getElementById('coins-refresh-btn');
+  const status = document.getElementById('coins-status');
+  if (btn) btn.innerHTML = '<span class="spinner"></span> Đang tải...';
+  if (status) status.textContent = 'Đang tải dữ liệu từ Binance...';
+  
+  // 1. Fetch tất cả 24hr ticker
+  const ok = await fetchBinanceTickers();
+  if (!ok) {
+    if (btn) btn.innerHTML = '↻ Thử lại';
+    if (status) status.textContent = '❌ Không tải được dữ liệu Binance. Có thể bị chặn mạng/firewall hoặc Binance không khả dụng ở khu vực.';
+    COIN_STATE.loading = false;
+    return;
+  }
+  
+  // 2. Render lần 1 (chưa có details)
+  renderCoins();
+  
+  // 3. Fetch details (RSI + high5m) cho top coins đang hiển thị
+  const coins = getFilteredCoins();
+  if (status) status.textContent = `Đã tải ${COIN_STATE.data.length} coin · Đang tính RSI và đỉnh 5m cho top ${coins.length}...`;
+  
+  // Fetch song song nhưng giới hạn 10 cùng lúc để không spam Binance
+  const batchSize = 10;
+  for (let i = 0; i < coins.length; i += batchSize) {
+    const batch = coins.slice(i, i + batchSize);
+    await Promise.all(batch.map(async c => {
+      const det = await fetchCoinDetails(c.symbol);
+      if (det) COIN_STATE.details[c.symbol] = det;
+    }));
+    renderCoins(); // render tăng dần để user thấy progress
+  }
+  
+  COIN_STATE.lastUpdate = new Date();
+  if (btn) btn.innerHTML = '↻ Làm mới';
+  if (status) status.textContent = `✅ Cập nhật lúc ${COIN_STATE.lastUpdate.toLocaleTimeString('vi-VN')} · ${COIN_STATE.data.length} coin · Tự refresh sau 30s`;
+  COIN_STATE.loading = false;
 }
 
 // ============= DATA MANAGEMENT =============
@@ -1773,8 +2152,21 @@ document.querySelectorAll('.tab').forEach(btn => {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    
+    // Lazy load tab Coin lần đầu vào, sau đó để interval tự refresh
+    if (btn.dataset.tab === 'coins' && COIN_STATE.data.length === 0) {
+      refreshCoins();
+    }
   });
 });
+
+// Auto-refresh tab Coin mỗi 30 giây nếu user đang xem tab này
+setInterval(() => {
+  const coinsTab = document.getElementById('tab-coins');
+  if (coinsTab && coinsTab.classList.contains('active') && !COIN_STATE.loading) {
+    refreshCoins();
+  }
+}, 30 * 1000);
 
 // ============= INIT =============
 async function init() {
@@ -1788,8 +2180,8 @@ async function init() {
   // Fetch live prices
   await refreshPrices();
   
-  // Auto refresh every 5 minutes
-  setInterval(refreshPrices, 5 * 60 * 1000);
+  // Auto refresh mỗi 60 giây (VN-Index, cổ phiếu VN, BTC/ETH cùng update)
+  setInterval(refreshPrices, 60 * 1000);
   
   // Update time every minute
   setInterval(updateHeader, 60 * 1000);
