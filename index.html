@@ -1079,6 +1079,7 @@ footer .serif { color: var(--text-secondary); }
               <th class="right" title="RSI(14) tại thời điểm nến 5m đã đóng gần nhất">RSI nến trước</th>
               <th class="right" title="Giá real-time hiện tại (nến đang hình thành)">Giá hiện tại</th>
               <th class="right" title="RSI(14) tính với giá real-time hiện tại">RSI hiện tại</th>
+              <th title="Phân kỳ giá - RSI: tín hiệu đảo chiều tiềm năng">Chú ý</th>
             </tr>
           </thead>
           <tbody id="coins-tbody">
@@ -1093,9 +1094,11 @@ footer .serif { color: var(--text-secondary); }
       <div style="margin-top: 8px; font-size: 12px; color: var(--text-secondary); line-height: 1.7;">
         <strong style="color: var(--text-primary);">% 5m:</strong> Biến động giá hiện tại so với nến 5m đã đóng gần nhất.<br>
         <strong style="color: var(--text-primary);">Đỉnh nến trước:</strong> Giá High cao nhất trong 5 nến 5 phút đã đóng gần nhất.<br>
-        <strong style="color: var(--text-primary);">RSI nến trước:</strong> RSI(14) tính tại thời điểm nến 5m đã đóng gần nhất.<br>
-        <strong style="color: var(--text-primary);">RSI hiện tại:</strong> RSI(14) tính theo giá real-time (nến đang hình thành). <span style="color: var(--danger);">>70 quá mua</span> · <span style="color: var(--success);">&lt;30 quá bán</span>.<br>
-        <em style="color: var(--text-tertiary);">⚠️ Dữ liệu từ Binance Futures (perpetual). RSI 5m phù hợp cho scalping/swing ngắn hạn. Không phải lời khuyên đầu tư.</em>
+        <strong style="color: var(--text-primary);">RSI nến trước / hiện tại:</strong> RSI(14) khung 5 phút. <span style="color:var(--danger);">&ge;80 quá mua</span> · <span style="color:var(--success);">&le;20 quá bán</span>.<br>
+        <strong style="color: var(--text-primary);">Chú ý:</strong>
+        <span style="color:var(--danger);">⚠️ Đảo chiều Giảm</span> = Giá tăng so với đỉnh nến trước nhưng RSI giảm (phân kỳ âm). &nbsp;
+        <span style="color:var(--success);">🚀 Đảo chiều Tăng</span> = Giá giảm nhưng RSI tăng (phân kỳ dương).<br>
+        <em style="color: var(--text-tertiary);">⚠️ Dữ liệu Binance Futures perpetual. Phân kỳ RSI là tín hiệu tham khảo, không phải chắc chắn. Không phải lời khuyên đầu tư.</em>
       </div>
     </div>
   </section>
@@ -1984,7 +1987,7 @@ function renderCoins() {
   
   const coins = getFilteredCoins();
   if (coins.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 24px; color: var(--text-tertiary);">Đang tải...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-tertiary);">Đang tải...</td></tr>';
     return;
   }
   
@@ -1994,30 +1997,48 @@ function renderCoins() {
     const color24h = change24h >= 0 ? 'var(--success)' : 'var(--danger)';
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${c.symbol}.P`;
 
-    // % 5m
-    let change5mHtml = '<span style="color: var(--text-tertiary);">...</span>';
-    // Đỉnh nến trước + RSI nến trước
-    let high5mHtml   = '<span style="color: var(--text-tertiary);">...</span>';
-    let rsiPrevHtml  = '<span style="color: var(--text-tertiary);">...</span>';
-    // Giá hiện tại + RSI hiện tại
+    let change5mHtml = '<span style="color:var(--text-tertiary);">...</span>';
+    let high5mHtml   = '<span style="color:var(--text-tertiary);">...</span>';
+    let rsiPrevHtml  = '<span style="color:var(--text-tertiary);">...</span>';
     let priceHtml    = `<span class="mono">${fmtPrice(c.price)}</span>`;
-    let rsiNowHtml   = '<span style="color: var(--text-tertiary);">...</span>';
+    let rsiNowHtml   = '<span style="color:var(--text-tertiary);">...</span>';
+    let noteHtml     = '<span style="color:var(--text-tertiary);">...</span>';
 
     if (det) {
       // % 5m
       const c5Color = det.change5m >= 0 ? 'var(--success)' : 'var(--danger)';
       change5mHtml = `<span style="color:${c5Color}; font-weight:600;">${det.change5m >= 0 ? '+' : ''}${det.change5m.toFixed(2)}%</span>`;
 
-      // Đỉnh nến trước (5 nến 5m)
+      // Đỉnh nến trước
       high5mHtml = `<span class="mono">${fmtPrice(det.high5m)}</span>`;
 
-      // RSI nến trước
-      const rsiPrevColor = det.rsiPrev >= 70 ? 'var(--danger)' : det.rsiPrev <= 30 ? 'var(--success)' : 'var(--text-secondary)';
+      // RSI nến trước (ngưỡng 80/20)
+      const rsiPrevColor = det.rsiPrev >= 80 ? 'var(--danger)' : det.rsiPrev <= 20 ? 'var(--success)' : 'var(--text-secondary)';
       rsiPrevHtml = `<span style="color:${rsiPrevColor}; font-weight:600;">${det.rsiPrev != null ? det.rsiPrev.toFixed(1) : '—'}</span>`;
 
-      // RSI hiện tại
-      const rsiNowColor = det.rsiNow >= 70 ? 'var(--danger)' : det.rsiNow <= 30 ? 'var(--success)' : 'var(--text-secondary)';
+      // RSI hiện tại (ngưỡng 80/20)
+      const rsiNowColor = det.rsiNow >= 80 ? 'var(--danger)' : det.rsiNow <= 20 ? 'var(--success)' : 'var(--text-secondary)';
       rsiNowHtml = `<span style="color:${rsiNowColor}; font-weight:600;">${det.rsiNow != null ? det.rsiNow.toFixed(1) : '—'}</span>`;
+
+      // Chú ý: Phân kỳ giá - RSI
+      // So sánh: Đỉnh nến trước (high5m) vs Giá hiện tại (c.price)
+      //          RSI nến trước (rsiPrev) vs RSI hiện tại (rsiNow)
+      if (det.rsiPrev != null && det.rsiNow != null) {
+        const priceUp  = c.price > det.high5m;   // giá tăng so với đỉnh nến trước
+        const priceDown= c.price < det.high5m;   // giá giảm so với đỉnh nến trước
+        const rsiUp    = det.rsiNow > det.rsiPrev; // RSI tăng
+        const rsiDown  = det.rsiNow < det.rsiPrev; // RSI giảm
+
+        if (priceUp && rsiDown) {
+          // Giá tăng nhưng RSI giảm → Phân kỳ âm → Đảo chiều Giảm
+          noteHtml = `<span style="color:var(--danger); font-weight:700;">⚠️ Đảo chiều Giảm</span>`;
+        } else if (priceDown && rsiUp) {
+          // Giá giảm nhưng RSI tăng → Phân kỳ dương → Đảo chiều Tăng
+          noteHtml = `<span style="color:var(--success); font-weight:700;">🚀 Đảo chiều Tăng</span>`;
+        } else {
+          noteHtml = `<span style="color:var(--text-tertiary); font-size:11px;">—</span>`;
+        }
+      }
     }
 
     return `
@@ -2029,6 +2050,7 @@ function renderCoins() {
         <td class="right">${rsiPrevHtml}</td>
         <td class="right">${priceHtml}</td>
         <td class="right">${rsiNowHtml}</td>
+        <td>${noteHtml}</td>
       </tr>
     `;
   }).join('');
