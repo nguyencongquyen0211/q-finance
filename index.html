@@ -2,2218 +2,565 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Q · Quản lý Tài chính Cá nhân</title>
-<meta name="description" content="Ứng dụng quản lý danh mục đầu tư cá nhân - Chứng khoán & Crypto">
-
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Q · Futures Scanner</title>
 <style>
-:root {
-  --bg-primary: #0a0e1a;
-  --bg-secondary: #131823;
-  --bg-tertiary: #1a2030;
-  --bg-elevated: #232b3d;
-  --border-subtle: #2a3344;
-  --border-strong: #3d4860;
-  --text-primary: #e8ecf3;
-  --text-secondary: #9ba8bd;
-  --text-tertiary: #6b7684;
-  --accent-gold: #d4a574;
-  --accent-gold-bright: #e8b885;
-  --success: #4ade80;
-  --success-bg: rgba(74, 222, 128, 0.1);
-  --danger: #f87171;
-  --danger-bg: rgba(248, 113, 113, 0.1);
-  --warning: #fbbf24;
-  --warning-bg: rgba(251, 191, 36, 0.1);
-  --info: #60a5fa;
-  --info-bg: rgba(96, 165, 250, 0.1);
-  --crypto: #f7931a;
-  --stock: #4ade80;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
-
-body {
-  background: 
-    radial-gradient(ellipse at top right, rgba(212, 165, 116, 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse at bottom left, rgba(96, 165, 250, 0.03) 0%, transparent 50%),
-    var(--bg-primary);
-  background-attachment: fixed;
-}
-
-.mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: 'tnum'; }
-.serif { font-family: 'Fraunces', serif; }
-
-/* Layout */
-.app {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-/* Header */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 0;
-  border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 32px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-mark {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-bright) 100%);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Fraunces', serif;
-  font-weight: 700;
-  font-size: 22px;
-  color: var(--bg-primary);
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
-}
-
-.logo-text {
-  font-family: 'Fraunces', serif;
-  font-size: 20px;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
-
-.logo-text small {
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--text-tertiary);
-  display: block;
-  font-weight: 400;
-  margin-top: -2px;
-}
-
-.header-stats {
-  display: flex;
-  gap: 32px;
-  align-items: center;
-}
-
-.header-stat {
-  text-align: right;
-}
-
-.header-stat-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--text-tertiary);
-  margin-bottom: 2px;
-}
-
-.header-stat-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.live-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: var(--success);
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-  margin-right: 6px;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.85); }
-}
-
-/* Tabs */
-.tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--border-subtle);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.tabs::-webkit-scrollbar { display: none; }
-
-.tab {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  padding: 12px 20px;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  position: relative;
-  white-space: nowrap;
-  transition: color 0.2s;
-}
-
-.tab:hover { color: var(--text-primary); }
-
-.tab.active {
-  color: var(--accent-gold);
-}
-
-.tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--accent-gold);
-}
-
-.tab-content {
-  display: none;
-  animation: fadeIn 0.3s ease;
-}
-
-.tab-content.active { display: block; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Grid */
-.grid {
-  display: grid;
-  gap: 16px;
-}
-
-.grid-4 { grid-template-columns: repeat(4, 1fr); }
-.grid-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-2-1 { grid-template-columns: 2fr 1fr; }
-
-@media (max-width: 1024px) {
-  .grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .grid-3 { grid-template-columns: 1fr; }
-  .grid-2-1 { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 640px) {
-  .grid-4 { grid-template-columns: 1fr; }
-  .grid-2 { grid-template-columns: 1fr; }
-  .header-stats { display: none; }
-  .app { padding: 0 16px; }
-}
-
-/* Cards */
-.card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 20px;
-  transition: border-color 0.2s;
-}
-
-.card:hover { border-color: var(--border-strong); }
-
-.card-title {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--text-tertiary);
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-.card-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-  letter-spacing: -0.02em;
-}
-
-.card-change {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.positive { color: var(--success); }
-.negative { color: var(--danger); }
-.neutral { color: var(--text-secondary); }
-
-.card-large {
-  padding: 24px;
-}
-
-.card-large .card-value {
-  font-size: 32px;
-}
-
-/* Section heading */
-.section-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin: 32px 0 16px;
-  padding-bottom: 8px;
-}
-
-.section-title {
-  font-family: 'Fraunces', serif;
-  font-size: 22px;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
-
-.section-subtitle {
-  font-size: 12px;
-  color: var(--text-tertiary);
-  font-style: italic;
-}
-
-/* Tables */
-.table-wrap {
-  overflow-x: auto;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-thead th {
-  background: var(--bg-tertiary);
-  padding: 12px 16px;
-  text-align: left;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--text-tertiary);
-  font-weight: 500;
-  border-bottom: 1px solid var(--border-subtle);
-  white-space: nowrap;
-}
-
-tbody td {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border-subtle);
-  vertical-align: middle;
-}
-
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
-
-td.mono, th.mono { font-family: 'JetBrains Mono', monospace; }
-td.right, th.right { text-align: right; }
-
-.asset-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.asset-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: var(--bg-elevated);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Fraunces', serif;
-  font-weight: 600;
-  font-size: 13px;
-  flex-shrink: 0;
-}
-
-.asset-icon.crypto-btc { background: linear-gradient(135deg, #f7931a, #ffb84d); color: #000; }
-.asset-icon.crypto-eth { background: linear-gradient(135deg, #627eea, #8aa3ff); color: #fff; }
-.asset-icon.stock { background: var(--bg-elevated); color: var(--accent-gold); }
-
-.asset-name {
-  font-weight: 500;
-  font-size: 13px;
-}
-
-.asset-sub {
-  font-size: 11px;
-  color: var(--text-tertiary);
-}
-
-/* Badges */
-.badge {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.badge-buy { background: var(--success-bg); color: var(--success); }
-.badge-sell { background: var(--danger-bg); color: var(--danger); }
-.badge-hold { background: var(--warning-bg); color: var(--warning); }
-.badge-stock { background: rgba(74, 222, 128, 0.1); color: var(--success); }
-.badge-crypto { background: rgba(247, 147, 26, 0.15); color: var(--crypto); }
-
-/* Buttons */
-.btn {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-strong);
-  color: var(--text-primary);
-  padding: 8px 16px;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn:hover {
-  background: var(--border-strong);
-  border-color: var(--accent-gold);
-}
-
-.btn-primary {
-  background: var(--accent-gold);
-  border-color: var(--accent-gold);
-  color: var(--bg-primary);
-  font-weight: 600;
-}
-
-.btn-primary:hover {
-  background: var(--accent-gold-bright);
-  border-color: var(--accent-gold-bright);
-}
-
-.btn-sm {
-  padding: 6px 12px;
-  font-size: 12px;
-}
-
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  justify-content: center;
-}
-
-/* Form */
-.form-row {
-  display: grid;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.form-grid {
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.form-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-tertiary);
-  font-weight: 500;
-}
-
-.form-input, .form-select {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
-  padding: 10px 12px;
-  border-radius: 6px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  transition: border-color 0.2s;
-}
-
-.form-input:focus, .form-select:focus {
-  outline: none;
-  border-color: var(--accent-gold);
-}
-
-.form-select {
-  cursor: pointer;
-  font-family: 'IBM Plex Sans', sans-serif;
-}
-
-/* Allocation bar */
-.alloc-bar {
-  display: flex;
-  height: 12px;
-  border-radius: 6px;
-  overflow: hidden;
-  background: var(--bg-tertiary);
-  margin: 8px 0;
-}
-
-.alloc-segment {
-  height: 100%;
-  transition: width 0.4s ease;
-}
-
-.alloc-stock { background: var(--success); }
-.alloc-crypto { background: var(--crypto); }
-.alloc-cash { background: var(--info); }
-
-.alloc-legend {
-  display: flex;
-  gap: 16px;
-  font-size: 11px;
-  margin-top: 8px;
-  flex-wrap: wrap;
-}
-
-.alloc-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  margin-right: 6px;
-  vertical-align: middle;
-}
-
-/* Alert */
-.alert {
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  border-left: 3px solid;
-  font-size: 13px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.alert-success { background: var(--success-bg); border-color: var(--success); color: var(--success); }
-.alert-warning { background: var(--warning-bg); border-color: var(--warning); color: var(--warning); }
-.alert-info { background: var(--info-bg); border-color: var(--info); color: var(--info); }
-.alert-danger { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
-
-.alert-icon {
-  font-size: 16px;
-  margin-top: 1px;
-}
-
-.alert-content { flex: 1; color: var(--text-primary); }
-.alert-title { font-weight: 600; margin-bottom: 2px; font-size: 13px; }
-.alert-text { font-size: 12px; color: var(--text-secondary); }
-
-/* Empty state */
-.empty {
-  text-align: center;
-  padding: 48px 24px;
-  color: var(--text-tertiary);
-}
-
-.empty-icon {
-  font-size: 36px;
-  margin-bottom: 12px;
-  opacity: 0.5;
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: 24px;
-}
-
-.modal-overlay.active { display: flex; }
-
-.modal {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 24px;
-  max-width: 500px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: var(--shadow-lg);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.modal-title {
-  font-family: 'Fraunces', serif;
-  font-size: 20px;
-  font-weight: 500;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: 24px;
-  line-height: 1;
-  padding: 4px;
-}
-
-/* Footer */
-footer {
-  margin-top: 64px;
-  padding: 24px 0;
-  border-top: 1px solid var(--border-subtle);
-  text-align: center;
-  color: var(--text-tertiary);
-  font-size: 12px;
-}
-
-footer .serif { color: var(--text-secondary); }
-
-/* Chart container */
-.chart-wrap {
-  position: relative;
-  height: 240px;
-}
-
-.chart-wrap-sm { height: 160px; }
-
-/* Toolbar */
-.toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.toolbar-actions { display: flex; gap: 8px; }
-
-/* Goal progress */
-.progress {
-  height: 6px;
-  background: var(--bg-tertiary);
-  border-radius: 3px;
-  overflow: hidden;
-  margin: 8px 0;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-bright));
-  transition: width 0.6s ease;
-}
-
-/* Loading */
-.spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--border-subtle);
-  border-top-color: var(--accent-gold);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  display: inline-block;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Refresh badge */
-.refresh-info {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--bg4:#21262d;
+  --border:#30363d;--border2:#21262d;
+  --text:#e6edf3;--text2:#8b949e;--text3:#484f58;
+  --green:#3fb950;--green2:rgba(63,185,80,.12);--green3:rgba(63,185,80,.06);
+  --red:#f85149;--red2:rgba(248,81,73,.12);--red3:rgba(248,81,73,.06);
+  --yellow:#e3b341;--blue:#58a6ff;--orange:#d18616;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;min-height:100vh}
+
+/* ── HEADER ── */
+.hdr{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--bg2);flex-wrap:wrap}
+.logo{font-size:17px;font-weight:800;color:var(--blue);letter-spacing:-.5px;white-space:nowrap}
+.logo em{color:var(--text2);font-style:normal;font-weight:400;font-size:12px;margin-left:6px}
+.hdr-mid{display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background .3s}
+.dot.on{background:var(--green);animation:pulse 2s infinite}
+.dot.err{background:var(--red)}
+.dot.loading{background:var(--yellow)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+#status-txt{color:var(--text2);font-size:11px}
+.hdr-controls{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
+.hdr-controls label{color:var(--text2);font-size:11px;white-space:nowrap}
+select,button{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;font-size:12px;cursor:pointer}
+select:focus{outline:none;border-color:var(--blue)}
+.btn-refresh{border-color:var(--blue);color:var(--blue);font-weight:600;padding:5px 12px}
+.btn-refresh:hover{background:var(--blue);color:#000}
+.btn-refresh:disabled{opacity:.5;cursor:default}
+
+/* ── TABS ── */
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;gap:4px}
+.tab-btn{padding:9px 20px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tab-btn .cnt{font-weight:400;font-size:11px;opacity:.6;margin-left:4px}
+.tab-btn.long.active{color:var(--green);border-bottom-color:var(--green)}
+.tab-btn.short.active{color:var(--red);border-bottom-color:var(--red)}
+.tab-btn:not(.active):hover{color:var(--text)}
+
+/* ── CONTENT ── */
+.tab-pane{display:none;padding:16px 20px}
+.tab-pane.active{display:block}
+
+/* ── SUMMARY CARDS ── */
+.cards{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;flex:1;min-width:130px}
+.card-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text2)}
+.card-value{font-size:18px;font-weight:800;margin-top:4px}
+.card-sub{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* ── TABLE ── */
+.tbl-wrap{border:1px solid var(--border);border-radius:8px;overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg3)}
+th{padding:9px 14px;text-align:right;color:var(--text2);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:1px solid var(--border)}
+th:first-child{text-align:left}
+tbody tr{border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg4)}
+tbody tr.hl-bull{border-left:3px solid var(--green);background:var(--green3)}
+tbody tr.hl-bull:hover{background:var(--green2)}
+tbody tr.hl-bear{border-left:3px solid var(--red);background:var(--red3)}
+tbody tr.hl-bear:hover{background:var(--red2)}
+td{padding:9px 14px;text-align:right;white-space:nowrap;font-size:13px}
+td:first-child{text-align:left}
+
+/* ── COIN CELL ── */
+.coin-cell{display:flex;align-items:center;gap:8px}
+.coin-rank{color:var(--text3);font-size:11px;width:20px;text-align:right;flex-shrink:0}
+.coin-info{}
+.coin-base{font-weight:800;font-size:14px;color:var(--text)}
+.coin-tag{font-size:10px;color:var(--text3);margin-top:1px}
+
+/* ── COLORS ── */
+.up{color:var(--green);font-weight:600}
+.dn{color:var(--red);font-weight:600}
+.neu{color:var(--text2)}
+.mono{font-family:'SF Mono','Fira Code',monospace}
+
+/* ── RSI BADGE ── */
+.rsi{display:inline-block;padding:2px 6px;border-radius:4px;font-weight:700;font-size:12px;font-family:'SF Mono',monospace}
+.rsi-ob{background:var(--red2);color:var(--red)}
+.rsi-os{background:var(--green2);color:var(--green)}
+.rsi-hi{color:var(--orange)}
+.rsi-lo{color:#58c98a}
+.rsi-mid{color:var(--text2)}
+.rsi-sep{color:var(--text3);margin:0 2px}
+
+/* ── SIGNAL BADGE ── */
+.sig{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap}
+.sig-bull{background:var(--green2);color:var(--green)}
+.sig-bear{background:var(--red2);color:var(--red)}
+.sig-none{color:var(--text3);font-size:12px}
+
+/* ── MISC ── */
+.empty-row td{text-align:center!important;padding:32px;color:var(--text2);font-size:13px}
+.spin{display:inline-block;animation:spin 1s linear infinite;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:768px){
+  .hdr{padding:8px 12px}
+  .tab-pane{padding:10px 12px}
+  th,td{padding:7px 8px;font-size:12px}
+  .cards{gap:8px}
+  .card{min-width:110px;padding:8px 10px}
+  .card-value{font-size:15px}
 }
 </style>
 </head>
 <body>
 
-<div class="app">
-  <!-- Header -->
-  <header>
-    <div class="logo">
-      <div class="logo-mark">Q</div>
-      <div class="logo-text">
-        Quản lý Tài chính
-        <small>Personal Investment Dashboard</small>
-      </div>
-    </div>
-    <div class="header-stats">
-      <div class="header-stat">
-        <div class="header-stat-label">VN-Index</div>
-        <div class="header-stat-value" id="hdr-vnindex">—</div>
-      </div>
-      <div class="header-stat">
-        <div class="header-stat-label">BTC/USD</div>
-        <div class="header-stat-value" id="hdr-btc">—</div>
-      </div>
-      <div class="header-stat">
-        <div class="header-stat-label">ETH/USD</div>
-        <div class="header-stat-value" id="hdr-eth">—</div>
-      </div>
-      <div class="header-stat">
-        <div class="header-stat-label"><span class="live-dot"></span>Live</div>
-        <div class="header-stat-value" id="hdr-time" style="font-size: 12px;">—</div>
-      </div>
-    </div>
-  </header>
+<header class="hdr">
+  <div class="logo">Q<em>· Futures Scanner</em></div>
+  <div class="hdr-mid">
+    <div class="dot" id="dot"></div>
+    <span id="status-txt">Chưa tải dữ liệu</span>
+  </div>
+  <div class="hdr-controls">
+    <label>Top</label>
+    <select id="topN">
+      <option value="20">20</option>
+      <option value="30" selected>30</option>
+      <option value="50">50</option>
+    </select>
+    <label>Vol min</label>
+    <select id="minVol">
+      <option value="10">$10M+</option>
+      <option value="50" selected>$50M+</option>
+      <option value="100">$100M+</option>
+      <option value="500">$500M+</option>
+    </select>
+    <label>RSI OB/OS</label>
+    <select id="rsiThresh">
+      <option value="70">70 / 30</option>
+      <option value="75">75 / 25</option>
+      <option value="80" selected>80 / 20</option>
+    </select>
+    <button class="btn-refresh" id="btn-refresh" onclick="refresh()">↻ Làm mới</button>
+  </div>
+</header>
 
-  <!-- Tabs -->
-  <nav class="tabs">
-    <button class="tab active" data-tab="dashboard">Tổng quan</button>
-    <button class="tab" data-tab="transactions">Giao dịch</button>
-    <button class="tab" data-tab="coins">Coin</button>
-    <button class="tab" data-tab="dca">Lịch DCA</button>
-    <button class="tab" data-tab="alerts">Cảnh báo</button>
-    <button class="tab" data-tab="plan">Kế hoạch</button>
-    <button class="tab" data-tab="settings">Cài đặt</button>
-  </nav>
-
-  <!-- DASHBOARD TAB -->
-  <section class="tab-content active" id="tab-dashboard">
-    <!-- Top stats -->
-    <div class="grid grid-4" style="margin-bottom: 24px;">
-      <div class="card card-large">
-        <div class="card-title">Tổng giá trị</div>
-        <div class="card-value mono" id="stat-total">0 ₫</div>
-        <div class="card-change" id="stat-total-change">—</div>
-      </div>
-      <div class="card card-large">
-        <div class="card-title">Tổng vốn đầu tư</div>
-        <div class="card-value mono" id="stat-invested">0 ₫</div>
-        <div class="card-change neutral" id="stat-invested-sub">—</div>
-      </div>
-      <div class="card card-large">
-        <div class="card-title">Lãi/Lỗ chưa thực hiện</div>
-        <div class="card-value mono" id="stat-pnl">0 ₫</div>
-        <div class="card-change" id="stat-pnl-pct">—</div>
-      </div>
-      <div class="card card-large">
-        <div class="card-title">Tiền mặt khả dụng</div>
-        <div class="card-value mono" id="stat-cash">0 ₫</div>
-        <div class="card-change neutral">Quỹ săn đáy</div>
-      </div>
-    </div>
-
-    <!-- Allocation -->
-    <div class="grid grid-2-1">
-      <div class="card">
-        <div class="card-title">Phân bổ danh mục</div>
-        <div style="margin-top: 12px;">
-          <div class="alloc-bar" id="alloc-bar"></div>
-          <div class="alloc-legend" id="alloc-legend"></div>
-        </div>
-        <div class="chart-wrap" style="margin-top: 16px;">
-          <canvas id="chart-alloc"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">Mục tiêu tài chính</div>
-        <div style="margin-top: 12px;">
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-            <span class="serif" style="font-size: 14px;">300 triệu (1-2 năm)</span>
-            <span class="mono" id="goal-1-pct">0%</span>
-          </div>
-          <div class="progress"><div class="progress-fill" id="goal-1-fill"></div></div>
-          <div style="font-size: 11px; color: var(--text-tertiary);" id="goal-1-detail">—</div>
-        </div>
-        <div style="margin-top: 16px;">
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-            <span class="serif" style="font-size: 14px;">1 tỷ (3-5 năm)</span>
-            <span class="mono" id="goal-2-pct">0%</span>
-          </div>
-          <div class="progress"><div class="progress-fill" id="goal-2-fill"></div></div>
-          <div style="font-size: 11px; color: var(--text-tertiary);" id="goal-2-detail">—</div>
-        </div>
-        <div style="margin-top: 16px;">
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-            <span class="serif" style="font-size: 14px;">3 tỷ (7-10 năm)</span>
-            <span class="mono" id="goal-3-pct">0%</span>
-          </div>
-          <div class="progress"><div class="progress-fill" id="goal-3-fill"></div></div>
-          <div style="font-size: 11px; color: var(--text-tertiary);" id="goal-3-detail">—</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Holdings -->
-    <div class="section-heading">
-      <h2 class="section-title">Danh mục đang nắm giữ</h2>
-      <div class="refresh-info">
-        <span class="live-dot"></span>
-        Cập nhật: <span id="last-update">—</span>
-        <button class="btn btn-sm" onclick="refreshPrices()" style="margin-left: 8px;">↻ Làm mới</button>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table id="holdings-table">
-        <thead>
-          <tr>
-            <th>Tài sản</th>
-            <th class="right">Khối lượng</th>
-            <th class="right">Giá vốn TB</th>
-            <th class="right">Giá hiện tại</th>
-            <th class="right">Giá trị</th>
-            <th class="right">Lãi/Lỗ</th>
-            <th class="right">% Danh mục</th>
-          </tr>
-        </thead>
-        <tbody id="holdings-body">
-          <tr><td colspan="7" class="empty">Chưa có dữ liệu. Thêm giao dịch ở tab "Giao dịch"</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- TRANSACTIONS TAB -->
-  <section class="tab-content" id="tab-transactions">
-    <div class="toolbar">
-      <h2 class="section-title">Lịch sử giao dịch</h2>
-      <div class="toolbar-actions">
-        <button class="btn btn-primary" onclick="openTxModal()">+ Thêm giao dịch</button>
-        <button class="btn" onclick="exportData()">Xuất JSON</button>
-      </div>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Ngày</th>
-            <th>Loại</th>
-            <th>Tài sản</th>
-            <th>Hành động</th>
-            <th class="right">Khối lượng</th>
-            <th class="right">Giá</th>
-            <th class="right">Tổng tiền</th>
-            <th>Ghi chú</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="tx-body">
-          <tr><td colspan="9" class="empty">Chưa có giao dịch nào</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- DCA TAB -->
-  <section class="tab-content" id="tab-dca">
-    <div class="toolbar">
-      <h2 class="section-title">Lịch đầu tư định kỳ (DCA)</h2>
-      <div class="refresh-info">Phân bổ 10tr/tháng theo Asymmetric DCA</div>
-    </div>
-
-    <div class="grid grid-3" style="margin-bottom: 24px;">
-      <div class="card">
-        <div class="card-title">Ngày 1 hàng tháng</div>
-        <div class="card-value mono" style="font-size: 18px; color: var(--success);">4.000.000 ₫</div>
-        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
-          • ETF VN30: 2tr<br>
-          • BTC: 1.5tr<br>
-          • ETH: 0.5tr
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">Ngày 10 hàng tháng</div>
-        <div class="card-value mono" style="font-size: 18px; color: var(--info);">3.000.000 ₫</div>
-        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
-          • Cổ phiếu (HPG/VCB): 2tr<br>
-          • BTC: 1tr
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">Ngày 20 hàng tháng</div>
-        <div class="card-value mono" style="font-size: 18px; color: var(--warning);">3.000.000 ₫</div>
-        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
-          • Cổ phiếu (theo grid): 2tr<br>
-          • Quỹ săn đáy: 1tr
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Lịch DCA 12 tháng tới</div>
-      <div class="table-wrap" style="margin-top: 12px; border: none;">
-        <table id="dca-schedule">
-          <thead>
-            <tr>
-              <th>Tháng</th>
-              <th>Ngày 1</th>
-              <th>Ngày 10</th>
-              <th>Ngày 20</th>
-              <th class="right">Tổng</th>
-              <th>Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody id="dca-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top: 16px;">
-      <div class="card-title">Quy tắc Asymmetric DCA</div>
-      <div style="margin-top: 12px; font-size: 13px; line-height: 1.7;">
-        <strong style="color: var(--success);">Kịch bản A (mặc định):</strong> Thị trường ổn định → CK 60% / Crypto 30% / Phòng thủ 10%<br>
-        <strong style="color: var(--warning);">Kịch bản B:</strong> BTC giảm > 20% → CK 40% / Crypto 50% / Phòng thủ 10% <em>(săn đáy crypto)</em><br>
-        <strong style="color: var(--info);">Kịch bản C:</strong> VN-Index giảm > 10% → CK 70% / Crypto 20% / Phòng thủ 10% <em>(săn đáy chứng khoán)</em>
-      </div>
-    </div>
-  </section>
-
-  <!-- ALERTS TAB -->
-  <section class="tab-content" id="tab-alerts">
-    <h2 class="section-title" style="margin-bottom: 16px;">Cảnh báo & Tín hiệu</h2>
-
-    <div id="alerts-list">
-      <!-- Auto generated -->
-    </div>
-
-    <div class="card" style="margin-top: 16px;">
-      <div class="card-title">Ngưỡng cảnh báo đã thiết lập</div>
-      <div class="grid grid-2" style="margin-top: 12px; gap: 12px;">
-        <div>
-          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">BTC quỹ săn đáy</div>
-          <div class="mono" style="font-size: 13px;">
-            ▼ -15% → mua 4tr<br>
-            ▼ -25% → mua 6tr<br>
-            ▼ -40% → mua 5tr (all-in)
-          </div>
-        </div>
-        <div>
-          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">VN-Index quỹ săn đáy</div>
-          <div class="mono" style="font-size: 13px;">
-            VNI 1.750 → mua ETF VN30 3tr<br>
-            VNI 1.650 → mua HPG/MBB 5tr<br>
-            VNI 1.500 → all-in còn lại
-          </div>
-        </div>
-        <div>
-          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">BTC chốt lời</div>
-          <div class="mono" style="font-size: 13px;">
-            $130k → bán 15%<br>
-            $160k → bán 20%<br>
-            $200k → bán 25%<br>
-            $250k+ → bán 20%, giữ 20% dài hạn
-          </div>
-        </div>
-        <div>
-          <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Rebalance</div>
-          <div class="mono" style="font-size: 13px;">
-            Lệch tỷ trọng > 10% → cân lại<br>
-            Crypto > 45% → giảm về 35%<br>
-            Tiền mặt < 10% → bổ sung
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PLAN TAB -->
-  <section class="tab-content" id="tab-plan">
-    <h2 class="section-title" style="margin-bottom: 16px;">Investment Policy Statement (IPS)</h2>
-
-    <div class="grid grid-2">
-      <div class="card">
-        <div class="card-title">Phân bổ vốn mục tiêu</div>
-        <div class="chart-wrap" style="margin-top: 12px;">
-          <canvas id="chart-target"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">Hồ sơ rủi ro</div>
-        <div style="margin-top: 16px; font-size: 13px; line-height: 1.8;">
-          ✓ Quỹ khẩn cấp ≥ 6 tháng chi tiêu<br>
-          ✓ Không có nợ tiêu dùng<br>
-          ✓ Chịu được drawdown -50%<br>
-          ✓ Theo dõi hằng ngày<br>
-          ✓ Khẩu vị: <strong style="color: var(--accent-gold);">Cân bằng</strong><br>
-          ✓ Khung thời gian: <strong style="color: var(--accent-gold);">5-10 năm</strong>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top: 16px;">
-      <div class="card-title">Nguyên tắc bất di bất dịch</div>
-      <div style="margin-top: 12px; font-size: 13px; line-height: 1.9;">
-        1. <strong>KHÔNG dùng tiền vay</strong> (margin, nợ tiêu dùng) để đầu tư<br>
-        2. <strong>KHÔNG all-in một kênh</strong> – tỷ trọng tối đa 1 kênh: 50%, 1 cổ phiếu: 15%<br>
-        3. <strong>KHÔNG bán cắt lỗ vì hoảng loạn</strong> – chỉ theo Stop Loss đã định<br>
-        4. <strong>KHÔNG chạy theo "phím hàng"</strong> từ MXH, hội nhóm<br>
-        5. <strong>LUÔN giữ ≥ 10% danh mục bằng tiền mặt</strong> (quỹ săn đáy)<br>
-        6. <strong>LUÔN review tỷ trọng mỗi quý</strong> – rebalance nếu lệch > 10%
-      </div>
-    </div>
-
-    <div class="grid grid-3" style="margin-top: 16px;">
-      <div class="card">
-        <div class="card-title">📅 Hằng ngày</div>
-        <div style="font-size: 12px; margin-top: 8px; line-height: 1.7;">
-          Theo dõi giá<br>
-          Đặt lệnh grid trading<br>
-          15-30 phút sáng
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">📊 Hằng tuần</div>
-        <div style="font-size: 12px; margin-top: 8px; line-height: 1.7;">
-          Cập nhật danh mục<br>
-          Đọc báo cáo CTCK<br>
-          1 giờ Chủ Nhật
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">🔄 Hằng quý</div>
-        <div style="font-size: 12px; margin-top: 8px; line-height: 1.7;">
-          Rebalance nếu cần<br>
-          Đánh giá IPS<br>
-          4 giờ
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SETTINGS TAB -->
-  <section class="tab-content" id="tab-coins">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-      <div>
-        <h2 class="section-title" style="margin-bottom: 4px;">Top Coin biến động</h2>
-        <div style="font-size: 12px; color: var(--text-tertiary);">
-          Real-time từ Binance Futures · Tự refresh mỗi 30 giây · Khung 1 phút
-        </div>
-      </div>
-      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-        <select class="form-input" id="coins-filter" style="width: auto; padding: 6px 10px;" onchange="renderCoins()">
-          <option value="gainers">Top tăng 24h</option>
-          <option value="losers">Top giảm 24h</option>
-          <option value="volume">Top khối lượng</option>
-          <option value="momentum">Pump 5 phút</option>
-        </select>
-        <select class="form-input" id="coins-limit" style="width: auto; padding: 6px 10px;" onchange="renderCoins()">
-          <option value="20">Top 20</option>
-          <option value="30" selected>Top 30</option>
-          <option value="50">Top 50</option>
-        </select>
-        <button class="btn" onclick="refreshCoins()" id="coins-refresh-btn">↻ Làm mới</button>
-      </div>
-    </div>
-
-    <div id="coins-status" style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 8px;"></div>
-
-    <div class="card" style="padding: 0; overflow: hidden;">
-      <div style="overflow-x: auto;">
-        <table class="data-table" id="coins-table">
-          <thead>
-            <tr>
-              <th>Coin</th>
-              <th class="right">% 24h</th>
-              <th class="right" title="Biến động so với nến 5m đã đóng gần nhất">% 5m</th>
-              <th class="right" title="Giá cao nhất trong 5 nến 5m đã đóng gần nhất">Đỉnh nến trước</th>
-              <th class="right" title="RSI(14) tại thời điểm nến 5m đã đóng gần nhất">RSI nến trước</th>
-              <th class="right" title="Giá real-time hiện tại (nến đang hình thành)">Giá hiện tại</th>
-              <th class="right" title="RSI(14) tính với giá real-time hiện tại">RSI hiện tại</th>
-              <th title="Phân kỳ giá - RSI: tín hiệu đảo chiều tiềm năng">Chú ý</th>
-            </tr>
-          </thead>
-          <tbody id="coins-tbody">
-            <tr><td colspan="9" style="text-align: center; padding: 24px; color: var(--text-tertiary);">Đang tải dữ liệu từ Binance...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top: 16px;">
-      <div class="card-title">Cách đọc bảng</div>
-      <div style="margin-top: 8px; font-size: 12px; color: var(--text-secondary); line-height: 1.7;">
-        <strong style="color: var(--text-primary);">% 5m:</strong> Biến động giá hiện tại so với nến 5m đã đóng gần nhất.<br>
-        <strong style="color: var(--text-primary);">Đỉnh nến trước:</strong> Giá High cao nhất trong 5 nến 5 phút đã đóng gần nhất.<br>
-        <strong style="color: var(--text-primary);">RSI nến trước / hiện tại:</strong> RSI(14) khung 5 phút. <span style="color:var(--danger);">&ge;80 quá mua</span> · <span style="color:var(--success);">&le;20 quá bán</span>.<br>
-        <strong style="color: var(--text-primary);">Chú ý – Phân kỳ giá/RSI:</strong><br>
-        &nbsp;&nbsp;<span style="color:var(--danger);">⚠️ Đảo chiều Giảm</span>: Giá tăng so với nến đóng trước, nhưng RSI giảm <em>và đang ở vùng cao (≥60)</em> → phân kỳ âm.<br>
-        &nbsp;&nbsp;<span style="color:var(--success);">🚀 Đảo chiều Tăng</span>: Giá giảm so với nến đóng trước, nhưng RSI tăng <em>và đang ở vùng thấp (≤40)</em> → phân kỳ dương.<br>
-        &nbsp;&nbsp;Cả hai so sánh nhất quán tại cùng 2 thời điểm: nến 5m đã đóng gần nhất và nến đang hình thành.<br>
-        <em style="color: var(--text-tertiary);">⚠️ Dữ liệu Binance Futures perpetual. Phân kỳ là tín hiệu tham khảo, không chắc chắn. Không phải lời khuyên đầu tư.</em>
-      </div>
-    </div>
-  </section>
-
-  <section class="tab-content" id="tab-settings">
-    <h2 class="section-title" style="margin-bottom: 16px;">Cài đặt</h2>
-
-    <div class="card">
-      <div class="card-title">Quản lý dữ liệu</div>
-      <div style="margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap;">
-        <button class="btn" onclick="exportData()">📥 Xuất dữ liệu (JSON)</button>
-        <button class="btn" onclick="document.getElementById('import-file').click()">📤 Nhập dữ liệu</button>
-        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
-        <button class="btn" onclick="seedData()">🌱 Tạo dữ liệu mẫu</button>
-        <button class="btn" style="border-color: var(--danger); color: var(--danger);" onclick="resetData()">🗑 Xóa toàn bộ</button>
-      </div>
-      <div style="margin-top: 12px; font-size: 12px; color: var(--text-tertiary);">
-        💡 Dữ liệu được lưu trên trình duyệt của bạn (localStorage). Hãy xuất file JSON định kỳ để sao lưu.
-      </div>
-    </div>
-
-    <div class="card" style="margin-top: 16px;">
-      <div class="card-title">Tỷ giá USD/VND</div>
-      <div class="form-row form-grid" style="margin-top: 12px;">
-        <div class="form-group">
-          <label class="form-label">Tỷ giá quy đổi</label>
-          <input type="number" class="form-input" id="setting-fx" value="25500" onchange="saveSettings()">
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top: 16px;">
-      <div class="card-title">Về ứng dụng</div>
-      <div style="margin-top: 12px; font-size: 13px; line-height: 1.8; color: var(--text-secondary);">
-        <strong style="color: var(--text-primary);">Q · Quản lý Tài chính v1.0</strong><br>
-        Ứng dụng quản lý danh mục đầu tư cá nhân theo Investment Policy Statement.<br>
-        Giá BTC/ETH cập nhật real-time qua CoinGecko API (miễn phí).<br>
-        <em style="color: var(--text-tertiary);">Lưu ý: Không phải lời khuyên đầu tư. Mọi quyết định là của bạn.</em>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div>
-      <span class="serif" style="font-size: 16px;">Q</span> · 
-      Quản lý Tài chính Cá nhân · 
-      Dữ liệu lưu cục bộ trên trình duyệt
-    </div>
-    <div style="margin-top: 4px; font-size: 11px;">
-      Powered by CoinGecko API · Built for the disciplined investor
-    </div>
-  </footer>
+<div class="tabs">
+  <button class="tab-btn long active" onclick="switchTab('long')">
+    📈 LONG <span class="cnt" id="long-cnt"></span>
+  </button>
+  <button class="tab-btn short" onclick="switchTab('short')">
+    📉 SHORT <span class="cnt" id="short-cnt"></span>
+  </button>
 </div>
 
-<!-- Transaction Modal -->
-<div class="modal-overlay" id="tx-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Thêm giao dịch</div>
-      <button class="modal-close" onclick="closeTxModal()">×</button>
+<!-- TAB LONG -->
+<div class="tab-pane active" id="pane-long">
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">🚀 Đảo chiều Tăng</div>
+      <div class="card-value" id="l-bull" style="color:var(--green)">—</div>
+      <div class="card-sub">tín hiệu Long mạnh</div>
     </div>
+    <div class="card">
+      <div class="card-label">RSI Quá bán (≤ OS)</div>
+      <div class="card-value" id="l-os" style="color:var(--green)">—</div>
+      <div class="card-sub">coin đang oversold</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Giảm mạnh nhất 24h</div>
+      <div class="card-value" id="l-top24" style="color:var(--red)">—</div>
+      <div class="card-sub" id="l-top24-sub"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Giảm mạnh nhất 5m</div>
+      <div class="card-value" id="l-top5m" style="color:var(--red)">—</div>
+      <div class="card-sub" id="l-top5m-sub"></div>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead id="long-thead"></thead>
+      <tbody id="long-tbody">
+        <tr class="empty-row"><td colspan="8">Nhấn ↻ Làm mới để tải dữ liệu</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Loại tài sản</label>
-        <select class="form-select" id="tx-type">
-          <option value="stock">Chứng khoán</option>
-          <option value="crypto">Crypto</option>
-          <option value="cash">Tiền mặt / Quỹ</option>
-        </select>
-      </div>
+<!-- TAB SHORT -->
+<div class="tab-pane" id="pane-short">
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">⚠️ Đảo chiều Giảm</div>
+      <div class="card-value" id="s-bear" style="color:var(--red)">—</div>
+      <div class="card-sub">tín hiệu Short mạnh</div>
     </div>
-
-    <div class="form-row form-grid">
-      <div class="form-group">
-        <label class="form-label">Mã / Symbol</label>
-        <input type="text" class="form-input" id="tx-symbol" placeholder="HPG, BTC, ETH...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Hành động</label>
-        <select class="form-select" id="tx-action">
-          <option value="buy">Mua</option>
-          <option value="sell">Bán</option>
-          <option value="deposit">Nạp tiền (cash)</option>
-        </select>
-      </div>
+    <div class="card">
+      <div class="card-label">RSI Quá mua (≥ OB)</div>
+      <div class="card-value" id="s-ob" style="color:var(--red)">—</div>
+      <div class="card-sub">coin đang overbought</div>
     </div>
-
-    <div class="form-row form-grid">
-      <div class="form-group">
-        <label class="form-label">Khối lượng</label>
-        <input type="number" step="any" class="form-input" id="tx-qty" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Giá / 1 đơn vị</label>
-        <input type="number" step="any" class="form-input" id="tx-price" placeholder="0">
-      </div>
+    <div class="card">
+      <div class="card-label">Tăng mạnh nhất 24h</div>
+      <div class="card-value" id="s-top24" style="color:var(--green)">—</div>
+      <div class="card-sub" id="s-top24-sub"></div>
     </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Ngày</label>
-        <input type="date" class="form-input" id="tx-date">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Ghi chú (tùy chọn)</label>
-        <input type="text" class="form-input" id="tx-note" placeholder="VD: DCA tháng 5">
-      </div>
+    <div class="card">
+      <div class="card-label">Tăng mạnh nhất 5m</div>
+      <div class="card-value" id="s-top5m" style="color:var(--green)">—</div>
+      <div class="card-sub" id="s-top5m-sub"></div>
     </div>
-
-    <div style="display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end;">
-      <button class="btn" onclick="closeTxModal()">Hủy</button>
-      <button class="btn btn-primary" onclick="saveTx()">Lưu giao dịch</button>
-    </div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead id="short-thead"></thead>
+      <tbody id="short-tbody">
+        <tr class="empty-row"><td colspan="8">Nhấn ↻ Làm mới để tải dữ liệu</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
 <script>
-// ============= STATE & STORAGE =============
-const STATE = {
-  transactions: [],
-  prices: {
-    BTC: { usd: 82305, vnd: null },
-    ETH: { usd: 2412, vnd: null },
-    'VN-INDEX': 1891.20,
-    HPG: 28000,
-    VCB: 76000,
-    MBB: 25850,
-    SSI: 28500,
-    FUEVFVND: 35000,
-    E1VFVN30: 32000
-  },
-  settings: { fx: 25500 },
-  lastUpdate: null
+// ════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════
+const S = {
+  longList: [], shortList: [],
+  details: {},
+  loading: false,
+  timer: null
 };
 
-const STORAGE_KEY = 'q_finance_v1';
-
-function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    transactions: STATE.transactions,
-    settings: STATE.settings
-  }));
-}
-
-function loadState() {
-  try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (data) {
-      STATE.transactions = data.transactions || [];
-      STATE.settings = { ...STATE.settings, ...(data.settings || {}) };
-    }
-  } catch (e) { console.warn('Load state failed:', e); }
-}
-
-// ============= UTILITIES =============
-function fmt(n, d = 0) {
-  if (n == null || isNaN(n)) return '—';
-  return new Intl.NumberFormat('vi-VN', { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
-}
-
-function fmtVND(n) { return fmt(Math.round(n)) + ' ₫'; }
-function fmtUSD(n) { return '$' + fmt(n, n < 100 ? 2 : 0); }
-function fmtPct(n) { return (n >= 0 ? '+' : '') + fmt(n, 2) + '%'; }
-
-function fmtDate(d) {
-  const dt = new Date(d);
-  return dt.toLocaleDateString('vi-VN');
-}
-
-function isoToday() {
-  return new Date().toISOString().split('T')[0];
-}
-
-// ============= PRICE FETCHING =============
-async function fetchCryptoPrices() {
-  try {
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd,vnd&include_24hr_change=true');
-    const data = await res.json();
-    if (data.bitcoin) {
-      STATE.prices.BTC = { usd: data.bitcoin.usd, vnd: data.bitcoin.vnd, change: data.bitcoin.usd_24h_change };
-    }
-    if (data.ethereum) {
-      STATE.prices.ETH = { usd: data.ethereum.usd, vnd: data.ethereum.vnd, change: data.ethereum.usd_24h_change };
-    }
-    return true;
-  } catch (e) {
-    console.warn('Fetch crypto failed:', e);
-    return false;
-  }
-}
-
-// Lấy danh sách mã VN duy nhất user đang sở hữu (từ transactions)
-function getOwnedVNTickers() {
-  const tickers = new Set();
-  (STATE.transactions || []).forEach(t => {
-    if (t.type === 'stock' && t.symbol) {
-      tickers.add(t.symbol.toUpperCase());
-    }
-  });
-  return Array.from(tickers);
-}
-
-// Fetch VN-Index từ TCBS (giống TCInvest đang dùng)
-async function fetchVNIndex() {
-  try {
-    const to = Math.floor(Date.now() / 1000);
-    const from = to - 7 * 24 * 3600; // 7 ngày
-    const url = `https://apipubaws.tcbs.com.vn/stock-insight/v2/stock/bars-long-term?ticker=VNINDEX&type=index&resolution=D&from=${from}&to=${to}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data && data.data && data.data.length > 0) {
-      const latest = data.data[data.data.length - 1];
-      const prev = data.data.length > 1 ? data.data[data.data.length - 2] : null;
-      const close = latest.close;
-      const change = prev ? ((close - prev.close) / prev.close * 100) : 0;
-      STATE.prices['VN-INDEX'] = close;
-      STATE.prices['VN-INDEX_change'] = change;
-      return true;
-    }
-  } catch (e) {
-    console.warn('Fetch VN-Index failed:', e);
-  }
-  return false;
-}
-
-// Fetch giá real-time của các mã cổ phiếu VN từ TCBS
-async function fetchVNStockPrices(tickers) {
-  if (!tickers || tickers.length === 0) return true;
-  try {
-    const tickersStr = tickers.join(',');
-    const url = `https://apipubaws.tcbs.com.vn/stock-insight/v1/stock/second-tc-price?tickers=${tickersStr}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data && data.data) {
-      data.data.forEach(item => {
-        const ticker = item.t || item.ticker;
-        const cp = item.cp || item.close || item.price; // current price (giá hiện tại, nghìn VND trên TCBS)
-        const acp = item.acp || item.refPrice; // giá tham chiếu phiên trước
-        if (ticker && cp) {
-          // TCBS trả giá theo nghìn VND, *1000 để ra VND
-          const priceVND = cp * 1000;
-          const refVND = acp ? acp * 1000 : priceVND;
-          const change = refVND > 0 ? ((priceVND - refVND) / refVND * 100) : 0;
-          STATE.prices[ticker.toUpperCase()] = priceVND;
-          STATE.prices[ticker.toUpperCase() + '_change'] = change;
-        }
-      });
-      return true;
-    }
-  } catch (e) {
-    console.warn('Fetch VN stocks failed:', e);
-  }
-  return false;
-}
-
-async function refreshPrices() {
-  const btn = document.querySelector('.refresh-info button');
-  if (btn) btn.innerHTML = '<span class="spinner"></span> Đang cập nhật...';
-  
-  // Fetch song song để nhanh
-  const ownedTickers = getOwnedVNTickers();
-  await Promise.all([
-    fetchCryptoPrices(),
-    fetchVNIndex(),
-    fetchVNStockPrices(ownedTickers)
-  ]);
-  
-  STATE.lastUpdate = new Date();
-  
-  updateHeader();
-  renderAll();
-  
-  if (btn) btn.innerHTML = '↻ Làm mới';
-}
-
-function updateHeader() {
-  const btc = STATE.prices.BTC;
-  const eth = STATE.prices.ETH;
-  
-  const vniEl = document.getElementById('hdr-vnindex');
-  vniEl.textContent = fmt(STATE.prices['VN-INDEX'], 2);
-  const vniChange = STATE.prices['VN-INDEX_change'];
-  if (vniChange !== undefined && vniChange !== null) {
-    vniEl.style.color = vniChange >= 0 ? 'var(--success)' : 'var(--danger)';
-  }
-  
-  const btcEl = document.getElementById('hdr-btc');
-  btcEl.textContent = fmtUSD(btc.usd);
-  if (btc.change !== undefined) {
-    btcEl.style.color = btc.change >= 0 ? 'var(--success)' : 'var(--danger)';
-  }
-  
-  const ethEl = document.getElementById('hdr-eth');
-  ethEl.textContent = fmtUSD(eth.usd);
-  if (eth.change !== undefined) {
-    ethEl.style.color = eth.change >= 0 ? 'var(--success)' : 'var(--danger)';
-  }
-  
-  const now = new Date();
-  document.getElementById('hdr-time').textContent = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-  
-  const lu = document.getElementById('last-update');
-  if (lu) lu.textContent = STATE.lastUpdate ? STATE.lastUpdate.toLocaleTimeString('vi-VN') : 'Chưa cập nhật';
-}
-
-// ============= PORTFOLIO CALCULATIONS =============
-function getCurrentPriceVND(symbol, type) {
-  if (type === 'crypto') {
-    const sym = symbol.toUpperCase();
-    if (STATE.prices[sym] && STATE.prices[sym].vnd) return STATE.prices[sym].vnd;
-    if (STATE.prices[sym] && STATE.prices[sym].usd) return STATE.prices[sym].usd * STATE.settings.fx;
-    return 0;
-  }
-  if (type === 'stock') {
-    return STATE.prices[symbol.toUpperCase()] || 0;
-  }
-  return 1; // cash
-}
-
-function calcHoldings() {
-  const map = {};
-  
-  STATE.transactions.forEach(tx => {
-    const key = `${tx.type}:${tx.symbol.toUpperCase()}`;
-    if (!map[key]) {
-      map[key] = {
-        type: tx.type,
-        symbol: tx.symbol.toUpperCase(),
-        qty: 0,
-        invested: 0,
-        realized: 0
-      };
-    }
-    const h = map[key];
-    
-    if (tx.action === 'buy' || tx.action === 'deposit') {
-      h.qty += tx.qty;
-      h.invested += tx.qty * tx.price;
-    } else if (tx.action === 'sell') {
-      const avgCost = h.qty > 0 ? h.invested / h.qty : 0;
-      h.qty -= tx.qty;
-      h.invested -= tx.qty * avgCost;
-      h.realized += tx.qty * (tx.price - avgCost);
-    }
-  });
-  
-  return Object.values(map).filter(h => Math.abs(h.qty) > 0.0000001);
-}
-
-function calcTotals() {
-  const holdings = calcHoldings();
-  let totalValue = 0;
-  let totalInvested = 0;
-  let cash = 0;
-  let stockValue = 0;
-  let cryptoValue = 0;
-  
-  holdings.forEach(h => {
-    const price = getCurrentPriceVND(h.symbol, h.type);
-    const value = h.qty * price;
-    h.currentPrice = price;
-    h.value = value;
-    h.avgCost = h.qty > 0 ? h.invested / h.qty : 0;
-    h.pnl = value - h.invested;
-    h.pnlPct = h.invested > 0 ? (h.pnl / h.invested * 100) : 0;
-    
-    totalValue += value;
-    totalInvested += h.invested;
-    
-    if (h.type === 'cash') cash += value;
-    else if (h.type === 'stock') stockValue += value;
-    else if (h.type === 'crypto') cryptoValue += value;
-  });
-  
+// ════════════════════════════════════════════════
+//  SETTINGS
+// ════════════════════════════════════════════════
+function cfg() {
+  const ob = parseInt(document.getElementById('rsiThresh').value);
   return {
-    holdings,
-    totalValue,
-    totalInvested,
-    cash,
-    stockValue,
-    cryptoValue,
-    pnl: totalValue - totalInvested,
-    pnlPct: totalInvested > 0 ? ((totalValue - totalInvested) / totalInvested * 100) : 0
+    topN:     parseInt(document.getElementById('topN').value),
+    minVolM:  parseInt(document.getElementById('minVol').value),
+    rsiOB:    ob,
+    rsiOS:    100 - ob,
+    rsiPer:   15,
   };
 }
 
-// ============= RENDER =============
-let chartAlloc = null;
-let chartTarget = null;
-
-function renderDashboard() {
-  const t = calcTotals();
-  
-  document.getElementById('stat-total').textContent = fmtVND(t.totalValue);
-  document.getElementById('stat-invested').textContent = fmtVND(t.totalInvested);
-  document.getElementById('stat-cash').textContent = fmtVND(t.cash);
-  
-  const pnlEl = document.getElementById('stat-pnl');
-  const pnlPctEl = document.getElementById('stat-pnl-pct');
-  pnlEl.textContent = (t.pnl >= 0 ? '+' : '') + fmtVND(t.pnl);
-  pnlEl.className = 'card-value mono ' + (t.pnl >= 0 ? 'positive' : 'negative');
-  pnlPctEl.textContent = fmtPct(t.pnlPct);
-  pnlPctEl.className = 'card-change ' + (t.pnl >= 0 ? 'positive' : 'negative');
-  
-  const totalChange = document.getElementById('stat-total-change');
-  totalChange.textContent = `${fmtPct(t.pnlPct)} so với vốn`;
-  totalChange.className = 'card-change ' + (t.pnl >= 0 ? 'positive' : 'negative');
-  
-  // Allocation bar
-  const total = t.totalValue;
-  const stockPct = total > 0 ? (t.stockValue / total * 100) : 0;
-  const cryptoPct = total > 0 ? (t.cryptoValue / total * 100) : 0;
-  const cashPct = total > 0 ? (t.cash / total * 100) : 0;
-  
-  document.getElementById('alloc-bar').innerHTML = `
-    <div class="alloc-segment alloc-stock" style="width: ${stockPct}%"></div>
-    <div class="alloc-segment alloc-crypto" style="width: ${cryptoPct}%"></div>
-    <div class="alloc-segment alloc-cash" style="width: ${cashPct}%"></div>
-  `;
-  
-  document.getElementById('alloc-legend').innerHTML = `
-    <span><span class="alloc-dot alloc-stock"></span>Chứng khoán ${fmt(stockPct, 1)}% (${fmtVND(t.stockValue)})</span>
-    <span><span class="alloc-dot alloc-crypto"></span>Crypto ${fmt(cryptoPct, 1)}% (${fmtVND(t.cryptoValue)})</span>
-    <span><span class="alloc-dot alloc-cash"></span>Tiền mặt ${fmt(cashPct, 1)}% (${fmtVND(t.cash)})</span>
-  `;
-  
-  // Holdings table
-  const tbody = document.getElementById('holdings-body');
-  if (t.holdings.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="empty"><div class="empty-icon">📊</div>Chưa có dữ liệu. Thêm giao dịch ở tab "Giao dịch"</td></tr>';
-  } else {
-    tbody.innerHTML = t.holdings
-      .sort((a, b) => b.value - a.value)
-      .map(h => {
-        const pct = total > 0 ? (h.value / total * 100) : 0;
-        const iconClass = h.type === 'crypto' 
-          ? (h.symbol === 'BTC' ? 'crypto-btc' : 'crypto-eth')
-          : 'stock';
-        const badge = h.type === 'crypto' ? 'badge-crypto' : 'badge-stock';
-        const typeName = h.type === 'crypto' ? 'Crypto' : (h.type === 'stock' ? 'Cổ phiếu' : 'Cash');
-        
-        return `
-          <tr>
-            <td>
-              <div class="asset-cell">
-                <div class="asset-icon ${iconClass}">${h.symbol.substring(0, 2)}</div>
-                <div>
-                  <div class="asset-name">${h.symbol}</div>
-                  <div class="asset-sub"><span class="badge ${badge}">${typeName}</span></div>
-                </div>
-              </div>
-            </td>
-            <td class="right mono">${fmt(h.qty, h.type === 'crypto' ? 6 : 0)}</td>
-            <td class="right mono">${h.type === 'crypto' && h.symbol !== 'USDT' ? fmtVND(h.avgCost) : fmtVND(h.avgCost)}</td>
-            <td class="right mono">${fmtVND(h.currentPrice)}</td>
-            <td class="right mono"><strong>${fmtVND(h.value)}</strong></td>
-            <td class="right mono ${h.pnl >= 0 ? 'positive' : 'negative'}">
-              ${(h.pnl >= 0 ? '+' : '')}${fmtVND(h.pnl)}<br>
-              <span style="font-size: 11px;">${fmtPct(h.pnlPct)}</span>
-            </td>
-            <td class="right mono">${fmt(pct, 1)}%</td>
-          </tr>
-        `;
-      }).join('');
+// ════════════════════════════════════════════════
+//  RSI(n)
+// ════════════════════════════════════════════════
+function calcRSI(closes, n) {
+  if (closes.length < n + 1) return null;
+  let g = 0, l = 0;
+  for (let i = 1; i <= n; i++) {
+    const d = closes[i] - closes[i-1];
+    if (d >= 0) g += d; else l -= d;
   }
-  
-  // Goals
-  const goal1 = 300_000_000;
-  const goal2 = 1_000_000_000;
-  const goal3 = 3_000_000_000;
-  
-  const p1 = Math.min(t.totalValue / goal1 * 100, 100);
-  const p2 = Math.min(t.totalValue / goal2 * 100, 100);
-  const p3 = Math.min(t.totalValue / goal3 * 100, 100);
-  
-  document.getElementById('goal-1-pct').textContent = fmt(p1, 1) + '%';
-  document.getElementById('goal-1-fill').style.width = p1 + '%';
-  document.getElementById('goal-1-detail').textContent = `${fmtVND(t.totalValue)} / ${fmtVND(goal1)} · còn ${fmtVND(Math.max(goal1 - t.totalValue, 0))}`;
-  
-  document.getElementById('goal-2-pct').textContent = fmt(p2, 1) + '%';
-  document.getElementById('goal-2-fill').style.width = p2 + '%';
-  document.getElementById('goal-2-detail').textContent = `${fmtVND(t.totalValue)} / ${fmtVND(goal2)}`;
-  
-  document.getElementById('goal-3-pct').textContent = fmt(p3, 1) + '%';
-  document.getElementById('goal-3-fill').style.width = p3 + '%';
-  document.getElementById('goal-3-detail').textContent = `${fmtVND(t.totalValue)} / ${fmtVND(goal3)}`;
-  
-  // Allocation chart
-  const ctx = document.getElementById('chart-alloc').getContext('2d');
-  const data = {
-    labels: ['Chứng khoán', 'Crypto', 'Tiền mặt'],
-    datasets: [{
-      data: [t.stockValue, t.cryptoValue, t.cash],
-      backgroundColor: ['#4ade80', '#f7931a', '#60a5fa'],
-      borderColor: '#131823',
-      borderWidth: 3
-    }]
-  };
-  if (chartAlloc) chartAlloc.destroy();
-  chartAlloc = new Chart(ctx, {
-    type: 'doughnut',
-    data,
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false }
-      },
-      cutout: '70%'
-    }
-  });
+  let ag = g/n, al = l/n;
+  for (let i = n+1; i < closes.length; i++) {
+    const d = closes[i] - closes[i-1];
+    ag = (ag*(n-1) + Math.max(d, 0)) / n;
+    al = (al*(n-1) + Math.max(-d, 0)) / n;
+  }
+  if (al === 0) return 100;
+  return parseFloat((100 - 100/(1 + ag/al)).toFixed(2));
 }
 
-function renderTransactions() {
-  const tbody = document.getElementById('tx-body');
-  if (STATE.transactions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="empty"><div class="empty-icon">📝</div>Chưa có giao dịch nào. Bấm "Thêm giao dịch" để bắt đầu.</td></tr>';
-    return;
-  }
-  
-  tbody.innerHTML = STATE.transactions
-    .slice()
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .map(tx => {
-      const typeName = { stock: 'Cổ phiếu', crypto: 'Crypto', cash: 'Cash' }[tx.type];
-      const actionName = { buy: 'MUA', sell: 'BÁN', deposit: 'NẠP' }[tx.action];
-      const badge = tx.action === 'buy' ? 'badge-buy' : (tx.action === 'sell' ? 'badge-sell' : 'badge-hold');
-      const total = tx.qty * tx.price;
-      
-      return `
-        <tr>
-          <td>${fmtDate(tx.date)}</td>
-          <td><span class="badge ${tx.type === 'crypto' ? 'badge-crypto' : 'badge-stock'}">${typeName}</span></td>
-          <td><strong>${tx.symbol.toUpperCase()}</strong></td>
-          <td><span class="badge ${badge}">${actionName}</span></td>
-          <td class="right mono">${fmt(tx.qty, tx.type === 'crypto' ? 6 : 0)}</td>
-          <td class="right mono">${fmtVND(tx.price)}</td>
-          <td class="right mono"><strong>${fmtVND(total)}</strong></td>
-          <td><span style="color: var(--text-tertiary); font-size: 12px;">${tx.note || '—'}</span></td>
-          <td><button class="btn btn-sm" style="border-color: var(--danger); color: var(--danger);" onclick="deleteTx('${tx.id}')">×</button></td>
-        </tr>
-      `;
-    }).join('');
-}
-
-function renderDCA() {
-  const tbody = document.getElementById('dca-body');
-  const months = [];
-  const today = new Date();
-  
-  for (let i = 0; i < 12; i++) {
-    const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
-    months.push(d);
-  }
-  
-  tbody.innerHTML = months.map(m => {
-    const monthStr = `${m.getMonth() + 1}/${m.getFullYear()}`;
-    const isPast = m < new Date(today.getFullYear(), today.getMonth(), 1);
-    const isCurrent = m.getMonth() === today.getMonth() && m.getFullYear() === today.getFullYear();
-    
-    let statusBadge;
-    if (isPast) statusBadge = '<span class="badge badge-buy">✓ Đã hoàn thành</span>';
-    else if (isCurrent) statusBadge = '<span class="badge badge-hold">● Đang thực hiện</span>';
-    else statusBadge = '<span class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-tertiary);">Sắp tới</span>';
-    
-    return `
-      <tr>
-        <td><strong>${monthStr}</strong></td>
-        <td class="mono">4.000.000 ₫</td>
-        <td class="mono">3.000.000 ₫</td>
-        <td class="mono">3.000.000 ₫</td>
-        <td class="right mono"><strong>10.000.000 ₫</strong></td>
-        <td>${statusBadge}</td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function renderAlerts() {
-  const t = calcTotals();
-  const alerts = [];
-  
-  // Check BTC drawdown
-  const btcAth = 126198;
-  const btcCurrent = STATE.prices.BTC.usd;
-  const btcDrawdown = (btcCurrent - btcAth) / btcAth * 100;
-  
-  if (btcDrawdown < -40) {
-    alerts.push({
-      type: 'danger',
-      icon: '⚠️',
-      title: `BTC giảm ${fmt(btcDrawdown, 1)}% từ ATH - KÍCH HOẠT QUỸ SĂN ĐÁY`,
-      text: `Mua đợt all-in: 5tr. Giá hiện tại $${fmt(btcCurrent)}.`
-    });
-  } else if (btcDrawdown < -25) {
-    alerts.push({
-      type: 'warning',
-      icon: '🔔',
-      title: `BTC giảm ${fmt(btcDrawdown, 1)}% từ ATH - Mua đợt 2`,
-      text: `Khuyến nghị mua thêm 6tr BTC. Giá hiện tại $${fmt(btcCurrent)}.`
-    });
-  } else if (btcDrawdown < -15) {
-    alerts.push({
-      type: 'info',
-      icon: '💡',
-      title: `BTC giảm ${fmt(btcDrawdown, 1)}% từ ATH - Mua đợt 1`,
-      text: `Có thể mua thêm 4tr BTC từ quỹ săn đáy. Giá hiện tại $${fmt(btcCurrent)}.`
-    });
-  }
-  
-  // Check BTC chốt lời
-  if (btcCurrent >= 250000) {
-    alerts.push({ type: 'success', icon: '🎯', title: 'BTC vượt $250k - CHỐT LỜI', text: 'Bán 20% danh mục BTC theo kế hoạch.' });
-  } else if (btcCurrent >= 200000) {
-    alerts.push({ type: 'success', icon: '🎯', title: 'BTC vượt $200k - CHỐT LỜI', text: 'Bán 25% danh mục BTC.' });
-  } else if (btcCurrent >= 130000) {
-    alerts.push({ type: 'success', icon: '🎯', title: 'BTC vượt $130k - CHỐT LỜI một phần', text: 'Bán 15% danh mục BTC.' });
-  }
-  
-  // Check VN-Index
-  const vni = STATE.prices['VN-INDEX'];
-  if (vni < 1500) {
-    alerts.push({ type: 'danger', icon: '🛒', title: 'VN-Index dưới 1.500 - SĂN ĐÁY MẠNH', text: 'All-in quỹ săn đáy còn lại vào ETF VN30 + cổ phiếu cơ bản.' });
-  } else if (vni < 1650) {
-    alerts.push({ type: 'warning', icon: '🛒', title: 'VN-Index dưới 1.650 - Mua thêm', text: 'Khuyến nghị mua HPG/MBB 5tr.' });
-  } else if (vni < 1750) {
-    alerts.push({ type: 'info', icon: '🛒', title: 'VN-Index dưới 1.750 - Cơ hội ETF VN30', text: 'Mua thêm ETF VN30 3tr.' });
-  }
-  
-  // Rebalance check
-  if (t.totalValue > 0) {
-    const cryptoPct = t.cryptoValue / t.totalValue * 100;
-    const stockPct = t.stockValue / t.totalValue * 100;
-    
-    if (cryptoPct > 45) {
-      alerts.push({ type: 'warning', icon: '⚖️', title: `Crypto chiếm ${fmt(cryptoPct, 1)}% danh mục`, text: 'Vượt ngưỡng 45%. Cân nhắc chốt lời một phần để rebalance.' });
-    }
-    if (stockPct < 35 && t.totalValue > 50_000_000) {
-      alerts.push({ type: 'info', icon: '⚖️', title: `Chứng khoán chỉ ${fmt(stockPct, 1)}% danh mục`, text: 'Dưới mục tiêu 50%. Cân nhắc tăng tỷ trọng.' });
-    }
-  }
-  
-  // Default if no alerts
-  if (alerts.length === 0) {
-    alerts.push({ type: 'success', icon: '✓', title: 'Không có cảnh báo nào', text: 'Danh mục đang ổn định, các ngưỡng chưa được kích hoạt.' });
-  }
-  
-  document.getElementById('alerts-list').innerHTML = alerts.map(a => `
-    <div class="alert alert-${a.type}">
-      <div class="alert-icon">${a.icon}</div>
-      <div class="alert-content">
-        <div class="alert-title">${a.title}</div>
-        <div class="alert-text">${a.text}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function renderTargetChart() {
-  const ctx = document.getElementById('chart-target');
-  if (!ctx) return;
-  
-  if (chartTarget) chartTarget.destroy();
-  chartTarget = new Chart(ctx.getContext('2d'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Chứng khoán (50%)', 'Crypto (35%)', 'Quỹ phòng thủ (15%)'],
-      datasets: [{
-        data: [50, 35, 15],
-        backgroundColor: ['#4ade80', '#f7931a', '#60a5fa'],
-        borderColor: '#131823',
-        borderWidth: 3
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { 
-          position: 'bottom',
-          labels: { color: '#9ba8bd', font: { size: 11, family: 'IBM Plex Sans' }, padding: 12 }
-        }
-      },
-      cutout: '60%'
-    }
-  });
-}
-
-function renderAll() {
-  renderDashboard();
-  renderTransactions();
-  renderDCA();
-  renderAlerts();
-  renderTargetChart();
-}
-
-// ============= TRANSACTIONS =============
-function openTxModal() {
-  document.getElementById('tx-modal').classList.add('active');
-  document.getElementById('tx-date').value = isoToday();
-}
-
-function closeTxModal() {
-  document.getElementById('tx-modal').classList.remove('active');
-  ['tx-symbol', 'tx-qty', 'tx-price', 'tx-note'].forEach(id => document.getElementById(id).value = '');
-}
-
-function saveTx() {
-  const tx = {
-    id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-    type: document.getElementById('tx-type').value,
-    symbol: document.getElementById('tx-symbol').value.trim(),
-    action: document.getElementById('tx-action').value,
-    qty: parseFloat(document.getElementById('tx-qty').value),
-    price: parseFloat(document.getElementById('tx-price').value),
-    date: document.getElementById('tx-date').value,
-    note: document.getElementById('tx-note').value.trim()
-  };
-  
-  if (!tx.symbol || isNaN(tx.qty) || isNaN(tx.price) || !tx.date) {
-    alert('Vui lòng điền đầy đủ thông tin');
-    return;
-  }
-  
-  STATE.transactions.push(tx);
-  saveState();
-  closeTxModal();
-  
-  // Nếu thêm mã VN mới chưa có trong cache → fetch giá ngay
-  if (tx.type === 'stock' && tx.symbol) {
-    const sym = tx.symbol.toUpperCase();
-    if (!STATE.prices[sym]) {
-      fetchVNStockPrices([sym]).then(() => {
-        renderAll();
-        updateHeader();
-      });
-    }
-  }
-  
-  renderAll();
-}
-
-function deleteTx(id) {
-  if (!confirm('Xóa giao dịch này?')) return;
-  STATE.transactions = STATE.transactions.filter(tx => tx.id !== id);
-  saveState();
-  renderAll();
-}
-
-// ============= COIN TRACKER (Binance API) =============
-const COIN_STATE = {
-  data: [],          // Raw 24hr ticker data
-  details: {},       // { SYMBOL: { rsi, high5m, change5m } }
-  lastUpdate: null,
-  loading: false
-};
-
-// Tính RSI(14) từ mảng giá đóng cửa
-function calcRSI(closes, period = 14) {
-  if (closes.length < period + 1) return null;
-  let gains = 0, losses = 0;
-  // Trung bình ban đầu
-  for (let i = 1; i <= period; i++) {
-    const diff = closes[i] - closes[i - 1];
-    if (diff >= 0) gains += diff;
-    else losses += Math.abs(diff);
-  }
-  let avgGain = gains / period;
-  let avgLoss = losses / period;
-  // Smoothing cho các giá trị tiếp theo
-  for (let i = period + 1; i < closes.length; i++) {
-    const diff = closes[i] - closes[i - 1];
-    const gain = diff >= 0 ? diff : 0;
-    const loss = diff < 0 ? Math.abs(diff) : 0;
-    avgGain = (avgGain * (period - 1) + gain) / period;
-    avgLoss = (avgLoss * (period - 1) + loss) / period;
-  }
-  if (avgLoss === 0) return 100;
-  const rs = avgGain / avgLoss;
-  return 100 - (100 / (1 + rs));
-}
-
-// Fetch top tickers 24h từ Binance Futures (USDT-margined perpetual)
-async function fetchBinanceTickers() {
-  try {
-    const res = await fetch('https://fapi.binance.com/fapi/v1/ticker/24hr');
-    const data = await res.json();
-    // Chỉ lấy cặp USDT perpetual, loại stablecoins
-    const filtered = data.filter(t => {
-      if (!t.symbol.endsWith('USDT')) return false;
-      const base = t.symbol.replace('USDT', '');
-      const blacklist = ['USDC', 'BUSD', 'TUSD', 'FDUSD', 'DAI', 'USDP', 'USTC'];
-      if (blacklist.includes(base)) return false;
-      if (parseFloat(t.quoteVolume) < 1000000) return false; // KL < 1M USDT bỏ
-      return true;
-    });
-    COIN_STATE.data = filtered.map(t => ({
-      symbol: t.symbol,
-      base: t.symbol.replace('USDT', ''),
-      price: parseFloat(t.lastPrice),
+// ════════════════════════════════════════════════
+//  FETCH TICKERS
+// ════════════════════════════════════════════════
+async function fetchTickers() {
+  const res = await fetch('https://fapi.binance.com/fapi/v1/ticker/24hr');
+  const data = await res.json();
+  const c = cfg();
+  const stables = new Set(['USDC','BUSD','TUSD','FDUSD','DAI','USDP','USTC','USDD']);
+  return data
+    .filter(t =>
+      t.symbol.endsWith('USDT') &&
+      !stables.has(t.symbol.replace('USDT','')) &&
+      parseFloat(t.quoteVolume) >= c.minVolM * 1e6
+    )
+    .map(t => ({
+      symbol:    t.symbol,
+      base:      t.symbol.replace('USDT',''),
+      price:     parseFloat(t.lastPrice),
       change24h: parseFloat(t.priceChangePercent),
-      volume24h: parseFloat(t.quoteVolume),
-      high24h: parseFloat(t.highPrice),
-      low24h: parseFloat(t.lowPrice)
+      volM:      parseFloat(t.quoteVolume)/1e6,
     }));
-    return true;
-  } catch (e) {
-    console.warn('Binance ticker fetch failed:', e);
-    return false;
-  }
 }
 
-// Fetch klines 5m cho 1 coin
-// Trả về: đỉnh 5 nến 5m, RSI nến trước (đã đóng), RSI hiện tại, % 5m
-async function fetchCoinDetails(symbol, currentPrice) {
+// ════════════════════════════════════════════════
+//  FETCH DETAILS (klines 5m)
+// ════════════════════════════════════════════════
+async function fetchDetails(symbol, price) {
   try {
-    const res = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=5m&limit=22`);
+    const n = cfg().rsiPer;
+    const res = await fetch(
+      `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=5m&limit=${n+20}`
+    );
     const klines = await res.json();
-    if (!Array.isArray(klines) || klines.length < 16) return null;
+    if (!Array.isArray(klines) || klines.length < n+3) return null;
 
-    const closes = klines.map(k => parseFloat(k[4]));
-    const highs  = klines.map(k => parseFloat(k[2]));
+    // Tách nến đang mở (cuối cùng)
+    const cc = klines.slice(0,-1).map(k => parseFloat(k[4])); // closed closes
+    if (cc.length < n+1) return null;
 
-    // Bỏ nến đang mở (nến cuối) để lấy nến đã đóng
-    const closedCloses = closes.slice(0, -1);
-    const closedHighs  = highs.slice(0, -1);
+    const prevClose = cc[cc.length-1];
 
-    // Đỉnh trong 5 nến 5m đã đóng gần nhất
-    const high5m = Math.max(...closedHighs.slice(-5));
+    // RSI tại nến đã đóng
+    const rsiPrev = calcRSI(cc, n);
+    // RSI với giá real-time
+    const rsiNow  = calcRSI([...cc, price], n);
 
-    // Giá close nến đã đóng gần nhất
-    const prevClose = closedCloses[closedCloses.length - 1];
+    // % 5m
+    const chg5m = prevClose > 0 ? (price - prevClose)/prevClose*100 : 0;
 
-    // RSI(14) tại nến đã đóng gần nhất
-    const rsiPrev = calcRSI(closedCloses, 14);
+    // % 1h (12 nến 5m = 60 phút)
+    const ref1h = cc.length >= 13 ? cc[cc.length-13] : cc[0];
+    const chg1h = ref1h > 0 ? (price - ref1h)/ref1h*100 : 0;
 
-    // RSI(14) hiện tại (dùng giá real-time làm close nến đang mở)
-    const rsiNow = calcRSI([...closedCloses, currentPrice], 14);
-
-    // % 5m = giá hiện tại so với nến đã đóng trước đó
-    const change5m = prevClose > 0 ? ((currentPrice - prevClose) / prevClose * 100) : 0;
-
-    return { high5m, prevClose, rsiPrev, rsiNow, change5m };
-  } catch (e) {
-    return null;
-  }
-}
-
-// Lọc và sort coin theo filter người dùng chọn
-function getFilteredCoins() {
-  const filter = document.getElementById('coins-filter')?.value || 'gainers';
-  const limit = parseInt(document.getElementById('coins-limit')?.value || '30');
-  
-  let arr = [...COIN_STATE.data];
-  
-  if (filter === 'gainers') {
-    arr.sort((a, b) => b.change24h - a.change24h);
-  } else if (filter === 'losers') {
-    arr.sort((a, b) => a.change24h - b.change24h);
-  } else if (filter === 'volume') {
-    arr.sort((a, b) => b.volume24h - a.volume24h);
-  } else if (filter === 'momentum') {
-    // Sort theo % 5m (cần details đã fetch)
-    arr.sort((a, b) => {
-      const ca = COIN_STATE.details[a.symbol]?.change5m ?? -999;
-      const cb = COIN_STATE.details[b.symbol]?.change5m ?? -999;
-      return cb - ca;
-    });
-  }
-  
-  return arr.slice(0, limit);
-}
-
-function fmtPrice(p) {
-  if (p >= 1000) return p.toLocaleString('en-US', { maximumFractionDigits: 2 });
-  if (p >= 1) return p.toFixed(3);
-  if (p >= 0.01) return p.toFixed(4);
-  if (p >= 0.0001) return p.toFixed(6);
-  return p.toFixed(8);
-}
-
-function renderCoins() {
-  const tbody = document.getElementById('coins-tbody');
-  if (!tbody) return;
-  
-  const coins = getFilteredCoins();
-  if (coins.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-tertiary);">Đang tải...</td></tr>';
-    return;
-  }
-  
-  tbody.innerHTML = coins.map((c, i) => {
-    const det = COIN_STATE.details[c.symbol];
-    const change24h = c.change24h;
-    const color24h = change24h >= 0 ? 'var(--success)' : 'var(--danger)';
-    const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${c.symbol}.P`;
-
-    let change5mHtml = '<span style="color:var(--text-tertiary);">...</span>';
-    let high5mHtml   = '<span style="color:var(--text-tertiary);">...</span>';
-    let rsiPrevHtml  = '<span style="color:var(--text-tertiary);">...</span>';
-    let priceHtml    = `<span class="mono">${fmtPrice(c.price)}</span>`;
-    let rsiNowHtml   = '<span style="color:var(--text-tertiary);">...</span>';
-    let noteHtml     = '<span style="color:var(--text-tertiary);">...</span>';
-
-    if (det) {
-      // % 5m
-      const c5Color = det.change5m >= 0 ? 'var(--success)' : 'var(--danger)';
-      change5mHtml = `<span style="color:${c5Color}; font-weight:600;">${det.change5m >= 0 ? '+' : ''}${det.change5m.toFixed(2)}%</span>`;
-
-      // Đỉnh nến trước
-      high5mHtml = `<span class="mono">${fmtPrice(det.high5m)}</span>`;
-
-      // RSI nến trước (ngưỡng 80/20)
-      const rsiPrevColor = det.rsiPrev >= 80 ? 'var(--danger)' : det.rsiPrev <= 20 ? 'var(--success)' : 'var(--text-secondary)';
-      rsiPrevHtml = `<span style="color:${rsiPrevColor}; font-weight:600;">${det.rsiPrev != null ? det.rsiPrev.toFixed(1) : '—'}</span>`;
-
-      // RSI hiện tại (ngưỡng 80/20)
-      const rsiNowColor = det.rsiNow >= 80 ? 'var(--danger)' : det.rsiNow <= 20 ? 'var(--success)' : 'var(--text-secondary)';
-      rsiNowHtml = `<span style="color:${rsiNowColor}; font-weight:600;">${det.rsiNow != null ? det.rsiNow.toFixed(1) : '—'}</span>`;
-
-      // Chú ý: Phân kỳ giá - RSI (so sánh nhất quán nến n-1 với nến đang mở)
-      // Điểm A: close của nến đã đóng gần nhất + RSI tại đó
-      // Điểm B: giá real-time hiện tại + RSI hiện tại
-      if (det.rsiPrev != null && det.rsiNow != null && det.prevClose > 0) {
-        const priceUp   = c.price > det.prevClose;   // giá tăng so với nến đóng trước
-        const priceDown = c.price < det.prevClose;   // giá giảm so với nến đóng trước
-        const rsiUp     = det.rsiNow > det.rsiPrev;  // RSI tăng
-        const rsiDown   = det.rsiNow < det.rsiPrev;  // RSI giảm
-
-        // Lọc nhiễu: chỉ báo khi RSI đang ở vùng có ý nghĩa
-        const rsiInHighZone = det.rsiNow >= 60; // RSI cao → bearish divergence có giá trị
-        const rsiInLowZone  = det.rsiNow <= 40; // RSI thấp → bullish divergence có giá trị
-
-        if (priceUp && rsiDown && rsiInHighZone) {
-          // Giá tăng nhưng RSI giảm → Phân kỳ âm → Đảo chiều Giảm
-          noteHtml = `<span style="color:var(--danger); font-weight:700;">⚠️ Đảo chiều Giảm</span>`;
-        } else if (priceDown && rsiUp && rsiInLowZone) {
-          // Giá giảm nhưng RSI tăng → Phân kỳ dương → Đảo chiều Tăng
-          noteHtml = `<span style="color:var(--success); font-weight:700;">🚀 Đảo chiều Tăng</span>`;
-        } else {
-          noteHtml = `<span style="color:var(--text-tertiary); font-size:11px;">—</span>`;
-        }
-      }
+    // ── PHÂN KỲ ──
+    // Nhất quán: so sánh [prevClose, rsiPrev] vs [price, rsiNow]
+    let divergence = null;
+    if (rsiPrev != null && rsiNow != null) {
+      const priceUp   = price > prevClose;
+      const priceDown = price < prevClose;
+      const rsiUp     = rsiNow > rsiPrev;
+      const rsiDown   = rsiNow < rsiPrev;
+      // Phân kỳ âm (Bearish): giá tăng, RSI giảm, RSI đang vùng cao (≥55)
+      if (priceUp   && rsiDown && rsiNow >= 55) divergence = 'bearish';
+      // Phân kỳ dương (Bullish): giá giảm, RSI tăng, RSI đang vùng thấp (≤45)
+      if (priceDown && rsiUp   && rsiNow <= 45) divergence = 'bullish';
     }
 
-    return `
-      <tr>
-        <td><a href="${tradingViewUrl}" target="_blank" style="color:var(--text-primary); font-weight:700; text-decoration:none; font-size:14px;">${c.base}</a></td>
-        <td class="right" style="color:${color24h}; font-weight:600;">${change24h >= 0 ? '+' : ''}${change24h.toFixed(2)}%</td>
-        <td class="right">${change5mHtml}</td>
-        <td class="right">${high5mHtml}</td>
-        <td class="right">${rsiPrevHtml}</td>
-        <td class="right">${priceHtml}</td>
-        <td class="right">${rsiNowHtml}</td>
-        <td>${noteHtml}</td>
-      </tr>
-    `;
+    return { prevClose, rsiPrev, rsiNow, chg5m, chg1h, divergence };
+  } catch(e) { return null; }
+}
+
+// ════════════════════════════════════════════════
+//  FORMAT
+// ════════════════════════════════════════════════
+function fPct(v, d=2) {
+  if (v==null) return '—';
+  return (v>=0?'+':'')+v.toFixed(d)+'%';
+}
+function fPrice(p) {
+  if (p>=10000) return p.toLocaleString('en',{maximumFractionDigits:1});
+  if (p>=100)   return p.toFixed(2);
+  if (p>=1)     return p.toFixed(3);
+  if (p>=0.01)  return p.toFixed(4);
+  return p.toFixed(6);
+}
+function fVol(m) {
+  return m>=1000 ? '$'+(m/1000).toFixed(1)+'B' : '$'+Math.round(m)+'M';
+}
+function pCls(v) { return v>0?'up':v<0?'dn':'neu'; }
+
+function rsiTag(rsi) {
+  if (rsi==null) return '<span class="rsi rsi-mid">...</span>';
+  const c = cfg();
+  let cls = rsi>=c.rsiOB?'rsi-ob':rsi<=c.rsiOS?'rsi-os':rsi>=60?'rsi-hi':rsi<=40?'rsi-lo':'rsi-mid';
+  return `<span class="rsi ${cls}">${rsi.toFixed(1)}</span>`;
+}
+
+function sigBadge(div) {
+  if (!div) return '<span class="sig-none">—</span>';
+  if (div==='bullish') return '<span class="sig sig-bull">🚀 Đảo chiều Tăng</span>';
+  return '<span class="sig sig-bear">⚠️ Đảo chiều Giảm</span>';
+}
+
+// ════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════
+const THEAD = `<tr>
+  <th style="text-align:left;min-width:130px">Coin</th>
+  <th>Giá USDT</th>
+  <th title="Biến động 5 phút">% 5m</th>
+  <th title="Biến động 1 giờ">% 1h</th>
+  <th title="Biến động 24 giờ">% 24h</th>
+  <th title="RSI(15) khung 5 phút — Nến đóng trước / Hiện tại">RSI(15) · Trước / Nay</th>
+  <th title="Phân kỳ giá-RSI: tín hiệu đảo chiều tiềm năng">Tín hiệu</th>
+  <th title="Khối lượng giao dịch 24h">KL 24h</th>
+</tr>`;
+
+function renderTable(side, list) {
+  document.getElementById(`${side}-thead`).innerHTML = THEAD;
+  const tbody = document.getElementById(`${side}-tbody`);
+  if (!list.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Không có dữ liệu</td></tr>';
+    return;
+  }
+
+  // Ưu tiên coin có divergence phù hợp lên đầu
+  const wantDiv = side==='long' ? 'bullish' : 'bearish';
+  const sorted = [
+    ...list.filter(c => S.details[c.symbol]?.divergence===wantDiv),
+    ...list.filter(c => S.details[c.symbol]?.divergence!==wantDiv),
+  ];
+
+  tbody.innerHTML = sorted.map((c, i) => {
+    const det = S.details[c.symbol];
+    const tv  = `https://www.tradingview.com/chart/?symbol=BINANCE:${c.symbol}.P`;
+
+    const chg5m = det?.chg5m ?? null;
+    const chg1h = det?.chg1h ?? null;
+    const div   = det?.divergence ?? null;
+
+    const hlCls = (side==='long'&&div==='bullish') ? 'hl-bull'
+                : (side==='short'&&div==='bearish') ? 'hl-bear' : '';
+
+    const rsiCell = det
+      ? `${rsiTag(det.rsiPrev)}<span class="rsi-sep">/</span>${rsiTag(det.rsiNow)}`
+      : '<span class="rsi rsi-mid">...</span>';
+
+    return `<tr class="${hlCls}" onclick="window.open('${tv}','_blank')">
+      <td>
+        <div class="coin-cell">
+          <span class="coin-rank">${i+1}</span>
+          <div class="coin-info">
+            <div class="coin-base">${c.base}</div>
+            <div class="coin-tag">USDT · PERP</div>
+          </div>
+        </div>
+      </td>
+      <td class="mono">${fPrice(c.price)}</td>
+      <td class="${pCls(chg5m)}">${chg5m==null?'...':fPct(chg5m)}</td>
+      <td class="${pCls(chg1h)}">${chg1h==null?'...':fPct(chg1h)}</td>
+      <td class="${pCls(c.change24h)}" style="font-weight:700">${fPct(c.change24h)}</td>
+      <td>${rsiCell}</td>
+      <td>${sigBadge(div)}</td>
+      <td class="neu mono">${fVol(c.volM)}</td>
+    </tr>`;
   }).join('');
 }
 
-async function refreshCoins() {
-  if (COIN_STATE.loading) return;
-  COIN_STATE.loading = true;
-  
-  const btn = document.getElementById('coins-refresh-btn');
-  const status = document.getElementById('coins-status');
-  if (btn) btn.innerHTML = '<span class="spinner"></span> Đang tải...';
-  if (status) status.textContent = 'Đang tải dữ liệu từ Binance...';
-  
-  // 1. Fetch tất cả 24hr ticker
-  const ok = await fetchBinanceTickers();
-  if (!ok) {
-    if (btn) btn.innerHTML = '↻ Thử lại';
-    if (status) status.textContent = '❌ Không tải được dữ liệu Binance Futures. Có thể bị chặn mạng/firewall.';
-    COIN_STATE.loading = false;
-    return;
+// ════════════════════════════════════════════════
+//  SUMMARY CARDS
+// ════════════════════════════════════════════════
+function updateCards(side, list) {
+  const c   = cfg();
+  const dets = list.map(x => S.details[x.symbol]).filter(Boolean);
+
+  if (side==='long') {
+    const bulls = dets.filter(d=>d.divergence==='bullish').length;
+    const os    = dets.filter(d=>d.rsiNow!=null&&d.rsiNow<=c.rsiOS).length;
+    // Giảm nhất 24h
+    const t24 = list.reduce((a,b)=>b.change24h<a.change24h?b:a, list[0]);
+    // Giảm nhất 5m
+    const byChg5 = list.filter(x=>S.details[x.symbol]);
+    const t5m = byChg5.length ? byChg5.reduce((a,b)=>S.details[b.symbol].chg5m<S.details[a.symbol].chg5m?b:a) : null;
+
+    document.getElementById('l-bull').textContent = bulls ? `${bulls} coin` : '0';
+    document.getElementById('l-os').textContent   = os    ? `${os} coin`   : '0';
+    document.getElementById('l-top24').textContent     = t24 ? fPct(t24.change24h) : '—';
+    document.getElementById('l-top24-sub').textContent = t24 ? t24.base : '';
+    document.getElementById('l-top5m').textContent     = t5m ? fPct(S.details[t5m.symbol].chg5m) : '—';
+    document.getElementById('l-top5m-sub').textContent = t5m ? t5m.base : '';
+    document.getElementById('long-cnt').textContent = `(${list.length})`;
+  } else {
+    const bears = dets.filter(d=>d.divergence==='bearish').length;
+    const ob    = dets.filter(d=>d.rsiNow!=null&&d.rsiNow>=c.rsiOB).length;
+    const t24 = list.reduce((a,b)=>b.change24h>a.change24h?b:a, list[0]);
+    const byChg5 = list.filter(x=>S.details[x.symbol]);
+    const t5m = byChg5.length ? byChg5.reduce((a,b)=>S.details[b.symbol].chg5m>S.details[a.symbol].chg5m?b:a) : null;
+
+    document.getElementById('s-bear').textContent = bears ? `${bears} coin` : '0';
+    document.getElementById('s-ob').textContent   = ob    ? `${ob} coin`   : '0';
+    document.getElementById('s-top24').textContent     = t24 ? fPct(t24.change24h) : '—';
+    document.getElementById('s-top24-sub').textContent = t24 ? t24.base : '';
+    document.getElementById('s-top5m').textContent     = t5m ? fPct(S.details[t5m.symbol].chg5m) : '—';
+    document.getElementById('s-top5m-sub').textContent = t5m ? t5m.base : '';
+    document.getElementById('short-cnt').textContent = `(${list.length})`;
   }
-  
-  // 2. Render lần 1 (chưa có details)
-  renderCoins();
-  
-  // 3. Fetch details (RSI + high5m) cho top coins đang hiển thị
-  const coins = getFilteredCoins();
-  if (status) status.textContent = `Đã tải ${COIN_STATE.data.length} coin · Đang tính RSI và đỉnh 5m cho top ${coins.length}...`;
-  
-  // Fetch song song nhưng giới hạn 10 cùng lúc để không spam Binance
-  const batchSize = 10;
-  for (let i = 0; i < coins.length; i += batchSize) {
-    const batch = coins.slice(i, i + batchSize);
-    await Promise.all(batch.map(async c => {
-      const det = await fetchCoinDetails(c.symbol, c.price);
-      if (det) COIN_STATE.details[c.symbol] = det;
-    }));
-    renderCoins(); // render tăng dần để user thấy progress
-  }
-  
-  COIN_STATE.lastUpdate = new Date();
-  if (btn) btn.innerHTML = '↻ Làm mới';
-  if (status) status.textContent = `✅ Cập nhật lúc ${COIN_STATE.lastUpdate.toLocaleTimeString('vi-VN')} · ${COIN_STATE.data.length} coin · Tự refresh sau 30s`;
-  COIN_STATE.loading = false;
 }
 
-// ============= DATA MANAGEMENT =============
-function exportData() {
-  const data = {
-    version: '1.0',
-    exportDate: new Date().toISOString(),
-    transactions: STATE.transactions,
-    settings: STATE.settings
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `q-finance-backup-${isoToday()}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+// ════════════════════════════════════════════════
+//  MAIN REFRESH
+// ════════════════════════════════════════════════
+async function refresh() {
+  if (S.loading) return;
+  S.loading = true;
+  clearTimeout(S.timer);
 
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (data.transactions) {
-        if (confirm(`Nhập ${data.transactions.length} giao dịch? Dữ liệu hiện tại sẽ bị thay thế.`)) {
-          STATE.transactions = data.transactions;
-          if (data.settings) STATE.settings = { ...STATE.settings, ...data.settings };
-          saveState();
-          renderAll();
-          alert('Nhập dữ liệu thành công!');
-        }
-      }
-    } catch (err) { alert('File không hợp lệ: ' + err.message); }
-  };
-  reader.readAsText(file);
-}
+  const dot = document.getElementById('dot');
+  const txt = document.getElementById('status-txt');
+  const btn = document.getElementById('btn-refresh');
 
-function resetData() {
-  if (!confirm('XÓA TOÀN BỘ dữ liệu? Hành động này không thể hoàn tác.')) return;
-  if (!confirm('Bạn chắc chắn chứ?')) return;
-  STATE.transactions = [];
-  saveState();
-  renderAll();
-}
+  dot.className = 'dot loading';
+  txt.textContent = 'Đang tải tickers...';
+  btn.disabled = true;
 
-function seedData() {
-  if (STATE.transactions.length > 0 && !confirm('Đã có dữ liệu. Thay thế bằng dữ liệu mẫu?')) return;
-  
-  const today = isoToday();
-  STATE.transactions = [
-    { id: 's1', type: 'cash', symbol: 'CASH', action: 'deposit', qty: 100000000, price: 1, date: '2026-05-01', note: 'Vốn ban đầu' },
-    { id: 's2', type: 'stock', symbol: 'FUEVFVND', action: 'buy', qty: 571, price: 35000, date: '2026-05-02', note: 'ETF VN30 đợt 1' },
-    { id: 's3', type: 'stock', symbol: 'HPG', action: 'buy', qty: 268, price: 28000, date: '2026-05-02', note: 'Mua HPG đợt 1' },
-    { id: 's4', type: 'stock', symbol: 'VCB', action: 'buy', qty: 197, price: 76000, date: '2026-05-03', note: 'Mua VCB đợt 1' },
-    { id: 's5', type: 'crypto', symbol: 'BTC', action: 'buy', qty: 0.0044, price: 2098000000, date: '2026-05-04', note: 'BTC đợt 1' },
-    { id: 's6', type: 'crypto', symbol: 'ETH', action: 'buy', qty: 0.073, price: 61500000, date: '2026-05-04', note: 'ETH đợt 1' }
-  ];
-  saveState();
-  renderAll();
-}
-
-function saveSettings() {
-  STATE.settings.fx = parseFloat(document.getElementById('setting-fx').value) || 25500;
-  saveState();
-  renderAll();
-}
-
-// ============= TABS =============
-document.querySelectorAll('.tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    
-    // Lazy load tab Coin lần đầu vào, sau đó để interval tự refresh
-    if (btn.dataset.tab === 'coins' && COIN_STATE.data.length === 0) {
-      refreshCoins();
-    }
+  ['long','short'].forEach(side => {
+    document.getElementById(`${side}-tbody`).innerHTML =
+      `<tr class="empty-row"><td colspan="8"><span class="spin">⟳</span> Đang tải dữ liệu từ Binance Futures...</td></tr>`;
   });
-});
 
-// Auto-refresh tab Coin mỗi 30 giây nếu user đang xem tab này
-setInterval(() => {
-  const coinsTab = document.getElementById('tab-coins');
-  if (coinsTab && coinsTab.classList.contains('active') && !COIN_STATE.loading) {
-    refreshCoins();
+  try {
+    const c = cfg();
+
+    // 1. Tickers
+    const all = await fetchTickers();
+
+    // LONG: top giảm mạnh nhất 24h
+    S.longList  = [...all].sort((a,b)=>a.change24h-b.change24h).slice(0, c.topN);
+    // SHORT: top tăng mạnh nhất 24h
+    S.shortList = [...all].sort((a,b)=>b.change24h-a.change24h).slice(0, c.topN);
+
+    // Render lần 1
+    renderTable('long',  S.longList);
+    renderTable('short', S.shortList);
+    updateCards('long',  S.longList);
+    updateCards('short', S.shortList);
+    txt.textContent = `Đang tính RSI(15) và phân kỳ...`;
+
+    // 2. Details - unique coins, batch 10
+    const uniq = [...new Map(
+      [...S.longList,...S.shortList].map(c=>[c.symbol,c])
+    ).values()];
+
+    for (let i=0; i<uniq.length; i+=10) {
+      await Promise.all(
+        uniq.slice(i,i+10).map(async c => {
+          const d = await fetchDetails(c.symbol, c.price);
+          if (d) S.details[c.symbol] = d;
+        })
+      );
+      renderTable('long',  S.longList);
+      renderTable('short', S.shortList);
+      updateCards('long',  S.longList);
+      updateCards('short', S.shortList);
+    }
+
+    const now = new Date();
+    dot.className = 'dot on';
+    txt.textContent = `Cập nhật ${now.toLocaleTimeString('vi-VN')} · Tự động làm mới sau 30s`;
+    S.timer = setTimeout(refresh, 30000);
+
+  } catch(e) {
+    dot.className = 'dot err';
+    txt.textContent = '❌ Lỗi kết nối Binance Futures (thử VPN nếu bị chặn)';
+    console.error(e);
   }
-}, 30 * 1000);
 
-// ============= INIT =============
-async function init() {
-  loadState();
-  document.getElementById('setting-fx').value = STATE.settings.fx;
-  
-  // Initial render with cached prices
-  renderAll();
-  updateHeader();
-  
-  // Fetch live prices
-  await refreshPrices();
-  
-  // Auto refresh mỗi 60 giây (VN-Index, cổ phiếu VN, BTC/ETH cùng update)
-  setInterval(refreshPrices, 60 * 1000);
-  
-  // Update time every minute
-  setInterval(updateHeader, 60 * 1000);
+  btn.disabled = false;
+  S.loading = false;
 }
 
-init();
+// ════════════════════════════════════════════════
+//  TAB SWITCH
+// ════════════════════════════════════════════════
+function switchTab(side) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`.tab-btn.${side}`).classList.add('active');
+  document.getElementById(`pane-${side}`).classList.add('active');
+}
+
+// ════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════
+refresh();
 </script>
 </body>
 </html>
