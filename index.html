@@ -42,6 +42,9 @@ select:focus{outline:none;border-color:var(--blue)}
 .btn-r{border-color:var(--blue);color:var(--blue);font-weight:600;padding:5px 12px}
 .btn-r:hover{background:var(--blue);color:#000}
 .btn-r:disabled{opacity:.5;cursor:default}
+.btn-notif{border-color:var(--text3);color:var(--text2);padding:5px 10px}
+.btn-notif.on{border-color:var(--green);color:var(--green)}
+.btn-notif.denied{border-color:var(--red);color:var(--red);cursor:not-allowed}
 
 /* ── TABS ── */
 .tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;gap:4px}
@@ -186,6 +189,7 @@ td:first-child{text-align:left}
       <option value="80" selected>80 / 20</option>
     </select>
     <button class="btn-r" id="btn-r" onclick="refresh()">↻ Làm mới</button>
+    <button class="btn-notif" id="btn-notif" onclick="toggleNotif()" title="Bật/tắt thông báo Chrome">🔔 Thông báo</button>
   </div>
 </header>
 
@@ -291,10 +295,12 @@ td:first-child{text-align:left}
 const S = {
   longList:[], shortList:[],
   details:{},
-  validPerps: null,   // Set of valid Binance Futures symbols
+  validPerps: null,
   loading:false,
   timer:null,
-  activeFilter:{ long:null, short:null }
+  activeFilter:{ long:null, short:null },
+  notifEnabled: localStorage.getItem('notif')==='1',
+  prevSignals: {}  // { symbol: { divergence, rsiOB, rsiOS } }
 };
 
 // ═══════════════════════════════
@@ -676,6 +682,10 @@ async function refresh(){
       updateCards('short',S.shortList);
     }
 
+    // Kiểm tra tín hiệu mới và gửi thông báo
+    checkSignals(S.shortList,'short');
+    checkSignals(S.longList,'long');
+
     const now=new Date();
     dot.className='dot on';
     txt.textContent=`Cập nhật ${now.toLocaleTimeString('vi-VN')} · Tự làm mới sau 30s`;
@@ -687,6 +697,119 @@ async function refresh(){
   }
   btn.disabled=false;
   S.loading=false;
+}
+
+// ═══════════════════════════════
+//  NOTIFICATIONS
+// ═══════════════════════════════
+function updateNotifBtn(){
+  const btn = document.getElementById('btn-notif');
+  if(!('Notification' in window)){
+    btn.textContent='🔕 Không hỗ trợ';
+    btn.classList.add('denied');
+    return;
+  }
+  if(Notification.permission==='denied'){
+    btn.textContent='🔕 Bị chặn';
+    btn.classList.add('denied');
+    btn.title='Vào Settings > Privacy > Notifications để bật lại';
+    return;
+  }
+  if(S.notifEnabled && Notification.permission==='granted'){
+    btn.textContent='🔔 Đang bật';
+    btn.className='btn-notif on';
+  }else{
+    btn.textContent='🔕 Thông báo';
+    btn.className='btn-notif';
+  }
+}
+
+async function toggleNotif(){
+  if(!('Notification' in window)) return;
+  if(Notification.permission==='denied'){
+    alert('Chrome đang chặn thông báo từ trang này.\n\nĐể bật lại:\n1. Click icon 🔒 bên trái địa chỉ web\n2. Notifications → Allow\n3. Reload trang');
+    return;
+  }
+  if(!S.notifEnabled){
+    const perm = await Notification.requestPermission();
+    if(perm==='granted'){
+      S.notifEnabled=true;
+      localStorage.setItem('notif','1');
+      // Test notification
+      new Notification('Q · Futures Scanner 🔔', {
+        body: 'Thông báo đã được bật! Bạn sẽ nhận cảnh báo khi có tín hiệu Đảo chiều, Quá mua, Quá bán.',
+        icon: 'https://favi.one/b.png'
+      });
+    }
+  }else{
+    S.notifEnabled=false;
+    localStorage.setItem('notif','0');
+  }
+  updateNotifBtn();
+}
+
+function sendNotif(title, body, tag){
+  if(!S.notifEnabled || Notification.permission!=='granted') return;
+  try{
+    const n = new Notification(title, { body, tag, renotify:true, icon:'https://favi.one/b.png' });
+    n.onclick=()=>{ window.focus(); n.close(); };
+  }catch(e){}
+}
+
+function checkSignals(list, side){
+  const c = cfg();
+  list.forEach(coin=>{
+    const det = S.details[coin.symbol];
+    if(!det) return;
+    const prev = S.prevSignals[coin.symbol] || {};
+
+    // 1. Phân kỳ mới xuất hiện
+    if(det.divergence && det.divergence !== prev.divergence){
+      if(det.divergence==='bullish' && side==='long'){
+        sendNotif(
+          `🚀 Đảo chiều TĂNG · ${coin.base}`,
+          `Phân kỳ dương 5m · RSI ${det.rsiNow?.toFixed(1)} · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
+          `bull-${coin.symbol}`
+        );
+      }
+      if(det.divergence==='bearish' && side==='short'){
+        sendNotif(
+          `⚠️ Đảo chiều GIẢM · ${coin.base}`,
+          `Phân kỳ âm 5m · RSI ${det.rsiNow?.toFixed(1)} · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
+          `bear-${coin.symbol}`
+        );
+      }
+    }
+
+    // 2. RSI vừa vào vùng quá mua (chưa bị cảnh báo lần trước)
+    const nowOB = det.rsiNow != null && det.rsiNow >= c.rsiOB;
+    const wasOB = prev.rsiOB;
+    if(nowOB && !wasOB && side==='short'){
+      sendNotif(
+        `🔴 RSI Quá mua · ${coin.base}`,
+        `RSI(14) = ${det.rsiNow?.toFixed(1)} ≥ ${c.rsiOB} · Khung 5m · Giá ${fPrice(coin.price)}`,
+        `ob-${coin.symbol}`
+      );
+    }
+
+    // 3. RSI vừa vào vùng quá bán
+    const nowOS = det.rsiNow != null && det.rsiNow <= c.rsiOS;
+    const wasOS = prev.rsiOS;
+    if(nowOS && !wasOS && side==='long'){
+      sendNotif(
+        `🟢 RSI Quá bán · ${coin.base}`,
+        `RSI(14) = ${det.rsiNow?.toFixed(1)} ≤ ${c.rsiOS} · Khung 5m · Giá ${fPrice(coin.price)}`,
+        `os-${coin.symbol}`
+      );
+    }
+
+    // Lưu trạng thái hiện tại
+    S.prevSignals[coin.symbol] = {
+      divergence: det.divergence,
+      rsiOB: nowOB,
+      rsiOS: nowOS
+    };
+  });
 }
 
 // ═══════════════════════════════
@@ -702,6 +825,7 @@ function switchTab(side){
 // ═══════════════════════════════
 //  INIT
 // ═══════════════════════════════
+updateNotifBtn();
 refresh();
 </script>
 </body>
