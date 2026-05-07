@@ -182,12 +182,6 @@ td:first-child{text-align:left}
       <option value="100">$100M+</option>
       <option value="500">$500M+</option>
     </select>
-    <label>RSI OB/OS</label>
-    <select id="rsiThresh">
-      <option value="70">70 / 30</option>
-      <option value="75">75 / 25</option>
-      <option value="80" selected>80 / 20</option>
-    </select>
     <button class="btn-r" id="btn-r" onclick="refresh()">↻ Làm mới</button>
     <button class="btn-notif" id="btn-notif" onclick="toggleNotif()" title="Bật/tắt thông báo Chrome">🔔 Thông báo</button>
   </div>
@@ -297,13 +291,10 @@ const S = {
 //  SETTINGS
 // ═══════════════════════════════
 function cfg(){
-  const ob = parseInt(document.getElementById('rsiThresh').value);
   return {
     topN:    parseInt(document.getElementById('topN').value),
     minVolM: parseInt(document.getElementById('minVol').value),
-    rsiOB:   ob,
-    rsiOS:   100-ob,
-    rsiPer:  14,   // RSI 14
+    rsiPer:  14,
   };
 }
 
@@ -384,24 +375,37 @@ function updateHeaderPrices(allTickers){
 // ═══════════════════════════════
 async function fetchDetails(symbol, price){
   try{
-    const n = cfg().rsiPer;
-    const res = await fetch(
-      `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=5m&limit=${n+20}`
-    );
-    const klines = await res.json();
-    if(!Array.isArray(klines)||klines.length<n+3) return null;
+    const N = 14;
+    const LIM = N + 5; // 19 nến đủ để tính RSI(14)
 
-    const cc = klines.slice(0,-1).map(k=>parseFloat(k[4]));
-    if(cc.length<n+1) return null;
+    // Fetch 4 khung thời gian song song
+    const [k1m, k3m, k5m, k15m] = await Promise.all([
+      fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1m&limit=${LIM}`).then(r=>r.json()),
+      fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=3m&limit=${LIM}`).then(r=>r.json()),
+      fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=5m&limit=28`).then(r=>r.json()),
+      fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=15m&limit=${LIM}`).then(r=>r.json()),
+    ]);
 
-    const prevClose = cc[cc.length-1];
-    const rsiPrev   = calcRSI(cc, n);
-    const rsiNow    = calcRSI([...cc, price], n);
-    const chg5m     = prevClose>0?(price-prevClose)/prevClose*100:0;
-    const ref1h     = cc.length>=13?cc[cc.length-13]:cc[0];
-    const chg1h     = ref1h>0?(price-ref1h)/ref1h*100:0;
+    const rsiOf = (klines) => {
+      if(!Array.isArray(klines)||klines.length<N+2) return null;
+      const cc = klines.slice(0,-1).map(k=>parseFloat(k[4]));
+      if(cc.length<N+1) return null;
+      return calcRSI([...cc, price], N);
+    };
 
-    return { prevClose, rsiPrev, rsiNow, chg5m, chg1h };
+    const rsi1m  = rsiOf(k1m);
+    const rsi3m  = rsiOf(k3m);
+    const rsi5m  = rsiOf(k5m);
+    const rsi15m = rsiOf(k15m);
+
+    // % 5m và % 1h từ klines 5m
+    const cc5 = Array.isArray(k5m) ? k5m.slice(0,-1).map(k=>parseFloat(k[4])) : [];
+    const prevClose = cc5.length ? cc5[cc5.length-1] : price;
+    const chg5m = prevClose>0 ? (price-prevClose)/prevClose*100 : 0;
+    const ref1h = cc5.length>=13 ? cc5[cc5.length-13] : cc5[0];
+    const chg1h = ref1h>0 ? (price-ref1h)/ref1h*100 : 0;
+
+    return { rsi1m, rsi3m, rsi5m, rsi15m, chg5m, chg1h };
   }catch(e){ return null; }
 }
 
@@ -424,17 +428,30 @@ function fVol(m){
 }
 function pCls(v){return v>0?'up':v<0?'dn':'neu';}
 
+// RSI badge — ngưỡng cứng 90/20
 function rsiTag(rsi){
-  if(rsi==null)return'<span class="rsi rsi-mid">...</span>';
-  const c=cfg();
-  const cls=rsi>=c.rsiOB?'rsi-ob':rsi<=c.rsiOS?'rsi-os':rsi>=60?'rsi-hi':rsi<=40?'rsi-lo':'rsi-mid';
-  return`<span class="rsi ${cls}">${rsi.toFixed(1)}</span>`;
+  if(rsi==null) return '<span class="rsi rsi-mid">...</span>';
+  const cls = rsi>90?'rsi-ob':rsi<20?'rsi-os':rsi>=60?'rsi-hi':rsi<=40?'rsi-lo':'rsi-mid';
+  return `<span class="rsi ${cls}">${rsi.toFixed(1)}</span>`;
 }
-function sigBadge(rsiNow){
-  if(rsiNow == null) return '<span class="sig-none">...</span>';
-  if(rsiNow > 90)  return '<span class="sig sig-bear">🔴 Quá mua &gt;90</span>';
-  if(rsiNow < 20)  return '<span class="sig sig-bull">🟢 Quá bán &lt;20</span>';
+
+// Tín hiệu: liệt kê TF nào vượt ngưỡng
+function sigBadge(det){
+  if(!det) return '<span class="sig-none">...</span>';
+  const TFS = ['1m','3m','5m','15m'];
+  const VALS = [det.rsi1m, det.rsi3m, det.rsi5m, det.rsi15m];
+  const ob = TFS.filter((_,i)=>VALS[i]!=null&&VALS[i]>90);
+  const os = TFS.filter((_,i)=>VALS[i]!=null&&VALS[i]<20);
+  if(ob.length) return `<span class="sig sig-bear">🔴 ${ob.join(' · ')}</span>`;
+  if(os.length) return `<span class="sig sig-bull">🟢 ${os.join(' · ')}</span>`;
   return '<span class="sig-none">—</span>';
+}
+
+// Helper: có tín hiệu không?
+function hasSignal(det, side){
+  if(!det) return false;
+  const v = [det.rsi1m, det.rsi3m, det.rsi5m, det.rsi15m];
+  return side==='short' ? v.some(r=>r!=null&&r>90) : v.some(r=>r!=null&&r<20);
 }
 
 // ═══════════════════════════════
@@ -465,11 +482,11 @@ function toggleFilter(side, type){
   const list = side==='long'?S.longList:S.shortList;
   let matching, title;
   if(type==='os'){
-    matching = list.filter(x=>{const d=S.details[x.symbol];return d&&d.rsiNow!=null&&d.rsiNow<20;});
-    title='🟢 RSI Quá bán (< 20)';
+    matching = list.filter(x=>hasSignal(S.details[x.symbol],'long'));
+    title='🟢 RSI < 20 (Quá bán) — bất kỳ khung nào';
   }else{
-    matching = list.filter(x=>{const d=S.details[x.symbol];return d&&d.rsiNow!=null&&d.rsiNow>90;});
-    title='🔴 RSI Quá mua (> 90)';
+    matching = list.filter(x=>hasSignal(S.details[x.symbol],'short'));
+    title='🔴 RSI > 90 (Quá mua) — bất kỳ khung nào';
   }
 
   document.getElementById(`fp-${side}-title`).textContent=`${title} · ${matching.length} coin`;
@@ -479,10 +496,14 @@ function toggleFilter(side, type){
   }else{
     chipsEl.innerHTML=matching.map(x=>{
       const d=S.details[x.symbol];
+      const rsiLine = d ? `<span class="chip-pct">${['1m','3m','5m','15m'].map((tf,i)=>{
+        const v=[d.rsi1m,d.rsi3m,d.rsi5m,d.rsi15m][i];
+        return v!=null?rsiTag(v):'';
+      }).join('')}</span>` : '';
       return`<div class="chip" onclick="scrollToRow('${x.symbol}')">
         <span>${x.base}</span>
         <span class="chip-pct ${pCls(x.change24h)}">${fPct(x.change24h)}</span>
-        ${d?'<span class="chip-pct">RSI:'+rsiTag(d.rsiNow)+'</span>':''}
+        ${rsiLine}
       </div>`;
     }).join('');
   }
@@ -504,8 +525,11 @@ const THEAD=`<tr>
   <th title="Biến động 5 phút">% 5m</th>
   <th title="Biến động 1 giờ">% 1h</th>
   <th title="Biến động 24 giờ">% 24h</th>
-  <th title="RSI(14) khung 5 phút — Nến đóng trước / Hiện tại">RSI(14) Trước/Nay</th>
-  <th title="Tín hiệu RSI(14) · > 90 quá mua · &lt; 20 quá bán">Tín hiệu RSI</th>
+  <th title="RSI(14) khung 1 phút">RSI 1m</th>
+  <th title="RSI(14) khung 3 phút">RSI 3m</th>
+  <th title="RSI(14) khung 5 phút">RSI 5m</th>
+  <th title="RSI(14) khung 15 phút">RSI 15m</th>
+  <th title="Tín hiệu: khung nào RSI > 90 hoặc < 20">Tín hiệu</th>
   <th title="Khối lượng 24h">KL 24h</th>
 </tr>`;
 
@@ -513,34 +537,30 @@ function renderTable(side, list){
   document.getElementById(`${side}-thead`).innerHTML=THEAD;
   const tbody=document.getElementById(`${side}-tbody`);
   if(!list.length){
-    tbody.innerHTML='<tr class="empty-row"><td colspan="8">Không có dữ liệu</td></tr>';
+    tbody.innerHTML='<tr class="empty-row"><td colspan="11">Không có dữ liệu</td></tr>';
     return;
   }
-  // Đưa coin có RSI signal phù hợp lên đầu
+
+  // Coin có tín hiệu lên đầu
   const sorted=[
-    ...list.filter(c=>{
-      const r=S.details[c.symbol]?.rsiNow;
-      return side==='short'?(r!=null&&r>90):(r!=null&&r<20);
-    }),
-    ...list.filter(c=>{
-      const r=S.details[c.symbol]?.rsiNow;
-      return !(side==='short'?(r!=null&&r>90):(r!=null&&r<20));
-    }),
+    ...list.filter(c=>hasSignal(S.details[c.symbol], side)),
+    ...list.filter(c=>!hasSignal(S.details[c.symbol], side)),
   ];
+
   tbody.innerHTML=sorted.map((c,i)=>{
     const det=S.details[c.symbol];
     const tv=`https://www.tradingview.com/chart/?symbol=BINANCE:${c.symbol}.P`;
     const chg5m=det?.chg5m??null;
     const chg1h=det?.chg1h??null;
-    const rsiNow=det?.rsiNow??null;
+    const sig=hasSignal(det,side);
 
-    // Highlight: RSI>90 trong SHORT, RSI<20 trong LONG
-    const hlCls=(side==='short'&&rsiNow!=null&&rsiNow>90)?'hl-bear'
-               :(side==='long' &&rsiNow!=null&&rsiNow<20)?'hl-bull':'';
+    const hlCls = sig ? (side==='short'?'hl-bear':'hl-bull') : '';
 
-    const rsiCell=det
-      ?`${rsiTag(det.rsiPrev)}<span class="rsi-sep">/</span>${rsiTag(det.rsiNow)}`
-      :'<span class="rsi rsi-mid">...</span>';
+    const loading='<span class="rsi rsi-mid">...</span>';
+    const r1=det?rsiTag(det.rsi1m):loading;
+    const r3=det?rsiTag(det.rsi3m):loading;
+    const r5=det?rsiTag(det.rsi5m):loading;
+    const r15=det?rsiTag(det.rsi15m):loading;
 
     return`<tr id="row-${c.symbol}" class="${hlCls}">
       <td>
@@ -559,8 +579,11 @@ function renderTable(side, list){
       <td class="${pCls(chg5m)}">${chg5m==null?'...':fPct(chg5m)}</td>
       <td class="${pCls(chg1h)}">${chg1h==null?'...':fPct(chg1h)}</td>
       <td class="${pCls(c.change24h)}" style="font-weight:700">${fPct(c.change24h)}</td>
-      <td>${rsiCell}</td>
-      <td>${sigBadge(rsiNow)}</td>
+      <td>${r1}</td>
+      <td>${r3}</td>
+      <td>${r5}</td>
+      <td>${r15}</td>
+      <td>${sigBadge(det)}</td>
       <td class="neu mono">${fVol(c.volM)}</td>
     </tr>`;
   }).join('');
@@ -570,9 +593,8 @@ function renderTable(side, list){
 //  SUMMARY CARDS
 // ═══════════════════════════════
 function updateCards(side,list){
-  const dets=list.map(x=>S.details[x.symbol]).filter(Boolean);
   if(side==='long'){
-    const os=dets.filter(d=>d.rsiNow!=null&&d.rsiNow<20).length;
+    const os=list.filter(c=>hasSignal(S.details[c.symbol],'long')).length;
     const t24=list.length?list.reduce((a,b)=>b.change24h<a.change24h?b:a):null;
     const b5=list.filter(x=>S.details[x.symbol]);
     const t5m=b5.length?b5.reduce((a,b)=>S.details[b.symbol].chg5m<S.details[a.symbol].chg5m?b:a):null;
@@ -583,7 +605,7 @@ function updateCards(side,list){
     document.getElementById('l-top5m-sub').textContent=t5m?t5m.base:'';
     document.getElementById('long-cnt').textContent=`(${list.length})`;
   }else{
-    const ob=dets.filter(d=>d.rsiNow!=null&&d.rsiNow>90).length;
+    const ob=list.filter(c=>hasSignal(S.details[c.symbol],'short')).length;
     const t24=list.length?list.reduce((a,b)=>b.change24h>a.change24h?b:a):null;
     const b5=list.filter(x=>S.details[x.symbol]);
     const t5m=b5.length?b5.reduce((a,b)=>S.details[b.symbol].chg5m>S.details[a.symbol].chg5m?b:a):null;
@@ -733,32 +755,34 @@ function sendNotif(title, body, tag){
 }
 
 function checkSignals(list, side){
+  const TFS = ['1m','3m','5m','15m'];
   list.forEach(coin=>{
     const det = S.details[coin.symbol];
     if(!det) return;
     const prev = S.prevSignals[coin.symbol] || {};
 
-    // RSI vừa vượt 90 → cảnh báo SHORT
-    const nowOB = det.rsiNow != null && det.rsiNow > 90;
-    if(nowOB && !prev.rsiOB && side==='short'){
+    const vals = [det.rsi1m, det.rsi3m, det.rsi5m, det.rsi15m];
+    const obTfs = TFS.filter((_,i)=>vals[i]!=null&&vals[i]>90);
+    const osTfs = TFS.filter((_,i)=>vals[i]!=null&&vals[i]<20);
+    const prevOb = prev.obTfs||'';
+    const prevOs = prev.osTfs||'';
+
+    if(obTfs.length && obTfs.join()!==prevOb && side==='short'){
       sendNotif(
         `🔴 RSI Quá mua · ${coin.base}`,
-        `RSI(14) = ${det.rsiNow.toFixed(1)} > 90 · Khung 5m · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
+        `Khung ${obTfs.join(', ')} vượt 90 · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
         `ob-${coin.symbol}`
       );
     }
-
-    // RSI vừa xuống dưới 20 → cảnh báo LONG
-    const nowOS = det.rsiNow != null && det.rsiNow < 20;
-    if(nowOS && !prev.rsiOS && side==='long'){
+    if(osTfs.length && osTfs.join()!==prevOs && side==='long'){
       sendNotif(
         `🟢 RSI Quá bán · ${coin.base}`,
-        `RSI(14) = ${det.rsiNow.toFixed(1)} < 20 · Khung 5m · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
+        `Khung ${osTfs.join(', ')} xuống dưới 20 · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
         `os-${coin.symbol}`
       );
     }
 
-    S.prevSignals[coin.symbol] = { rsiOB: nowOB, rsiOS: nowOS };
+    S.prevSignals[coin.symbol] = { obTfs: obTfs.join(), osTfs: osTfs.join() };
   });
 }
 
