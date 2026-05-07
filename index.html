@@ -1072,15 +1072,13 @@ footer .serif { color: var(--text-secondary); }
         <table class="data-table" id="coins-table">
           <thead>
             <tr>
-              <th class="right" style="width: 36px;">#</th>
-              <th>Symbol</th>
-              <th class="right">Giá USDT</th>
+              <th>Coin</th>
               <th class="right">% 24h</th>
-              <th class="right" title="% biến động 5 phút gần nhất">% 5m</th>
-              <th class="right" title="Đỉnh trong 5 phút">Đỉnh 5m</th>
-              <th class="right" title="Khoảng cách từ giá hiện tại đến đỉnh 5m">Δ Đỉnh</th>
-              <th class="right" title="Relative Strength Index 14 (timeframe 1m)">RSI(14)</th>
-              <th class="right">KL 24h ($M)</th>
+              <th class="right" title="Biến động so với nến 5m đã đóng gần nhất">% 5m</th>
+              <th class="right" title="Giá cao nhất trong 5 nến 5m đã đóng gần nhất">Đỉnh nến trước</th>
+              <th class="right" title="RSI(14) tại thời điểm nến 5m đã đóng gần nhất">RSI nến trước</th>
+              <th class="right" title="Giá real-time hiện tại (nến đang hình thành)">Giá hiện tại</th>
+              <th class="right" title="RSI(14) tính với giá real-time hiện tại">RSI hiện tại</th>
             </tr>
           </thead>
           <tbody id="coins-tbody">
@@ -1093,11 +1091,11 @@ footer .serif { color: var(--text-secondary); }
     <div class="card" style="margin-top: 16px;">
       <div class="card-title">Cách đọc bảng</div>
       <div style="margin-top: 8px; font-size: 12px; color: var(--text-secondary); line-height: 1.7;">
-        <strong style="color: var(--text-primary);">% 5m:</strong> Biến động giá trong 5 phút gần nhất. Số dương lớn → coin đang pump.<br>
-        <strong style="color: var(--text-primary);">Đỉnh 5m:</strong> Giá cao nhất trong 5 nến 1 phút gần nhất.<br>
-        <strong style="color: var(--text-primary);">Δ Đỉnh:</strong> Khoảng cách từ giá hiện tại đến đỉnh 5m. Số 0% nghĩa là đang ở đỉnh.<br>
-        <strong style="color: var(--text-primary);">RSI(14):</strong> Momentum oscillator. <span style="color: var(--danger);">>70 quá mua</span>, <span style="color: var(--success);">&lt;30 quá bán</span>, 50 trung tính. Tính trên timeframe 1 phút.<br>
-        <em style="color: var(--text-tertiary);">⚠️ Lưu ý: Coin pump nhanh dễ bị xả nhanh. RSI cao + đỉnh = rủi ro cao. Không phải lời khuyên đầu tư.</em>
+        <strong style="color: var(--text-primary);">% 5m:</strong> Biến động giá hiện tại so với nến 5m đã đóng gần nhất.<br>
+        <strong style="color: var(--text-primary);">Đỉnh nến trước:</strong> Giá High cao nhất trong 5 nến 5 phút đã đóng gần nhất.<br>
+        <strong style="color: var(--text-primary);">RSI nến trước:</strong> RSI(14) tính tại thời điểm nến 5m đã đóng gần nhất.<br>
+        <strong style="color: var(--text-primary);">RSI hiện tại:</strong> RSI(14) tính theo giá real-time (nến đang hình thành). <span style="color: var(--danger);">>70 quá mua</span> · <span style="color: var(--success);">&lt;30 quá bán</span>.<br>
+        <em style="color: var(--text-tertiary);">⚠️ Dữ liệu từ Binance Futures (perpetual). RSI 5m phù hợp cho scalping/swing ngắn hạn. Không phải lời khuyên đầu tư.</em>
       </div>
     </div>
   </section>
@@ -1911,31 +1909,37 @@ async function fetchBinanceTickers() {
   }
 }
 
-// Fetch klines 1m cho 1 coin (15 nến để tính RSI(14) + đỉnh 5 phút)
-async function fetchCoinDetails(symbol) {
+// Fetch klines 5m cho 1 coin
+// Trả về: đỉnh 5 nến 5m, RSI nến trước (đã đóng), RSI hiện tại, % 5m
+async function fetchCoinDetails(symbol, currentPrice) {
   try {
-    const res = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1m&limit=20`);
+    const res = await fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=5m&limit=22`);
     const klines = await res.json();
-    if (!Array.isArray(klines) || klines.length < 15) return null;
-    
-    // Kline format: [openTime, open, high, low, close, volume, ...]
+    if (!Array.isArray(klines) || klines.length < 16) return null;
+
     const closes = klines.map(k => parseFloat(k[4]));
-    const highs = klines.map(k => parseFloat(k[2]));
-    
-    // RSI(14) trên timeframe 1m
-    const rsi = calcRSI(closes, 14);
-    
-    // Đỉnh trong 5 phút gần nhất
-    const last5Highs = highs.slice(-5);
-    const high5m = Math.max(...last5Highs);
-    
-    // % biến động 5 phút (giá hiện tại vs giá đầu 5 phút)
-    const last5Closes = closes.slice(-6); // 6 điểm = 5 khoảng
-    const change5m = last5Closes.length >= 2 
-      ? ((last5Closes[last5Closes.length - 1] - last5Closes[0]) / last5Closes[0]) * 100
-      : 0;
-    
-    return { rsi, high5m, change5m };
+    const highs  = klines.map(k => parseFloat(k[2]));
+
+    // Bỏ nến đang mở (nến cuối) để lấy nến đã đóng
+    const closedCloses = closes.slice(0, -1);
+    const closedHighs  = highs.slice(0, -1);
+
+    // Đỉnh trong 5 nến 5m đã đóng gần nhất
+    const high5m = Math.max(...closedHighs.slice(-5));
+
+    // Giá close nến đã đóng gần nhất
+    const prevClose = closedCloses[closedCloses.length - 1];
+
+    // RSI(14) tại nến đã đóng gần nhất
+    const rsiPrev = calcRSI(closedCloses, 14);
+
+    // RSI(14) hiện tại (dùng giá real-time làm close nến đang mở)
+    const rsiNow = calcRSI([...closedCloses, currentPrice], 14);
+
+    // % 5m = giá hiện tại so với nến đã đóng trước đó
+    const change5m = prevClose > 0 ? ((currentPrice - prevClose) / prevClose * 100) : 0;
+
+    return { high5m, prevClose, rsiPrev, rsiNow, change5m };
   } catch (e) {
     return null;
   }
@@ -1980,54 +1984,51 @@ function renderCoins() {
   
   const coins = getFilteredCoins();
   if (coins.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 24px; color: var(--text-tertiary);">Đang tải...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 24px; color: var(--text-tertiary);">Đang tải...</td></tr>';
     return;
   }
   
   tbody.innerHTML = coins.map((c, i) => {
     const det = COIN_STATE.details[c.symbol];
     const change24h = c.change24h;
-    const colorChange = change24h >= 0 ? 'var(--success)' : 'var(--danger)';
-    
-    let rsiHtml = '<span style="color: var(--text-tertiary);">...</span>';
-    let high5mHtml = '<span style="color: var(--text-tertiary);">...</span>';
-    let change5mHtml = '<span style="color: var(--text-tertiary);">...</span>';
-    let deltaHtml = '<span style="color: var(--text-tertiary);">...</span>';
-    
-    if (det) {
-      // RSI
-      let rsiColor = 'var(--text-secondary)';
-      if (det.rsi >= 70) rsiColor = 'var(--danger)';
-      else if (det.rsi <= 30) rsiColor = 'var(--success)';
-      rsiHtml = `<span style="color: ${rsiColor}; font-weight: 600;">${det.rsi.toFixed(1)}</span>`;
-      
-      // High 5m
-      high5mHtml = `<span class="mono">${fmtPrice(det.high5m)}</span>`;
-      
-      // Change 5m
-      const c5Color = det.change5m >= 0 ? 'var(--success)' : 'var(--danger)';
-      change5mHtml = `<span style="color: ${c5Color}; font-weight: 600;">${det.change5m >= 0 ? '+' : ''}${det.change5m.toFixed(2)}%</span>`;
-      
-      // Delta to high5m
-      const delta = det.high5m > 0 ? ((c.price - det.high5m) / det.high5m) * 100 : 0;
-      const deltaColor = delta >= -0.1 ? 'var(--warning)' : 'var(--text-secondary)';
-      deltaHtml = `<span style="color: ${deltaColor};">${delta.toFixed(2)}%</span>`;
-    }
-    
-    const volM = (c.volume24h / 1e6).toFixed(1);
+    const color24h = change24h >= 0 ? 'var(--success)' : 'var(--danger)';
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${c.symbol}.P`;
-    
+
+    // % 5m
+    let change5mHtml = '<span style="color: var(--text-tertiary);">...</span>';
+    // Đỉnh nến trước + RSI nến trước
+    let high5mHtml   = '<span style="color: var(--text-tertiary);">...</span>';
+    let rsiPrevHtml  = '<span style="color: var(--text-tertiary);">...</span>';
+    // Giá hiện tại + RSI hiện tại
+    let priceHtml    = `<span class="mono">${fmtPrice(c.price)}</span>`;
+    let rsiNowHtml   = '<span style="color: var(--text-tertiary);">...</span>';
+
+    if (det) {
+      // % 5m
+      const c5Color = det.change5m >= 0 ? 'var(--success)' : 'var(--danger)';
+      change5mHtml = `<span style="color:${c5Color}; font-weight:600;">${det.change5m >= 0 ? '+' : ''}${det.change5m.toFixed(2)}%</span>`;
+
+      // Đỉnh nến trước (5 nến 5m)
+      high5mHtml = `<span class="mono">${fmtPrice(det.high5m)}</span>`;
+
+      // RSI nến trước
+      const rsiPrevColor = det.rsiPrev >= 70 ? 'var(--danger)' : det.rsiPrev <= 30 ? 'var(--success)' : 'var(--text-secondary)';
+      rsiPrevHtml = `<span style="color:${rsiPrevColor}; font-weight:600;">${det.rsiPrev != null ? det.rsiPrev.toFixed(1) : '—'}</span>`;
+
+      // RSI hiện tại
+      const rsiNowColor = det.rsiNow >= 70 ? 'var(--danger)' : det.rsiNow <= 30 ? 'var(--success)' : 'var(--text-secondary)';
+      rsiNowHtml = `<span style="color:${rsiNowColor}; font-weight:600;">${det.rsiNow != null ? det.rsiNow.toFixed(1) : '—'}</span>`;
+    }
+
     return `
       <tr>
-        <td class="right" style="color: var(--text-tertiary);">${i + 1}</td>
-        <td><a href="${tradingViewUrl}" target="_blank" style="color: var(--text-primary); font-weight: 600; text-decoration: none;">${c.base}</a></td>
-        <td class="right mono">${fmtPrice(c.price)}</td>
-        <td class="right" style="color: ${colorChange}; font-weight: 600;">${change24h >= 0 ? '+' : ''}${change24h.toFixed(2)}%</td>
+        <td><a href="${tradingViewUrl}" target="_blank" style="color:var(--text-primary); font-weight:700; text-decoration:none; font-size:14px;">${c.base}</a></td>
+        <td class="right" style="color:${color24h}; font-weight:600;">${change24h >= 0 ? '+' : ''}${change24h.toFixed(2)}%</td>
         <td class="right">${change5mHtml}</td>
         <td class="right">${high5mHtml}</td>
-        <td class="right">${deltaHtml}</td>
-        <td class="right">${rsiHtml}</td>
-        <td class="right mono" style="color: var(--text-secondary);">${volM}</td>
+        <td class="right">${rsiPrevHtml}</td>
+        <td class="right">${priceHtml}</td>
+        <td class="right">${rsiNowHtml}</td>
       </tr>
     `;
   }).join('');
@@ -2063,7 +2064,7 @@ async function refreshCoins() {
   for (let i = 0; i < coins.length; i += batchSize) {
     const batch = coins.slice(i, i + batchSize);
     await Promise.all(batch.map(async c => {
-      const det = await fetchCoinDetails(c.symbol);
+      const det = await fetchCoinDetails(c.symbol, c.price);
       if (det) COIN_STATE.details[c.symbol] = det;
     }));
     renderCoins(); // render tăng dần để user thấy progress
