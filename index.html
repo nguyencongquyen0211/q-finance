@@ -378,10 +378,8 @@ async function fetchDetails(symbol, price){
     const N = 14;
     const LIM = N + 5; // 19 nến đủ để tính RSI(14)
 
-    // Fetch 4 khung thời gian song song
-    const [k1m, k3m, k5m, k15m] = await Promise.all([
-      fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=1m&limit=${LIM}`).then(r=>r.json()),
-      fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=3m&limit=${LIM}`).then(r=>r.json()),
+    // Fetch 2 khung thời gian song song
+    const [k5m, k15m] = await Promise.all([
       fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=5m&limit=28`).then(r=>r.json()),
       fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=15m&limit=${LIM}`).then(r=>r.json()),
     ]);
@@ -393,8 +391,6 @@ async function fetchDetails(symbol, price){
       return calcRSI([...cc, price], N);
     };
 
-    const rsi1m  = rsiOf(k1m);
-    const rsi3m  = rsiOf(k3m);
     const rsi5m  = rsiOf(k5m);
     const rsi15m = rsiOf(k15m);
 
@@ -405,7 +401,7 @@ async function fetchDetails(symbol, price){
     const ref1h = cc5.length>=13 ? cc5[cc5.length-13] : cc5[0];
     const chg1h = ref1h>0 ? (price-ref1h)/ref1h*100 : 0;
 
-    return { rsi1m, rsi3m, rsi5m, rsi15m, chg5m, chg1h };
+    return { rsi5m, rsi15m, chg5m, chg1h };
   }catch(e){ return null; }
 }
 
@@ -438,8 +434,8 @@ function rsiTag(rsi){
 // Tín hiệu: liệt kê TF nào vượt ngưỡng
 function sigBadge(det){
   if(!det) return '<span class="sig-none">...</span>';
-  const TFS = ['1m','3m','5m','15m'];
-  const VALS = [det.rsi1m, det.rsi3m, det.rsi5m, det.rsi15m];
+  const TFS = ['5m','15m'];
+  const VALS = [det.rsi5m, det.rsi15m];
   const ob = TFS.filter((_,i)=>VALS[i]!=null&&VALS[i]>90);
   const os = TFS.filter((_,i)=>VALS[i]!=null&&VALS[i]<20);
   if(ob.length) return `<span class="sig sig-bear">🔴 ${ob.join(' · ')}</span>`;
@@ -447,10 +443,9 @@ function sigBadge(det){
   return '<span class="sig-none">—</span>';
 }
 
-// Helper: có tín hiệu không?
 function hasSignal(det, side){
   if(!det) return false;
-  const v = [det.rsi1m, det.rsi3m, det.rsi5m, det.rsi15m];
+  const v = [det.rsi5m, det.rsi15m];
   return side==='short' ? v.some(r=>r!=null&&r>90) : v.some(r=>r!=null&&r<20);
 }
 
@@ -462,7 +457,7 @@ function scrollToRow(symbol){
   if(!row) return;
   row.scrollIntoView({behavior:'smooth', block:'center'});
   row.classList.remove('flash');
-  void row.offsetWidth; // reflow để reset animation
+  void row.offsetWidth;
   row.classList.add('flash');
   setTimeout(()=>row.classList.remove('flash'), 2000);
 }
@@ -483,10 +478,10 @@ function toggleFilter(side, type){
   let matching, title;
   if(type==='os'){
     matching = list.filter(x=>hasSignal(S.details[x.symbol],'long'));
-    title='🟢 RSI < 20 (Quá bán) — bất kỳ khung nào';
+    title='🟢 RSI < 20 (Quá bán)';
   }else{
     matching = list.filter(x=>hasSignal(S.details[x.symbol],'short'));
-    title='🔴 RSI > 90 (Quá mua) — bất kỳ khung nào';
+    title='🔴 RSI > 90 (Quá mua)';
   }
 
   document.getElementById(`fp-${side}-title`).textContent=`${title} · ${matching.length} coin`;
@@ -496,10 +491,10 @@ function toggleFilter(side, type){
   }else{
     chipsEl.innerHTML=matching.map(x=>{
       const d=S.details[x.symbol];
-      const rsiLine = d ? `<span class="chip-pct">${['1m','3m','5m','15m'].map((tf,i)=>{
-        const v=[d.rsi1m,d.rsi3m,d.rsi5m,d.rsi15m][i];
-        return v!=null?rsiTag(v):'';
-      }).join('')}</span>` : '';
+      const rsiLine = d ? `<span class="chip-pct">${['5m','15m'].map((tf,i)=>{
+        const v=[d.rsi5m,d.rsi15m][i];
+        return v!=null?`<span style="font-size:10px;color:var(--text2)">${tf}:</span>${rsiTag(v)}`:'';
+      }).join(' ')}</span>` : '';
       return`<div class="chip" onclick="scrollToRow('${x.symbol}')">
         <span>${x.base}</span>
         <span class="chip-pct ${pCls(x.change24h)}">${fPct(x.change24h)}</span>
@@ -525,11 +520,9 @@ const THEAD=`<tr>
   <th title="Biến động 5 phút">% 5m</th>
   <th title="Biến động 1 giờ">% 1h</th>
   <th title="Biến động 24 giờ">% 24h</th>
-  <th title="RSI(14) khung 1 phút">RSI 1m</th>
-  <th title="RSI(14) khung 3 phút">RSI 3m</th>
   <th title="RSI(14) khung 5 phút">RSI 5m</th>
   <th title="RSI(14) khung 15 phút">RSI 15m</th>
-  <th title="Tín hiệu: khung nào RSI > 90 hoặc < 20">Tín hiệu</th>
+  <th title="Tín hiệu: RSI > 90 hoặc < 20">Tín hiệu</th>
   <th title="Khối lượng 24h">KL 24h</th>
 </tr>`;
 
@@ -537,11 +530,10 @@ function renderTable(side, list){
   document.getElementById(`${side}-thead`).innerHTML=THEAD;
   const tbody=document.getElementById(`${side}-tbody`);
   if(!list.length){
-    tbody.innerHTML='<tr class="empty-row"><td colspan="11">Không có dữ liệu</td></tr>';
+    tbody.innerHTML='<tr class="empty-row"><td colspan="9">Không có dữ liệu</td></tr>';
     return;
   }
 
-  // Coin có tín hiệu lên đầu
   const sorted=[
     ...list.filter(c=>hasSignal(S.details[c.symbol], side)),
     ...list.filter(c=>!hasSignal(S.details[c.symbol], side)),
@@ -552,15 +544,8 @@ function renderTable(side, list){
     const tv=`https://www.tradingview.com/chart/?symbol=BINANCE:${c.symbol}.P`;
     const chg5m=det?.chg5m??null;
     const chg1h=det?.chg1h??null;
-    const sig=hasSignal(det,side);
-
-    const hlCls = sig ? (side==='short'?'hl-bear':'hl-bull') : '';
-
+    const hlCls = hasSignal(det,side) ? (side==='short'?'hl-bear':'hl-bull') : '';
     const loading='<span class="rsi rsi-mid">...</span>';
-    const r1=det?rsiTag(det.rsi1m):loading;
-    const r3=det?rsiTag(det.rsi3m):loading;
-    const r5=det?rsiTag(det.rsi5m):loading;
-    const r15=det?rsiTag(det.rsi15m):loading;
 
     return`<tr id="row-${c.symbol}" class="${hlCls}">
       <td>
@@ -579,10 +564,8 @@ function renderTable(side, list){
       <td class="${pCls(chg5m)}">${chg5m==null?'...':fPct(chg5m)}</td>
       <td class="${pCls(chg1h)}">${chg1h==null?'...':fPct(chg1h)}</td>
       <td class="${pCls(c.change24h)}" style="font-weight:700">${fPct(c.change24h)}</td>
-      <td>${r1}</td>
-      <td>${r3}</td>
-      <td>${r5}</td>
-      <td>${r15}</td>
+      <td>${det?rsiTag(det.rsi5m):loading}</td>
+      <td>${det?rsiTag(det.rsi15m):loading}</td>
       <td>${sigBadge(det)}</td>
       <td class="neu mono">${fVol(c.volM)}</td>
     </tr>`;
@@ -755,13 +738,13 @@ function sendNotif(title, body, tag){
 }
 
 function checkSignals(list, side){
-  const TFS = ['1m','3m','5m','15m'];
+  const TFS = ['5m','15m'];
   list.forEach(coin=>{
     const det = S.details[coin.symbol];
     if(!det) return;
     const prev = S.prevSignals[coin.symbol] || {};
 
-    const vals = [det.rsi1m, det.rsi3m, det.rsi5m, det.rsi15m];
+    const vals = [det.rsi5m, det.rsi15m];
     const obTfs = TFS.filter((_,i)=>vals[i]!=null&&vals[i]>90);
     const osTfs = TFS.filter((_,i)=>vals[i]!=null&&vals[i]<20);
     const prevOb = prev.obTfs||'';
