@@ -320,6 +320,7 @@ function cfg(){
 // ═══════════════════════════════
 //  RSI(14)
 // ═══════════════════════════════
+// ─── RSI single value (dùng để hiển thị) ───
 function calcRSI(closes, n){
   if(closes.length < n+1) return null;
   let g=0,l=0;
@@ -332,6 +333,85 @@ function calcRSI(closes, n){
   }
   if(al===0) return 100;
   return parseFloat((100-100/(1+ag/al)).toFixed(2));
+}
+
+// ─── RSI toàn bộ chuỗi (dùng cho swing divergence) ───
+function calcRSISeries(closes, n){
+  const out = new Array(closes.length).fill(null);
+  if(closes.length < n+1) return out;
+  let g=0,l=0;
+  for(let i=1;i<=n;i++){const d=closes[i]-closes[i-1];if(d>=0)g+=d;else l-=d;}
+  let ag=g/n,al=l/n;
+  out[n] = al===0?100:100-100/(1+ag/al);
+  for(let i=n+1;i<closes.length;i++){
+    const d=closes[i]-closes[i-1];
+    ag=(ag*(n-1)+Math.max(d,0))/n;
+    al=(al*(n-1)+Math.max(-d,0))/n;
+    out[i] = al===0?100:100-100/(1+ag/al);
+  }
+  return out;
+}
+
+// ─── Tìm Swing Highs và Swing Lows ───
+// strength: số nến mỗi bên cần so sánh (3 = cần 3 nến thấp hơn ở mỗi bên)
+function findSwings(highs, lows, rsiSeries, strength=3){
+  const swingHighs=[], swingLows=[];
+  const len = highs.length;
+  for(let i=strength; i<len-strength; i++){
+    if(rsiSeries[i]==null) continue;
+    // Swing High: high[i] phải cao hơn tất cả strength nến trước và sau
+    let isH=true;
+    for(let j=1;j<=strength;j++){
+      if(highs[i]<=highs[i-j]||highs[i]<=highs[i+j]){isH=false;break;}
+    }
+    if(isH) swingHighs.push({i, price:highs[i], rsi:rsiSeries[i]});
+    // Swing Low: low[i] phải thấp hơn tất cả strength nến trước và sau
+    let isL=true;
+    for(let j=1;j<=strength;j++){
+      if(lows[i]>=lows[i-j]||lows[i]>=lows[i+j]){isL=false;break;}
+    }
+    if(isL) swingLows.push({i, price:lows[i], rsi:rsiSeries[i]});
+  }
+  return{swingHighs, swingLows};
+}
+
+// ─── Phát hiện phân kỳ từ swing points ───
+function detectDivergence(swingHighs, swingLows, totalCandles){
+  const MIN_DIST  = 5;   // tối thiểu 5 nến (25 phút) giữa 2 swing
+  const MAX_AGE   = 20;  // swing gần nhất phải trong 20 nến cuối (100 phút)
+  const lastIdx   = totalCandles - 1;
+
+  // Lấy 2 swing high gần nhất để detect bearish divergence
+  const shs = swingHighs.slice(-3); // giữ tối đa 3 để có lựa chọn
+  for(let k=shs.length-1; k>=1; k--){
+    const sh2=shs[k], sh1=shs[k-1];
+    if(sh2.i - sh1.i < MIN_DIST) continue;         // quá gần nhau
+    if(lastIdx - sh2.i > MAX_AGE) break;            // swing mới nhất quá cũ
+    if(sh2.price > sh1.price && sh2.rsi < sh1.rsi){ // HH price + LH RSI
+      return {
+        type: 'bearish',
+        sh1, sh2,
+        desc: `SH1(${sh1.price.toFixed(2)},RSI${sh1.rsi.toFixed(1)}) → SH2(${sh2.price.toFixed(2)},RSI${sh2.rsi.toFixed(1)})`
+      };
+    }
+  }
+
+  // Lấy 2 swing low gần nhất để detect bullish divergence
+  const sls = swingLows.slice(-3);
+  for(let k=sls.length-1; k>=1; k--){
+    const sl2=sls[k], sl1=sls[k-1];
+    if(sl2.i - sl1.i < MIN_DIST) continue;
+    if(lastIdx - sl2.i > MAX_AGE) break;
+    if(sl2.price < sl1.price && sl2.rsi > sl1.rsi){ // LL price + HL RSI
+      return {
+        type: 'bullish',
+        sl1, sl2,
+        desc: `SL1(${sl1.price.toFixed(2)},RSI${sl1.rsi.toFixed(1)}) → SL2(${sl2.price.toFixed(2)},RSI${sl2.rsi.toFixed(1)})`
+      };
+    }
+  }
+
+  return null;
 }
 
 // ═══════════════════════════════
@@ -394,30 +474,45 @@ function updateHeaderPrices(allTickers){
 async function fetchDetails(symbol, price){
   try{
     const n = cfg().rsiPer;
+    // Fetch 80 nến: đủ để RSI ổn định + tìm ít nhất 2 swing points có ý nghĩa
     const res = await fetch(
-      `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=5m&limit=${n+20}`
+      `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=5m&limit=80`
     );
     const klines = await res.json();
-    if(!Array.isArray(klines)||klines.length<n+3) return null;
+    if(!Array.isArray(klines)||klines.length<n+15) return null;
 
-    const cc = klines.slice(0,-1).map(k=>parseFloat(k[4])); // closed closes
-    if(cc.length<n+1) return null;
+    // Bỏ nến đang mở (nến cuối)
+    const closed = klines.slice(0,-1);
+    const cc  = closed.map(k=>parseFloat(k[4])); // closes
+    const hh  = closed.map(k=>parseFloat(k[2])); // highs
+    const ll  = closed.map(k=>parseFloat(k[3])); // lows
+    if(cc.length < n+10) return null;
 
     const prevClose = cc[cc.length-1];
-    const rsiPrev   = calcRSI(cc, n);
-    const rsiNow    = calcRSI([...cc, price], n);
-    const chg5m     = prevClose>0?(price-prevClose)/prevClose*100:0;
-    const ref1h     = cc.length>=13?cc[cc.length-13]:cc[0];
-    const chg1h     = ref1h>0?(price-ref1h)/ref1h*100:0;
 
-    // Phân kỳ - nhất quán [prevClose,rsiPrev] vs [price,rsiNow]
-    let divergence = null;
-    if(rsiPrev!=null&&rsiNow!=null){
-      if(price>prevClose && rsiNow<rsiPrev && rsiNow>=55) divergence='bearish';
-      if(price<prevClose && rsiNow>rsiPrev && rsiNow<=45) divergence='bullish';
-    }
-    return{prevClose,rsiPrev,rsiNow,chg5m,chg1h,divergence};
-  }catch(e){return null;}
+    // RSI hiển thị
+    const rsiPrev = calcRSI(cc, n);
+    const rsiNow  = calcRSI([...cc, price], n);
+
+    // % thay đổi
+    const chg5m = prevClose>0?(price-prevClose)/prevClose*100:0;
+    const ref1h = cc.length>=13?cc[cc.length-13]:cc[0];
+    const chg1h = ref1h>0?(price-ref1h)/ref1h*100:0;
+
+    // ── PHÂN KỲ SWING THỰC SỰ ──
+    // 1. Tính RSI toàn bộ chuỗi
+    const rsiSeries = calcRSISeries(cc, n);
+
+    // 2. Tìm swing highs/lows với strength=3
+    const { swingHighs, swingLows } = findSwings(hh, ll, rsiSeries, 3);
+
+    // 3. So sánh 2 swing points gần nhất để detect divergence
+    const divResult = detectDivergence(swingHighs, swingLows, cc.length);
+    const divergence = divResult ? divResult.type : null;
+
+    return { prevClose, rsiPrev, rsiNow, chg5m, chg1h, divergence,
+             swingHighs, swingLows, divResult };
+  }catch(e){ return null; }
 }
 
 // ═══════════════════════════════
@@ -445,10 +540,11 @@ function rsiTag(rsi){
   const cls=rsi>=c.rsiOB?'rsi-ob':rsi<=c.rsiOS?'rsi-os':rsi>=60?'rsi-hi':rsi<=40?'rsi-lo':'rsi-mid';
   return`<span class="rsi ${cls}">${rsi.toFixed(1)}</span>`;
 }
-function sigBadge(div){
-  if(!div)return'<span class="sig-none">—</span>';
-  if(div==='bullish')return'<span class="sig sig-bull">🚀 Đảo chiều Tăng</span>';
-  return'<span class="sig sig-bear">⚠️ Đảo chiều Giảm</span>';
+function sigBadge(div, det){
+  const desc = det?.divResult?.desc ? ` title="${det.divResult.desc}"` : '';
+  if(!div) return '<span class="sig-none">—</span>';
+  if(div==='bullish') return `<span class="sig sig-bull"${desc}>🚀 Đảo chiều Tăng</span>`;
+  return `<span class="sig sig-bear"${desc}>⚠️ Đảo chiều Giảm</span>`;
 }
 
 // ═══════════════════════════════
@@ -578,7 +674,7 @@ function renderTable(side, list){
       <td class="${pCls(chg1h)}">${chg1h==null?'...':fPct(chg1h)}</td>
       <td class="${pCls(c.change24h)}" style="font-weight:700">${fPct(c.change24h)}</td>
       <td>${rsiCell}</td>
-      <td>${sigBadge(div)}</td>
+      <td>${sigBadge(div,det)}</td>
       <td class="neu mono">${fVol(c.volM)}</td>
     </tr>`;
   }).join('');
