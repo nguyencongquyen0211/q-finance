@@ -205,13 +205,8 @@ td:first-child{text-align:left}
 <!-- TAB LONG -->
 <div class="tab-pane" id="pane-long">
   <div class="cards" id="cards-long">
-    <div class="card" id="card-l-bull" onclick="toggleFilter('long','bullish')">
-      <div class="card-label">🚀 Đảo chiều Tăng</div>
-      <div class="card-value" id="l-bull" style="color:var(--green)">—</div>
-      <div class="card-sub">bấm để xem coin</div>
-    </div>
     <div class="card" id="card-l-os" onclick="toggleFilter('long','os')">
-      <div class="card-label">RSI Quá bán (≤ OS)</div>
+      <div class="card-label">🟢 RSI &lt; 20 (Quá bán)</div>
       <div class="card-value" id="l-os" style="color:var(--green)">—</div>
       <div class="card-sub">bấm để xem coin</div>
     </div>
@@ -249,13 +244,8 @@ td:first-child{text-align:left}
 <!-- TAB SHORT (active mặc định) -->
 <div class="tab-pane active" id="pane-short">
   <div class="cards" id="cards-short">
-    <div class="card" id="card-s-bear" onclick="toggleFilter('short','bearish')">
-      <div class="card-label">⚠️ Đảo chiều Giảm</div>
-      <div class="card-value" id="s-bear" style="color:var(--red)">—</div>
-      <div class="card-sub">bấm để xem coin</div>
-    </div>
     <div class="card" id="card-s-ob" onclick="toggleFilter('short','ob')">
-      <div class="card-label">RSI Quá mua (≥ OB)</div>
+      <div class="card-label">🔴 RSI &gt; 90 (Quá mua)</div>
       <div class="card-value" id="s-ob" style="color:var(--red)">—</div>
       <div class="card-sub">bấm để xem coin</div>
     </div>
@@ -320,7 +310,7 @@ function cfg(){
 // ═══════════════════════════════
 //  RSI(14)
 // ═══════════════════════════════
-// ─── RSI single value (dùng để hiển thị) ───
+// ─── RSI single value ───
 function calcRSI(closes, n){
   if(closes.length < n+1) return null;
   let g=0,l=0;
@@ -333,85 +323,6 @@ function calcRSI(closes, n){
   }
   if(al===0) return 100;
   return parseFloat((100-100/(1+ag/al)).toFixed(2));
-}
-
-// ─── RSI toàn bộ chuỗi (dùng cho swing divergence) ───
-function calcRSISeries(closes, n){
-  const out = new Array(closes.length).fill(null);
-  if(closes.length < n+1) return out;
-  let g=0,l=0;
-  for(let i=1;i<=n;i++){const d=closes[i]-closes[i-1];if(d>=0)g+=d;else l-=d;}
-  let ag=g/n,al=l/n;
-  out[n] = al===0?100:100-100/(1+ag/al);
-  for(let i=n+1;i<closes.length;i++){
-    const d=closes[i]-closes[i-1];
-    ag=(ag*(n-1)+Math.max(d,0))/n;
-    al=(al*(n-1)+Math.max(-d,0))/n;
-    out[i] = al===0?100:100-100/(1+ag/al);
-  }
-  return out;
-}
-
-// ─── Tìm Swing Highs và Swing Lows ───
-// strength: số nến mỗi bên cần so sánh (3 = cần 3 nến thấp hơn ở mỗi bên)
-function findSwings(highs, lows, rsiSeries, strength=3){
-  const swingHighs=[], swingLows=[];
-  const len = highs.length;
-  for(let i=strength; i<len-strength; i++){
-    if(rsiSeries[i]==null) continue;
-    // Swing High: high[i] phải cao hơn tất cả strength nến trước và sau
-    let isH=true;
-    for(let j=1;j<=strength;j++){
-      if(highs[i]<=highs[i-j]||highs[i]<=highs[i+j]){isH=false;break;}
-    }
-    if(isH) swingHighs.push({i, price:highs[i], rsi:rsiSeries[i]});
-    // Swing Low: low[i] phải thấp hơn tất cả strength nến trước và sau
-    let isL=true;
-    for(let j=1;j<=strength;j++){
-      if(lows[i]>=lows[i-j]||lows[i]>=lows[i+j]){isL=false;break;}
-    }
-    if(isL) swingLows.push({i, price:lows[i], rsi:rsiSeries[i]});
-  }
-  return{swingHighs, swingLows};
-}
-
-// ─── Phát hiện phân kỳ từ swing points ───
-function detectDivergence(swingHighs, swingLows, totalCandles){
-  const MIN_DIST  = 5;   // tối thiểu 5 nến (25 phút) giữa 2 swing
-  const MAX_AGE   = 20;  // swing gần nhất phải trong 20 nến cuối (100 phút)
-  const lastIdx   = totalCandles - 1;
-
-  // Lấy 2 swing high gần nhất để detect bearish divergence
-  const shs = swingHighs.slice(-3); // giữ tối đa 3 để có lựa chọn
-  for(let k=shs.length-1; k>=1; k--){
-    const sh2=shs[k], sh1=shs[k-1];
-    if(sh2.i - sh1.i < MIN_DIST) continue;         // quá gần nhau
-    if(lastIdx - sh2.i > MAX_AGE) break;            // swing mới nhất quá cũ
-    if(sh2.price > sh1.price && sh2.rsi < sh1.rsi){ // HH price + LH RSI
-      return {
-        type: 'bearish',
-        sh1, sh2,
-        desc: `SH1(${sh1.price.toFixed(2)},RSI${sh1.rsi.toFixed(1)}) → SH2(${sh2.price.toFixed(2)},RSI${sh2.rsi.toFixed(1)})`
-      };
-    }
-  }
-
-  // Lấy 2 swing low gần nhất để detect bullish divergence
-  const sls = swingLows.slice(-3);
-  for(let k=sls.length-1; k>=1; k--){
-    const sl2=sls[k], sl1=sls[k-1];
-    if(sl2.i - sl1.i < MIN_DIST) continue;
-    if(lastIdx - sl2.i > MAX_AGE) break;
-    if(sl2.price < sl1.price && sl2.rsi > sl1.rsi){ // LL price + HL RSI
-      return {
-        type: 'bullish',
-        sl1, sl2,
-        desc: `SL1(${sl1.price.toFixed(2)},RSI${sl1.rsi.toFixed(1)}) → SL2(${sl2.price.toFixed(2)},RSI${sl2.rsi.toFixed(1)})`
-      };
-    }
-  }
-
-  return null;
 }
 
 // ═══════════════════════════════
@@ -474,44 +385,23 @@ function updateHeaderPrices(allTickers){
 async function fetchDetails(symbol, price){
   try{
     const n = cfg().rsiPer;
-    // Fetch 80 nến: đủ để RSI ổn định + tìm ít nhất 2 swing points có ý nghĩa
     const res = await fetch(
-      `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=5m&limit=80`
+      `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=5m&limit=${n+20}`
     );
     const klines = await res.json();
-    if(!Array.isArray(klines)||klines.length<n+15) return null;
+    if(!Array.isArray(klines)||klines.length<n+3) return null;
 
-    // Bỏ nến đang mở (nến cuối)
-    const closed = klines.slice(0,-1);
-    const cc  = closed.map(k=>parseFloat(k[4])); // closes
-    const hh  = closed.map(k=>parseFloat(k[2])); // highs
-    const ll  = closed.map(k=>parseFloat(k[3])); // lows
-    if(cc.length < n+10) return null;
+    const cc = klines.slice(0,-1).map(k=>parseFloat(k[4]));
+    if(cc.length<n+1) return null;
 
     const prevClose = cc[cc.length-1];
+    const rsiPrev   = calcRSI(cc, n);
+    const rsiNow    = calcRSI([...cc, price], n);
+    const chg5m     = prevClose>0?(price-prevClose)/prevClose*100:0;
+    const ref1h     = cc.length>=13?cc[cc.length-13]:cc[0];
+    const chg1h     = ref1h>0?(price-ref1h)/ref1h*100:0;
 
-    // RSI hiển thị
-    const rsiPrev = calcRSI(cc, n);
-    const rsiNow  = calcRSI([...cc, price], n);
-
-    // % thay đổi
-    const chg5m = prevClose>0?(price-prevClose)/prevClose*100:0;
-    const ref1h = cc.length>=13?cc[cc.length-13]:cc[0];
-    const chg1h = ref1h>0?(price-ref1h)/ref1h*100:0;
-
-    // ── PHÂN KỲ SWING THỰC SỰ ──
-    // 1. Tính RSI toàn bộ chuỗi
-    const rsiSeries = calcRSISeries(cc, n);
-
-    // 2. Tìm swing highs/lows với strength=3
-    const { swingHighs, swingLows } = findSwings(hh, ll, rsiSeries, 3);
-
-    // 3. So sánh 2 swing points gần nhất để detect divergence
-    const divResult = detectDivergence(swingHighs, swingLows, cc.length);
-    const divergence = divResult ? divResult.type : null;
-
-    return { prevClose, rsiPrev, rsiNow, chg5m, chg1h, divergence,
-             swingHighs, swingLows, divResult };
+    return { prevClose, rsiPrev, rsiNow, chg5m, chg1h };
   }catch(e){ return null; }
 }
 
@@ -540,11 +430,11 @@ function rsiTag(rsi){
   const cls=rsi>=c.rsiOB?'rsi-ob':rsi<=c.rsiOS?'rsi-os':rsi>=60?'rsi-hi':rsi<=40?'rsi-lo':'rsi-mid';
   return`<span class="rsi ${cls}">${rsi.toFixed(1)}</span>`;
 }
-function sigBadge(div, det){
-  const desc = det?.divResult?.desc ? ` title="${det.divResult.desc}"` : '';
-  if(!div) return '<span class="sig-none">—</span>';
-  if(div==='bullish') return `<span class="sig sig-bull"${desc}>🚀 Đảo chiều Tăng</span>`;
-  return `<span class="sig sig-bear"${desc}>⚠️ Đảo chiều Giảm</span>`;
+function sigBadge(rsiNow){
+  if(rsiNow == null) return '<span class="sig-none">...</span>';
+  if(rsiNow > 90)  return '<span class="sig sig-bear">🔴 Quá mua &gt;90</span>';
+  if(rsiNow < 20)  return '<span class="sig sig-bull">🟢 Quá bán &lt;20</span>';
+  return '<span class="sig-none">—</span>';
 }
 
 // ═══════════════════════════════
@@ -565,34 +455,21 @@ function scrollToRow(symbol){
 // ═══════════════════════════════
 function toggleFilter(side, type){
   const current = S.activeFilter[side];
-  // Nếu cùng loại → đóng lại
   if(current===type){closeFilter(side);return;}
   S.activeFilter[side]=type;
 
-  // Reset active cards
   document.querySelectorAll(`#cards-${side} .card`).forEach(c=>c.classList.remove('active-filter'));
-  const cardId = side==='long'
-    ?(type==='bullish'?'card-l-bull':'card-l-os')
-    :(type==='bearish'?'card-s-bear':'card-s-ob');
+  const cardId = side==='long'?'card-l-os':'card-s-ob';
   document.getElementById(cardId)?.classList.add('active-filter');
 
-  // Build chip list
   const list = side==='long'?S.longList:S.shortList;
-  const c = cfg();
-  let matching;
-  let title;
-  if(type==='bullish'){
-    matching = list.filter(x=>S.details[x.symbol]?.divergence==='bullish');
-    title='🚀 Đảo chiều Tăng';
-  }else if(type==='bearish'){
-    matching = list.filter(x=>S.details[x.symbol]?.divergence==='bearish');
-    title='⚠️ Đảo chiều Giảm';
-  }else if(type==='os'){
-    matching = list.filter(x=>{const d=S.details[x.symbol];return d&&d.rsiNow!=null&&d.rsiNow<=c.rsiOS;});
-    title=`RSI Quá bán (≤${c.rsiOS})`;
+  let matching, title;
+  if(type==='os'){
+    matching = list.filter(x=>{const d=S.details[x.symbol];return d&&d.rsiNow!=null&&d.rsiNow<20;});
+    title='🟢 RSI Quá bán (< 20)';
   }else{
-    matching = list.filter(x=>{const d=S.details[x.symbol];return d&&d.rsiNow!=null&&d.rsiNow>=c.rsiOB;});
-    title=`RSI Quá mua (≥${c.rsiOB})`;
+    matching = list.filter(x=>{const d=S.details[x.symbol];return d&&d.rsiNow!=null&&d.rsiNow>90;});
+    title='🔴 RSI Quá mua (> 90)';
   }
 
   document.getElementById(`fp-${side}-title`).textContent=`${title} · ${matching.length} coin`;
@@ -602,10 +479,9 @@ function toggleFilter(side, type){
   }else{
     chipsEl.innerHTML=matching.map(x=>{
       const d=S.details[x.symbol];
-      const pct=d?fPct(x.change24h):'';
       return`<div class="chip" onclick="scrollToRow('${x.symbol}')">
         <span>${x.base}</span>
-        <span class="chip-pct ${pCls(x.change24h)}">${pct}</span>
+        <span class="chip-pct ${pCls(x.change24h)}">${fPct(x.change24h)}</span>
         ${d?'<span class="chip-pct">RSI:'+rsiTag(d.rsiNow)+'</span>':''}
       </div>`;
     }).join('');
@@ -629,7 +505,7 @@ const THEAD=`<tr>
   <th title="Biến động 1 giờ">% 1h</th>
   <th title="Biến động 24 giờ">% 24h</th>
   <th title="RSI(14) khung 5 phút — Nến đóng trước / Hiện tại">RSI(14) Trước/Nay</th>
-  <th title="Tín hiệu phân kỳ giá-RSI">Tín hiệu</th>
+  <th title="Tín hiệu RSI(14) · > 90 quá mua · &lt; 20 quá bán">Tín hiệu RSI</th>
   <th title="Khối lượng 24h">KL 24h</th>
 </tr>`;
 
@@ -640,22 +516,32 @@ function renderTable(side, list){
     tbody.innerHTML='<tr class="empty-row"><td colspan="8">Không có dữ liệu</td></tr>';
     return;
   }
-  // Đưa coin có divergence phù hợp lên đầu
-  const want=side==='long'?'bullish':'bearish';
+  // Đưa coin có RSI signal phù hợp lên đầu
   const sorted=[
-    ...list.filter(c=>S.details[c.symbol]?.divergence===want),
-    ...list.filter(c=>S.details[c.symbol]?.divergence!==want),
+    ...list.filter(c=>{
+      const r=S.details[c.symbol]?.rsiNow;
+      return side==='short'?(r!=null&&r>90):(r!=null&&r<20);
+    }),
+    ...list.filter(c=>{
+      const r=S.details[c.symbol]?.rsiNow;
+      return !(side==='short'?(r!=null&&r>90):(r!=null&&r<20));
+    }),
   ];
   tbody.innerHTML=sorted.map((c,i)=>{
     const det=S.details[c.symbol];
     const tv=`https://www.tradingview.com/chart/?symbol=BINANCE:${c.symbol}.P`;
     const chg5m=det?.chg5m??null;
     const chg1h=det?.chg1h??null;
-    const div=det?.divergence??null;
-    const hlCls=(side==='long'&&div==='bullish')?'hl-bull':(side==='short'&&div==='bearish')?'hl-bear':'';
+    const rsiNow=det?.rsiNow??null;
+
+    // Highlight: RSI>90 trong SHORT, RSI<20 trong LONG
+    const hlCls=(side==='short'&&rsiNow!=null&&rsiNow>90)?'hl-bear'
+               :(side==='long' &&rsiNow!=null&&rsiNow<20)?'hl-bull':'';
+
     const rsiCell=det
       ?`${rsiTag(det.rsiPrev)}<span class="rsi-sep">/</span>${rsiTag(det.rsiNow)}`
       :'<span class="rsi rsi-mid">...</span>';
+
     return`<tr id="row-${c.symbol}" class="${hlCls}">
       <td>
         <div class="coin-cell">
@@ -674,7 +560,7 @@ function renderTable(side, list){
       <td class="${pCls(chg1h)}">${chg1h==null?'...':fPct(chg1h)}</td>
       <td class="${pCls(c.change24h)}" style="font-weight:700">${fPct(c.change24h)}</td>
       <td>${rsiCell}</td>
-      <td>${sigBadge(div,det)}</td>
+      <td>${sigBadge(rsiNow)}</td>
       <td class="neu mono">${fVol(c.volM)}</td>
     </tr>`;
   }).join('');
@@ -684,15 +570,12 @@ function renderTable(side, list){
 //  SUMMARY CARDS
 // ═══════════════════════════════
 function updateCards(side,list){
-  const c=cfg();
   const dets=list.map(x=>S.details[x.symbol]).filter(Boolean);
   if(side==='long'){
-    const bulls=dets.filter(d=>d.divergence==='bullish').length;
-    const os=dets.filter(d=>d.rsiNow!=null&&d.rsiNow<=c.rsiOS).length;
+    const os=dets.filter(d=>d.rsiNow!=null&&d.rsiNow<20).length;
     const t24=list.length?list.reduce((a,b)=>b.change24h<a.change24h?b:a):null;
     const b5=list.filter(x=>S.details[x.symbol]);
     const t5m=b5.length?b5.reduce((a,b)=>S.details[b.symbol].chg5m<S.details[a.symbol].chg5m?b:a):null;
-    document.getElementById('l-bull').textContent=bulls?`${bulls} coin`:'0';
     document.getElementById('l-os').textContent=os?`${os} coin`:'0';
     document.getElementById('l-top24').textContent=t24?fPct(t24.change24h):'—';
     document.getElementById('l-top24-sub').textContent=t24?t24.base:'';
@@ -700,12 +583,10 @@ function updateCards(side,list){
     document.getElementById('l-top5m-sub').textContent=t5m?t5m.base:'';
     document.getElementById('long-cnt').textContent=`(${list.length})`;
   }else{
-    const bears=dets.filter(d=>d.divergence==='bearish').length;
-    const ob=dets.filter(d=>d.rsiNow!=null&&d.rsiNow>=c.rsiOB).length;
+    const ob=dets.filter(d=>d.rsiNow!=null&&d.rsiNow>90).length;
     const t24=list.length?list.reduce((a,b)=>b.change24h>a.change24h?b:a):null;
     const b5=list.filter(x=>S.details[x.symbol]);
     const t5m=b5.length?b5.reduce((a,b)=>S.details[b.symbol].chg5m>S.details[a.symbol].chg5m?b:a):null;
-    document.getElementById('s-bear').textContent=bears?`${bears} coin`:'0';
     document.getElementById('s-ob').textContent=ob?`${ob} coin`:'0';
     document.getElementById('s-top24').textContent=t24?fPct(t24.change24h):'—';
     document.getElementById('s-top24-sub').textContent=t24?t24.base:'';
@@ -713,7 +594,6 @@ function updateCards(side,list){
     document.getElementById('s-top5m-sub').textContent=t5m?t5m.base:'';
     document.getElementById('short-cnt').textContent=`(${list.length})`;
   }
-  // Refresh filter panel nếu đang mở
   if(S.activeFilter[side]) toggleFilter(side, S.activeFilter[side]);
 }
 
@@ -853,58 +733,32 @@ function sendNotif(title, body, tag){
 }
 
 function checkSignals(list, side){
-  const c = cfg();
   list.forEach(coin=>{
     const det = S.details[coin.symbol];
     if(!det) return;
     const prev = S.prevSignals[coin.symbol] || {};
 
-    // 1. Phân kỳ mới xuất hiện
-    if(det.divergence && det.divergence !== prev.divergence){
-      if(det.divergence==='bullish' && side==='long'){
-        sendNotif(
-          `🚀 Đảo chiều TĂNG · ${coin.base}`,
-          `Phân kỳ dương 5m · RSI ${det.rsiNow?.toFixed(1)} · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
-          `bull-${coin.symbol}`
-        );
-      }
-      if(det.divergence==='bearish' && side==='short'){
-        sendNotif(
-          `⚠️ Đảo chiều GIẢM · ${coin.base}`,
-          `Phân kỳ âm 5m · RSI ${det.rsiNow?.toFixed(1)} · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
-          `bear-${coin.symbol}`
-        );
-      }
-    }
-
-    // 2. RSI vừa vào vùng quá mua (chưa bị cảnh báo lần trước)
-    const nowOB = det.rsiNow != null && det.rsiNow >= c.rsiOB;
-    const wasOB = prev.rsiOB;
-    if(nowOB && !wasOB && side==='short'){
+    // RSI vừa vượt 90 → cảnh báo SHORT
+    const nowOB = det.rsiNow != null && det.rsiNow > 90;
+    if(nowOB && !prev.rsiOB && side==='short'){
       sendNotif(
         `🔴 RSI Quá mua · ${coin.base}`,
-        `RSI(14) = ${det.rsiNow?.toFixed(1)} ≥ ${c.rsiOB} · Khung 5m · Giá ${fPrice(coin.price)}`,
+        `RSI(14) = ${det.rsiNow.toFixed(1)} > 90 · Khung 5m · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
         `ob-${coin.symbol}`
       );
     }
 
-    // 3. RSI vừa vào vùng quá bán
-    const nowOS = det.rsiNow != null && det.rsiNow <= c.rsiOS;
-    const wasOS = prev.rsiOS;
-    if(nowOS && !wasOS && side==='long'){
+    // RSI vừa xuống dưới 20 → cảnh báo LONG
+    const nowOS = det.rsiNow != null && det.rsiNow < 20;
+    if(nowOS && !prev.rsiOS && side==='long'){
       sendNotif(
         `🟢 RSI Quá bán · ${coin.base}`,
-        `RSI(14) = ${det.rsiNow?.toFixed(1)} ≤ ${c.rsiOS} · Khung 5m · Giá ${fPrice(coin.price)}`,
+        `RSI(14) = ${det.rsiNow.toFixed(1)} < 20 · Khung 5m · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
         `os-${coin.symbol}`
       );
     }
 
-    // Lưu trạng thái hiện tại
-    S.prevSignals[coin.symbol] = {
-      divergence: det.divergence,
-      rsiOB: nowOB,
-      rsiOS: nowOS
-    };
+    S.prevSignals[coin.symbol] = { rsiOB: nowOB, rsiOS: nowOS };
   });
 }
 
