@@ -21,12 +21,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .logo{font-size:17px;font-weight:800;color:var(--blue);letter-spacing:-.5px;white-space:nowrap;flex-shrink:0}
 .logo em{color:var(--text2);font-style:normal;font-weight:400;font-size:12px;margin-left:6px}
 
-/* BTC / ETH prices in header */
-.hdr-prices{display:flex;gap:14px;padding:0 4px;flex-shrink:0}
-.hdr-coin{display:flex;flex-direction:column;align-items:center;gap:1px}
-.hdr-coin-name{font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+/* BTC / ETH prices in header - 1 dòng */
+.hdr-prices{display:flex;align-items:center;gap:6px;padding:4px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;flex-shrink:0}
+.hdr-coin-name{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.3px}
 .hdr-coin-price{font-size:13px;font-weight:700;font-family:'SF Mono','Fira Code',monospace;color:var(--text)}
-.hdr-coin-chg{font-size:10px;font-weight:600}
+.hdr-coin-chg{font-size:11px;font-weight:600}
+.hdr-divider{color:var(--text3);margin:0 4px;font-size:12px}
 
 .hdr-mid{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background .3s}
@@ -150,18 +150,15 @@ td:first-child{text-align:left}
 <header class="hdr">
   <div class="logo">Q<em>· Futures Scanner</em></div>
 
-  <!-- BTC / ETH realtime -->
+  <!-- BTC / ETH realtime - 1 dòng -->
   <div class="hdr-prices">
-    <div class="hdr-coin">
-      <span class="hdr-coin-name">BTC</span>
-      <span class="hdr-coin-price" id="hdr-btc-price">—</span>
-      <span class="hdr-coin-chg" id="hdr-btc-chg"></span>
-    </div>
-    <div class="hdr-coin">
-      <span class="hdr-coin-name">ETH</span>
-      <span class="hdr-coin-price" id="hdr-eth-price">—</span>
-      <span class="hdr-coin-chg" id="hdr-eth-chg"></span>
-    </div>
+    <span class="hdr-coin-name">BTC</span>
+    <span class="hdr-coin-price" id="hdr-btc-price">—</span>
+    <span class="hdr-coin-chg" id="hdr-btc-chg"></span>
+    <span class="hdr-divider">|</span>
+    <span class="hdr-coin-name">ETH</span>
+    <span class="hdr-coin-price" id="hdr-eth-price">—</span>
+    <span class="hdr-coin-chg" id="hdr-eth-chg"></span>
   </div>
 
   <div class="hdr-mid">
@@ -193,12 +190,11 @@ td:first-child{text-align:left}
 </header>
 
 <div class="tabs">
-  <button class="tab-btn long" onclick="switchTab('long')">
-    📈 LONG <span class="cnt" id="long-cnt"></span>
-  </button>
-  <!-- SHORT là tab mặc định -->
   <button class="tab-btn short active" onclick="switchTab('short')">
     📉 SHORT <span class="cnt" id="short-cnt"></span>
+  </button>
+  <button class="tab-btn long" onclick="switchTab('long')">
+    📈 LONG <span class="cnt" id="long-cnt"></span>
   </button>
 </div>
 
