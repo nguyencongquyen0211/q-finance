@@ -997,6 +997,216 @@ p { margin: 0; }
 /* photo-block (slide 4, 15) - circular too */
 .photo-block img { border-radius: var(--r-lg); }
 
+
+/* ===== SLIDE VĂN NGHỆ ===== */
+.slide-vn { padding: 0 !important; }
+.vn-stage {
+  width: 100%; height: 100%;
+  background: linear-gradient(155deg, #1A0A30 0%, #2D1060 35%, #1A2060 70%, #0A1840 100%);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  padding: 40px 5vw 80px;
+}
+.vn-bg-notes {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+}
+.vn-spotlight {
+  position: absolute; border-radius: 50%;
+  pointer-events: none; z-index: 1;
+}
+.sp1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(245,166,35,.18) 0%, transparent 65%);
+  top: -200px; left: 10%;
+  animation: spotMove1 8s ease-in-out infinite;
+}
+.sp2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(255,143,171,.15) 0%, transparent 65%);
+  bottom: -150px; right: 5%;
+  animation: spotMove2 10s ease-in-out infinite;
+}
+@keyframes spotMove1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(80px,40px)} }
+@keyframes spotMove2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-60px,-30px)} }
+.vn-inner {
+  display: flex; align-items: center; gap: 0;
+  max-width: 1100px; width: 100%; z-index: 2; position: relative;
+}
+.vn-block {
+  flex: 1; text-align: center; padding: 0 32px;
+}
+.vn-bigicon {
+  font-size: clamp(56px, 7vw, 88px);
+  display: block; margin-bottom: 16px;
+  animation: iconBounce 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 4px 16px rgba(255,255,255,.2));
+}
+.vn-block:nth-child(1) .vn-bigicon { animation-delay: 0s; }
+.vn-block:nth-child(3) .vn-bigicon { animation-delay: .8s; }
+@keyframes iconBounce {
+  0%,100%{ transform: translateY(0) rotate(-3deg) scale(1); }
+  40%    { transform: translateY(-14px) rotate(4deg) scale(1.08); }
+  60%    { transform: translateY(-8px) rotate(-2deg) scale(1.04); }
+}
+.vn-eyebrow {
+  font-size: clamp(10px, 1.1vw, 13px); font-weight: 700;
+  letter-spacing: 2px; color: rgba(255,255,255,.55);
+  margin-bottom: 12px; text-transform: uppercase;
+}
+.vn-h2 {
+  font-size: clamp(28px, 4vw, 52px); font-weight: 900;
+  color: white; line-height: 1.1; margin-bottom: 16px;
+  text-shadow: 0 2px 24px rgba(245,166,35,.4);
+}
+.vn-h2 span { color: var(--pink); }
+.vn-desc {
+  font-size: clamp(13px, 1.4vw, 16px); color: rgba(255,255,255,.7);
+  line-height: 1.7; font-weight: 500;
+}
+.vn-sep {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding: 0 16px; flex-shrink: 0;
+}
+.vn-sep-line {
+  width: 2px; height: 100px;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,.3), transparent);
+}
+.vn-sep-note {
+  font-size: 28px; animation: noteSpin 4s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(245,166,35,.6));
+}
+@keyframes noteSpin { 0%{transform:rotate(0) scale(1)} 50%{transform:rotate(20deg) scale(1.2)} 100%{transform:rotate(0) scale(1)} }
+/* floating notes JS creates */
+.vn-note-float {
+  position: absolute; font-size: 20px;
+  animation: noteFloat linear infinite;
+  pointer-events: none; opacity: 0;
+}
+@keyframes noteFloat {
+  0%  { transform: translateY(0)   rotate(0deg);   opacity: 0; }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.3; }
+  100%{ transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+@media(max-width: 640px) {
+  .vn-inner { flex-direction: column; gap: 24px; }
+  .vn-sep-line { width: 80px; height: 2px; }
+  .vn-sep { flex-direction: row; }
+}
+
+/* ===== VINH DANH PHỤ HUYNH ===== */
+.vinh-danh-ph {
+  text-align: center;
+  background: linear-gradient(135deg, #2D1B69 0%, #4A2F9A 35%, #6B45B8 65%, #8B5CF6 100%);
+  color: white;
+  border-radius: var(--r-xl);
+  padding: 64px 48px;
+  max-width: 1000px; margin: 0 auto; width: 100%;
+  box-shadow: 0 24px 60px rgba(75,47,154,.45);
+  position: relative; overflow: hidden;
+}
+.vdph-deco {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  pointer-events: none;
+}
+.vdph-deco-1 { width: 300px; height: 300px; top: -120px; left: -100px; }
+.vdph-deco-2 { width: 220px; height: 220px; bottom: -90px; right: -80px; }
+.vdph-deco-3 { width: 150px; height: 150px; top: 30%; right: 5%; background: rgba(255,255,255,.05); animation: bubbleDrift 9s ease-in-out infinite; }
+.vdph-hearts {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+}
+.vdph-icon {
+  font-size: clamp(52px, 7vw, 88px);
+  display: block; margin-bottom: 16px; position: relative; z-index: 1;
+  filter: drop-shadow(0 4px 20px rgba(255,255,255,.3));
+  animation: heartPulse 2s ease-in-out infinite;
+}
+@keyframes heartPulse {
+  0%,100%{ transform: scale(1) rotate(-5deg); }
+  50%    { transform: scale(1.15) rotate(5deg); }
+}
+.vdph-label {
+  font-size: clamp(10px,1.1vw,13px); font-weight: 700;
+  letter-spacing: 3px; opacity: .7; margin-bottom: 14px;
+  position: relative; z-index: 1;
+}
+.vdph-title {
+  font-size: clamp(36px, 5.5vw, 72px); font-weight: 900;
+  line-height: 1.1; margin-bottom: 18px;
+  position: relative; z-index: 1;
+  text-shadow: 0 3px 24px rgba(0,0,0,.25);
+}
+.vdph-year {
+  font-size: clamp(15px,1.8vw,20px); font-weight: 700;
+  opacity: .85; margin-bottom: 16px; position: relative; z-index: 1;
+}
+.vdph-msg {
+  font-size: clamp(14px,1.5vw,18px); opacity: .85;
+  line-height: 1.75; margin-bottom: 20px;
+  position: relative; z-index: 1; font-style: italic;
+}
+.vdph-flowers {
+  font-size: clamp(22px,3vw,34px); letter-spacing: 8px;
+  position: relative; z-index: 1;
+  animation: flowerSway 3s ease-in-out infinite;
+}
+@keyframes flowerSway {
+  0%,100%{ transform: scale(1); letter-spacing: 8px; }
+  50%    { transform: scale(1.06); letter-spacing: 12px; }
+}
+/* floating hearts */
+.vdph-heart-float {
+  position: absolute; font-size: 18px;
+  animation: heartFloat linear infinite;
+  pointer-events: none; opacity: 0; z-index: 0;
+}
+@keyframes heartFloat {
+  0%  { transform: translateY(0) scale(0.8);   opacity: 0; }
+  15% { opacity: 0.6; }
+  85% { opacity: 0.2; }
+  100%{ transform: translateY(-100%) scale(1.2); opacity: 0; }
+}
+
+/* ===== STUDENT PHOTOS — ring pulse + hover glow ===== */
+.student-card img {
+  width: 100%; aspect-ratio: 1/1; object-fit: cover;
+  border-radius: 50%;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.student-card:hover img { transform: scale(1.08); }
+/* Animate ring glow */
+.slide.active .photos-grid .student-card:nth-child(1) img { animation: ringGlow1 4s ease-in-out infinite 0.5s; }
+.slide.active .photos-grid .student-card:nth-child(2) img { animation: ringGlow2 4.5s ease-in-out infinite 1s; }
+.slide.active .photos-grid .student-card:nth-child(3) img { animation: ringGlow3 4s ease-in-out infinite 0.2s; }
+.slide.active .photos-grid .student-card:nth-child(4) img { animation: ringGlow4 5s ease-in-out infinite 1.5s; }
+@keyframes ringGlow1 {
+  0%,100%{ box-shadow: 0 0 0 5px var(--pink),   0 6px 24px rgba(255,143,171,.3); }
+  50%    { box-shadow: 0 0 0 7px var(--pink),   0 8px 32px rgba(255,143,171,.6); }
+}
+@keyframes ringGlow2 {
+  0%,100%{ box-shadow: 0 0 0 5px var(--gold),   0 6px 24px rgba(245,166,35,.3); }
+  50%    { box-shadow: 0 0 0 7px var(--gold),   0 8px 32px rgba(245,166,35,.6); }
+}
+@keyframes ringGlow3 {
+  0%,100%{ box-shadow: 0 0 0 5px var(--mint),   0 6px 24px rgba(132,217,166,.3); }
+  50%    { box-shadow: 0 0 0 7px var(--mint),   0 8px 32px rgba(132,217,166,.6); }
+}
+@keyframes ringGlow4 {
+  0%,100%{ box-shadow: 0 0 0 5px var(--sky),    0 6px 24px rgba(126,200,242,.3); }
+  50%    { box-shadow: 0 0 0 7px var(--sky),    0 8px 32px rgba(126,200,242,.6); }
+}
+/* Stagger photo card entrance */
+.slide.active .student-card { animation: photoCardIn 0.5s ease both; }
+.slide.active .photos-grid .student-card:nth-child(1) { animation-delay: 0.1s; }
+.slide.active .photos-grid .student-card:nth-child(2) { animation-delay: 0.2s; }
+.slide.active .photos-grid .student-card:nth-child(3) { animation-delay: 0.3s; }
+.slide.active .photos-grid .student-card:nth-child(4) { animation-delay: 0.4s; }
+@keyframes photoCardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.92); }
+  to   { opacity: 1; transform: none; }
+}
+
 </style>
 </head>
 <body>
@@ -1028,27 +1238,30 @@ p { margin: 0; }
       </div>
     </section>
 
-    <!-- 2: VĂN NGHỆ CHÀO MỪNG -->
-    <section class="slide" data-title="Văn nghệ chào mừng">
-      <div class="container-narrow" style="width:100%">
-        <div style="text-align:center;margin-bottom:28px">
-          <h2 style="font-size:clamp(28px,4vw,52px);color:var(--pink);letter-spacing:1px">VĂN NGHỆ CHÀO MỪNG</h2>
-          <p style="color:var(--muted);font-size:16px;margin-top:8px">Lời ca tiếng hát thay cho lời chào yêu thương đến đại gia đình 4B02</p>
-        </div>
-        <div class="photo-block" style="transform:none;max-width:760px;margin:0 auto">
-          <img src="images/slide2.jpg" alt="Văn nghệ chào mừng"/>
-        </div>
-      </div>
-    </section>
-
-    <!-- 3: VÈ 4B02 -->
-    <section class="slide" data-title="Vè 4B02">
-      <div class="container-narrow" style="width:100%">
-        <div style="text-align:center;margin-bottom:28px">
-          <h2 style="font-size:clamp(28px,4vw,52px);color:var(--gold-deep);letter-spacing:1px">VÈ 4B02</h2>
-        </div>
-        <div class="photo-block" style="transform:none;max-width:760px;margin:0 auto">
-          <img src="images/slide3.jpg" alt="Vè 4B02"/>
+    <!-- 2+3: VĂN NGHỆ + VÈ 4B02 (gộp, hoạt ảnh) -->
+    <section class="slide slide-vn" data-title="Văn nghệ · Vè 4B02">
+      <div class="vn-stage" id="vnStage">
+        <div class="vn-bg-notes" id="vnNotes"></div>
+        <div class="vn-spotlight sp1"></div>
+        <div class="vn-spotlight sp2"></div>
+        <div class="vn-inner">
+          <div class="vn-block">
+            <div class="vn-bigicon">🎭</div>
+            <div class="vn-eyebrow">✦ CHƯƠNG TRÌNH MỞ MÀN ✦</div>
+            <h2 class="vn-h2">VĂN NGHỆ<br><span>CHÀO MỪNG</span></h2>
+            <p class="vn-desc">Lời ca tiếng hát thay cho lời chào yêu thương<br>đến đại gia đình 4B02 💕</p>
+          </div>
+          <div class="vn-sep">
+            <div class="vn-sep-line"></div>
+            <div class="vn-sep-note">🎵</div>
+            <div class="vn-sep-line"></div>
+          </div>
+          <div class="vn-block">
+            <div class="vn-bigicon">📜</div>
+            <div class="vn-eyebrow">✦ BÀI VÈ CỦA LỚP ✦</div>
+            <h2 class="vn-h2" style="color:var(--gold)">VÈ<br><span style="color:var(--gold)">4B02</span></h2>
+            <p class="vn-desc">Những lời vè vui tươi về từng bạn trong lớp<br>do các bạn học sinh thể hiện 🌟</p>
+          </div>
         </div>
       </div>
     </section>
@@ -1489,9 +1702,17 @@ Dang tay chào đón.</div>
 
     <!-- 31: VINH DANH PHỤ HUYNH -->
     <section class="slide" data-title="Vinh danh Phụ huynh">
-      <div class="section-divider blue">
-        <h2>VINH DANH PHỤ HUYNH</h2>
-        <p>Năm học 2025 — 2026</p>
+      <div class="vinh-danh-ph">
+        <div class="vdph-deco vdph-deco-1"></div>
+        <div class="vdph-deco vdph-deco-2"></div>
+        <div class="vdph-deco vdph-deco-3"></div>
+        <div class="vdph-hearts" id="vdphHearts"></div>
+        <div class="vdph-icon">💜</div>
+        <div class="vdph-label">TRI ÂN · CẢM ƠN · ĐỒNG HÀNH</div>
+        <h2 class="vdph-title">VINH DANH<br>PHỤ HUYNH</h2>
+        <p class="vdph-year">Năm học 2025 — 2026</p>
+        <p class="vdph-msg">Cảm ơn Quý phụ huynh đã luôn tin tưởng<br>và đồng hành cùng các con và Nhà trường</p>
+        <div class="vdph-flowers">🌸 🌺 🌻 🌷 🌸</div>
       </div>
     </section>
 
@@ -1835,6 +2056,44 @@ function launchConfetti() {
 const _cfStyle=document.createElement('style');
 _cfStyle.textContent='@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(160px) rotate(480deg)}}';
 document.head.appendChild(_cfStyle);
+
+// ── Floating notes in Văn nghệ slide ──
+function spawnNotes() {
+  const el = document.getElementById('vnNotes');
+  if (!el) return;
+  const notes = ['🎵','🎶','🎤','🎸','🎺','🎻','🥁','⭐','✨','🌟','🎊','🎉'];
+  setInterval(() => {
+    const n = document.createElement('div');
+    n.className = 'vn-note-float';
+    n.textContent = notes[Math.floor(Math.random()*notes.length)];
+    n.style.cssText = `left:${5+Math.random()*90}%;bottom:-40px;` +
+      `animation-duration:${5+Math.random()*5}s;` +
+      `animation-delay:${Math.random()*2}s;` +
+      `font-size:${14+Math.random()*18}px;`;
+    el.appendChild(n);
+    setTimeout(()=>n.remove(), 11000);
+  }, 500);
+}
+// ── Floating hearts in Vinh danh PH ──
+function spawnHearts() {
+  const el = document.getElementById('vdphHearts');
+  if (!el) return;
+  const hearts = ['💜','💙','🌸','⭐','✨','💫','🤍','💐'];
+  setInterval(() => {
+    const h = document.createElement('div');
+    h.className = 'vdph-heart-float';
+    h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+    h.style.cssText = `left:${3+Math.random()*94}%;bottom:0;` +
+      `animation-duration:${4+Math.random()*4}s;` +
+      `animation-delay:${Math.random()*1.5}s;` +
+      `font-size:${12+Math.random()*16}px;`;
+    el.appendChild(h);
+    setTimeout(()=>h.remove(), 9000);
+  }, 600);
+}
+spawnNotes();
+spawnHearts();
+
 </script>
 
 </body>
