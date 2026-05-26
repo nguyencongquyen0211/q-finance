@@ -122,46 +122,7 @@ p { margin: 0; }
   padding: 16px 22px;
 }
 .hud > * { pointer-events: auto; }
-.hud-progress {
-  flex: 1;
-  background: rgba(255,255,255, 0.9);
-  backdrop-filter: blur(12px);
-  border-radius: 999px;
-  padding: 10px 18px;
-  display: flex; align-items: center; gap: 14px;
-  box-shadow: 0 4px 20px rgba(38,57,110,.12);
-  max-width: 560px;
-  margin-right: 14px;
-}
-.hud-counter {
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 600;
-  color: var(--navy);
-  white-space: nowrap;
-  font-size: 14px;
-}
-.hud-bar {
-  flex: 1;
-  height: 6px;
-  background: var(--cream-2);
-  border-radius: 999px;
-  overflow: hidden;
-}
-.hud-bar > span {
-  display: block; height: 100%;
-  background: linear-gradient(90deg, #FF7BAC, #F5A623, #4A94D9);
-  width: 0;
-  transition: width 0.4s ease;
-  border-radius: 999px;
-}
-.hud-title {
-  font-size: 12px; font-weight: 700;
-  color: var(--muted);
-  letter-spacing: 1.5px; text-transform: uppercase;
-  white-space: nowrap;
-  max-width: 200px;
-  overflow: hidden; text-overflow: ellipsis;
-}
+
 
 .arrow-btn {
   width: 52px; height: 52px;
@@ -226,30 +187,8 @@ p { margin: 0; }
 }
 
 /* ===== KEY-HINT ===== */
-.key-hint {
-  position: fixed; top: 16px; right: 22px; z-index: 40;
-  background: rgba(255, 248, 238, 0.85);
-  backdrop-filter: blur(10px);
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-size: 12px; font-weight: 600;
-  color: var(--muted);
-  box-shadow: var(--shadow);
-  display: flex; align-items: center; gap: 6px;
-}
-.kbd {
-  display: inline-grid; place-items: center;
-  min-width: 22px; height: 22px;
-  background: white;
-  border-radius: 6px;
-  font-family: 'Baloo 2', monospace;
-  font-size: 12px;
-  color: var(--navy);
-  padding: 0 4px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-}
 
-@media (max-width: 720px) { .key-hint, .top-brand { display: none; } }
+@media (max-width: 720px) { .top-brand { display: none; } }
 
 /* ===== COMMON CONTENT ===== */
 .kicker {
@@ -983,8 +922,6 @@ p { margin: 0; }
   to   { transform: scale(1);   opacity: 1; }
 }
 
-/* HUD progress bar smooth */
-.hud-bar > span { transition: width 0.4s cubic-bezier(.4,0,.2,1); }
 
 /* Section divider bubbles pulse */
 .section-divider::before { animation: bubbleDrift 8s ease-in-out infinite; }
@@ -994,6 +931,18 @@ p { margin: 0; }
   50%     { transform: translate(20px,-15px) scale(1.1); }
 }
 
+
+/* Slide full image */
+.slide-fullimg {
+  padding: 0 !important;
+  justify-content: stretch !important;
+}
+.slide-fullimg .fullimg {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  background: #1a1a1a;
+  display: block;
+}
 </style>
 </head>
 <body>
@@ -1002,9 +951,6 @@ p { margin: 0; }
 <div class="top-brand">
   <img src="images/logo.png" alt="Vinschool"/>
   Lễ Tổng Kết · 4B02
-</div>
-<div class="key-hint">
-  <span class="kbd">←</span><span class="kbd">→</span> để chuyển slide
 </div>
 
 <!-- ===== SIDE ARROWS ===== -->
@@ -1034,58 +980,19 @@ p { margin: 0; }
     </section>
 
     <!-- 2: VĂN NGHỆ CHÀO MỪNG -->
-    <section class="slide" data-title="Văn nghệ chào mừng">
-      <div class="section-divider">
-        <div class="roman">I</div>
-        <div class="label">CHƯƠNG TRÌNH · MỞ MÀN</div>
-        <h2>VĂN NGHỆ CHÀO MỪNG</h2>
-        <p>Lời ca tiếng hát thay cho lời chào yêu thương, thay cho lời cảm ơn đến các gia đình 4B02.</p>
-      </div>
+    <section class="slide slide-fullimg" data-title="Văn nghệ chào mừng">
+      <img src="images/slide2.jpg" alt="Văn nghệ chào mừng" class="fullimg">
     </section>
 
-    <!-- 3: VỀ 4B02 -->
-    <section class="slide" data-title="Về 4B02">
-      <div class="container-wide">
-        <div class="center-head">
-          <div class="kicker">Giới thiệu</div>
-          <h2>Về 4B02</h2>
-          <p>Một tập thể nhỏ với rất nhiều điều đáng nhớ.</p>
-        </div>
-        <div class="sticky-grid">
-          <div class="sticky-note">
-            <div class="sticky-num">01</div>
-            <div class="sticky-title">Mái nhà chung</div>
-            <div class="sticky-poem">Ngôi trường mến yêu
-Là Vinschool đó
-Ở đó luôn có
-Bao tình yêu thương.</div>
-          </div>
-          <div class="sticky-note">
-            <div class="sticky-num">02</div>
-            <div class="sticky-title">Tinh thần học tập</div>
-            <div class="sticky-poem">Xếp theo danh sách
-Vỹ An đứng đầu
-Học nhanh nhớ lâu
-Môn nào cũng giỏi…</div>
-          </div>
-          <div class="sticky-note">
-            <div class="sticky-num">03</div>
-            <div class="sticky-title">Khoảnh khắc cuối năm</div>
-            <div class="sticky-poem">Giờ vàng đã điểm
-Chúng con cười tươi
-Chia tay năm học
-Không bạn nào khóc…</div>
-          </div>
-        </div>
-      </div>
+    <!-- 3: VÈ 4B02 -->
+    <section class="slide slide-fullimg" data-title="Vè 4B02">
+      <img src="images/slide3.jpg" alt="Vè 4B02" class="fullimg">
     </section>
 
     <!-- 4: KHI NGHE TIẾNG VE -->
-    <section class="slide" data-title="Khi nghe tiếng ve">
+    <section class="slide" data-title="Mở đầu">
       <div class="container-wide two-col">
         <div class="text-block">
-          <div class="small-cap">Lời mở</div>
-          <h3>Khi nghe tiếng ve…</h3>
           <div class="poem">Xúc xắc xúc xẻ
 Khi nghe tiếng ve
 Lòng con rộn rã
@@ -1099,7 +1006,6 @@ Bao tình yêu thương.</div>
         </div>
         <div class="photo-block">
           <img src="images/slide4-bg.jpg" alt="Lớp 4B02 trên sân khấu"/>
-          <div class="caption">SÂN KHẤU · LỚP 4B02</div>
         </div>
       </div>
     </section>
@@ -1108,8 +1014,6 @@ Bao tình yêu thương.</div>
     <section class="slide" data-title="Điểm danh 01">
       <div class="container-wide two-col">
         <div class="text-block">
-          <div class="roll-num">01</div>
-          <div class="small-cap">Xếp theo danh sách</div>
           <h3>Vỹ An & Diệu Anh</h3>
           <div class="poem">Xếp theo danh sách
 Vỹ An đứng đầu
@@ -1132,8 +1036,6 @@ Nhiều môn Xuất sắc.</div>
     <section class="slide" data-title="Điểm danh 02">
       <div class="container-wide two-col reverse">
         <div class="text-block">
-          <div class="roll-num">02</div>
-          <div class="small-cap">Cô học trò tò mò</div>
           <h3>Thảo Nhi</h3>
           <div class="poem">Suốt ngày thắc mắc
 Chính là Thảo Nhi
@@ -1150,8 +1052,6 @@ Mỗi lần sắp thi
     <section class="slide" data-title="Điểm danh 03">
       <div class="container-wide two-col">
         <div class="text-block">
-          <div class="roll-num">03</div>
-          <div class="small-cap">Ba nhân vật — ba sắc màu</div>
           <h3>Gia Huy · Vân Khánh · Linh Nga</h3>
           <div class="poem">Có tài ăn nói
 Học hành cũng chăm
@@ -1180,8 +1080,6 @@ MC — Linh Nga.</div>
     <section class="slide" data-title="Điểm danh 04">
       <div class="container-wide two-col reverse">
         <div class="text-block">
-          <div class="roll-num">04</div>
-          <div class="small-cap">Những nghệ sĩ nhỏ</div>
           <h3>Trần Ngọc Phúc · Đăng Khoa · Minh Anh</h3>
           <div class="poem">Tính hay bày trò
 Là Trần Ngọc Phúc
@@ -1208,8 +1106,6 @@ Là một câu chuyện.</div>
     <section class="slide" data-title="Điểm danh 05">
       <div class="container-wide two-col">
         <div class="text-block">
-          <div class="roll-num">05</div>
-          <div class="small-cap">Nghệ thuật & tư duy</div>
           <h3>Nhất Chi Mai · Minh Khang · Duy Khang</h3>
           <div class="poem">Múa đẹp uyển chuyển
 Là Nhất Chi Mai
@@ -1233,8 +1129,6 @@ Thiên tài toán học.</div>
     <section class="slide" data-title="Điểm danh 06">
       <div class="container-wide two-col reverse">
         <div class="text-block">
-          <div class="roll-num">06</div>
-          <div class="small-cap">Gương mặt mẫu mực</div>
           <h3>Thanh Lan · Gia Linh · Minh Hiếu</h3>
           <div class="poem">Đồ đạc ngăn nắp
 Chăm chỉ làm gương
@@ -1263,8 +1157,6 @@ Trong môn Tin học.</div>
     <section class="slide" data-title="Điểm danh 07">
       <div class="container-wide two-col">
         <div class="text-block">
-          <div class="roll-num">07</div>
-          <div class="small-cap">Bộ tứ tài năng</div>
           <h3>Tuấn Tú · Zelda · Minh Phương · Minh Nam</h3>
           <div class="poem">Không hề sợ nhọc
 Chàng trai — Tuấn Tú
@@ -1296,8 +1188,6 @@ kêu luôn: “Ai hỏi”.</div>
     <section class="slide" data-title="Điểm danh 08">
       <div class="container-wide two-col reverse">
         <div class="text-block">
-          <div class="roll-num">08</div>
-          <div class="small-cap">Toán, nghệ & tấm lòng</div>
           <h3>Quang Minh · Jeron · Như Kiên</h3>
           <div class="poem">Toán — Khoa đều giỏi
 Là bạn Quang Minh
@@ -1321,8 +1211,6 @@ Lại hay giúp đỡ.</div>
     <section class="slide" data-title="Điểm danh 09">
       <div class="container-wide two-col">
         <div class="text-block">
-          <div class="roll-num">09</div>
-          <div class="small-cap">Hát hay, văn giỏi</div>
           <h3>Minh Thảo · Khánh Chi</h3>
           <div class="poem">Tính tình cởi mở
 Minh Thảo chứ ai
@@ -1345,8 +1233,6 @@ Khánh Chi làm tốt.</div>
     <section class="slide" data-title="Điểm danh 10">
       <div class="container-wide two-col reverse">
         <div class="text-block">
-          <div class="roll-num">10</div>
-          <div class="small-cap">Khép lại điểm danh</div>
           <h3>Trúc Linh · Đức Vượng</h3>
           <div class="poem">Giải toán phút mốt
 Là bạn Trúc Linh
@@ -1364,8 +1250,6 @@ Là Bạn Đức Vượng.</div>
     <section class="slide" data-title="Lời tạm biệt">
       <div class="container-wide two-col">
         <div class="text-block">
-          <div class="small-cap">Khoảnh khắc · Lời tạm biệt</div>
-          <h3>Lời tạm biệt</h3>
           <div class="poem">Điểm 10 tươi đỏ
 Trên vở của con
 Đến mai chỉ còn
@@ -1387,7 +1271,6 @@ Dang tay chào đón.</div>
         </div>
         <div class="photo-block">
           <img src="images/slide4-bg.jpg" alt="Lớp 4B02 tổng kết"/>
-          <div class="caption">LỚP 4B02 · LỜI TẠM BIỆT</div>
         </div>
       </div>
     </section>
@@ -1396,15 +1279,13 @@ Dang tay chào đón.</div>
     <section class="slide" data-title="Nội dung">
       <div class="container-wide">
         <div class="center-head">
-          <div class="kicker">Chương trình</div>
           <h2>Nội dung</h2>
-          <p>Bốn nội dung chính trong buổi họp phụ huynh hôm nay.</p>
         </div>
         <div class="agenda-grid">
-          <div class="agenda-card"><div class="agenda-num">01</div><h4>Kết quả hoạt động</h4><p>của Nhà trường trong năm học vừa qua.</p></div>
-          <div class="agenda-card"><div class="agenda-num">02</div><h4>Kết quả học tập</h4><p>và rèn luyện của lớp 4B02.</p></div>
-          <div class="agenda-card"><div class="agenda-num">03</div><h4>Chương trình</h4><p>hoạt động hè 2026.</p></div>
-          <div class="agenda-card"><div class="agenda-num">04</div><h4>Ban phụ huynh</h4><p>và các trao đổi cuối chương trình.</p></div>
+          <div class="agenda-card"><div class="agenda-num">01</div><h4>Kết quả hoạt động của Nhà trường</h4></div>
+          <div class="agenda-card"><div class="agenda-num">02</div><h4>Kết quả học tập và rèn luyện của lớp</h4></div>
+          <div class="agenda-card"><div class="agenda-num">03</div><h4>Chương trình hoạt động hè</h4></div>
+          <div class="agenda-card"><div class="agenda-num">04</div><h4>Ban phụ huynh</h4></div>
         </div>
       </div>
     </section>
@@ -1414,7 +1295,6 @@ Dang tay chào đón.</div>
       <div class="container-wide">
         <div class="focus-card">
           <div>
-            <div class="focus-kicker">PHẦN II · KẾT QUẢ HỌC TẬP</div>
             <h3>Tiêu điểm <span class="accent">giáo dục</span></h3>
             <p class="quote">“Hành trình chinh phục và trưởng thành.”</p>
             <p class="meta">Năm học 2025 — 2026 · Lớp 4B02</p>
@@ -1497,10 +1377,8 @@ Dang tay chào đón.</div>
     <!-- 23: VINH DANH HỌC SINH -->
     <section class="slide" data-title="Vinh danh Học sinh">
       <div class="section-divider">
-        <div class="roman">III</div>
-        <div class="label">PHẦN III · TRAO THƯỞNG</div>
         <h2>VINH DANH HỌC SINH</h2>
-        <p>Tri ân nỗ lực, ghi nhận thành quả của các con suốt một năm học. Năm học 2025 — 2026.</p>
+        <p>Năm học 2025 — 2026</p>
       </div>
     </section>
 
@@ -1508,20 +1386,15 @@ Dang tay chào đón.</div>
     <section class="slide" data-title="Góc nhìn thẳng">
       <div class="container-wide">
         <div class="center-head">
-          <div class="kicker">Lời khuyên</div>
           <h2>Góc nhìn thẳng</h2>
-          <p>Đối diện thực trạng và tương lai.</p>
+          <p>Đối diện thực trạng và tương lai</p>
         </div>
         <div class="advice-grid">
           <div class="advice-card">
-            <div class="small-cap">Lời khuyên về nỗ lực</div>
-            <h4>Học cách làm chủ cảm xúc</h4>
-            <p>Biết nhường nhịn và lắng nghe. Biến những hiểu lầm của tuổi học trò thành sự thấu hiểu và sẻ chia.</p>
+              <p>Biết nhường nhịn và lắng nghe. Biến những hiểu lầm của tuổi học trò thành sự thấu hiểu và sẻ chia.</p>
           </div>
           <div class="advice-card b2">
-            <div class="small-cap">Lời khuyên về sự tự tin</div>
-            <h4>Hành trang bước vào lớp 5</h4>
-            <p>Đòi hỏi sự chủ động. Tự tin vững bước, không ngại đặt câu hỏi và dám chinh phục những thử thách mới.</p>
+              <p>Đòi hỏi sự chủ động. Tự tin vững bước, không ngại đặt câu hỏi và dám chinh phục những thử thách mới.</p>
           </div>
         </div>
       </div>
@@ -1547,10 +1420,8 @@ Dang tay chào đón.</div>
     <!-- 31: VINH DANH PHỤ HUYNH -->
     <section class="slide" data-title="Vinh danh Phụ huynh">
       <div class="section-divider blue">
-        <div class="roman">V</div>
-        <div class="label">PHẦN V · TRI ÂN</div>
         <h2>VINH DANH PHỤ HUYNH</h2>
-        <p>Xin trân trọng cảm ơn Quý Phụ huynh đã luôn đồng hành cùng các con và Nhà trường. Năm học 2025 — 2026.</p>
+        <p>Năm học 2025 — 2026</p>
       </div>
     </section>
 
@@ -1558,9 +1429,7 @@ Dang tay chào đón.</div>
     <section class="slide" data-title="Video tổng kết">
       <div class="container-narrow">
         <div class="center-head">
-          <div class="kicker">Phần VI · Nhìn lại một năm</div>
           <h2>Video tổng kết năm học</h2>
-          <p>Hành trình một năm học của lớp 4B02 — gói gọn trong vài phút.</p>
         </div>
         <div class="video-card">
           <div class="video-frame">
@@ -1609,11 +1478,7 @@ Dang tay chào đón.</div>
 
 <!-- ===== HUD ===== -->
 <div class="hud">
-  <div class="hud-progress">
-    <div class="hud-counter"><span id="cur">1</span> / <span id="total">34</span></div>
-    <div class="hud-bar"><span id="bar"></span></div>
-    <div class="hud-title" id="title">Trang bìa</div>
-  </div>
+  <div class="hud-counter-pill"><span id="cur">1</span> / <span id="total">34</span></div>
   <button class="arrow-btn" id="prev" aria-label="Trước">←</button>
   <button class="arrow-btn" id="next" aria-label="Sau">→</button>
 </div>
@@ -1801,8 +1666,6 @@ let currentIdx = 0;
 const slidesEl = document.getElementById('slides');
 const curEl = document.getElementById('cur');
 const totalEl = document.getElementById('total');
-const titleEl = document.getElementById('title');
-const barEl = document.getElementById('bar');
 const prevBtn = document.getElementById('prev');
 const nextBtn = document.getElementById('next');
 const sideLeft = document.getElementById('sideLeft');
@@ -1827,8 +1690,7 @@ function goTo(idx) {
 
   curEl.innerText = idx + 1;
   totalEl.innerText = totalSlides;
-  titleEl.innerText = slides[idx].dataset.title || '';
-  barEl.style.width = ((idx + 1) / totalSlides * 100) + '%';
+
   prevBtn.disabled = idx === 0;
   nextBtn.disabled = idx === totalSlides - 1;
   sideLeft.disabled = idx === 0;
