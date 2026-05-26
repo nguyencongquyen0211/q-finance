@@ -3,787 +3,1051 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Q · Futures Scanner</title>
+<title>Lớp 4B2 · Vinschool Ocean Park · 2025–2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
+/* ═══════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--bg4:#21262d;
-  --border:#30363d;--border2:#21262d;
-  --text:#e6edf3;--text2:#8b949e;--text3:#484f58;
-  --green:#3fb950;--green2:rgba(63,185,80,.15);--green3:rgba(63,185,80,.07);
-  --red:#f85149;--red2:rgba(248,81,73,.15);--red3:rgba(248,81,73,.07);
-  --yellow:#e3b341;--blue:#58a6ff;--orange:#d18616;--purple:#bc8cff;
+  --pink:   #E8507A;
+  --rose:   #F472B6;
+  --soft-pink: #FFF0F5;
+  --gold:   #F59E0B;
+  --gold-light:#FEF3C7;
+  --green:  #34D399;
+  --green-light:#D1FAE5;
+  --blue:   #60A5FA;
+  --blue-light:#EFF6FF;
+  --purple: #A78BFA;
+  --purple-light:#F5F3FF;
+  --cream:  #FFFBF0;
+  --text:   #3D2C3E;
+  --text2:  #7C6C80;
+  --white:  #FFFFFF;
+  --shadow: 0 4px 24px rgba(200,80,120,.12);
+  --shadow-lg: 0 8px 40px rgba(200,80,120,.18);
 }
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;min-height:100vh}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Nunito','Nunito Sans',sans-serif;
+  background:var(--cream);
+  color:var(--text);
+  overflow-x:hidden;
+}
 
-/* ── HEADER ── */
-.hdr{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--border);background:var(--bg2);flex-wrap:wrap}
-.logo{font-size:17px;font-weight:800;color:var(--blue);letter-spacing:-.5px;white-space:nowrap;flex-shrink:0}
-.logo em{color:var(--text2);font-style:normal;font-weight:400;font-size:12px;margin-left:6px}
+/* ═══════════════════════════════════════
+   FLOATING CONFETTI BACKGROUND
+═══════════════════════════════════════ */
+.confetti-bg{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;overflow:hidden;
+}
+.confetti-bg span{
+  position:absolute;
+  border-radius:50%;
+  opacity:.15;
+  animation:floatUp linear infinite;
+}
+@keyframes floatUp{
+  0%{transform:translateY(100vh) rotate(0);opacity:.15}
+  100%{transform:translateY(-200px) rotate(720deg);opacity:0}
+}
 
-/* BTC / ETH prices in header - 1 dòng */
-.hdr-prices{display:flex;align-items:center;gap:6px;padding:4px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;flex-shrink:0}
-.hdr-coin-name{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.3px}
-.hdr-coin-price{font-size:13px;font-weight:700;font-family:'SF Mono','Fira Code',monospace;color:var(--text)}
-.hdr-coin-chg{font-size:11px;font-weight:600}
-.hdr-divider{color:var(--text3);margin:0 4px;font-size:12px}
+/* ═══════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
 
-.hdr-mid{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background .3s}
-.dot.on{background:var(--green);animation:pulse 2s infinite}
-.dot.err{background:var(--red)}
-.dot.ld{background:var(--yellow)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-#status-txt{color:var(--text2);font-size:11px}
-.hdr-controls{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
-.hdr-controls label{color:var(--text2);font-size:11px;white-space:nowrap}
-select,button{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:5px;font-size:12px;cursor:pointer}
-select:focus{outline:none;border-color:var(--blue)}
-.btn-r{border-color:var(--blue);color:var(--blue);font-weight:600;padding:5px 12px}
-.btn-r:hover{background:var(--blue);color:#000}
-.btn-r:disabled{opacity:.5;cursor:default}
-.btn-notif{border-color:var(--text3);color:var(--text2);padding:5px 10px}
-.btn-notif.on{border-color:var(--green);color:var(--green)}
-.btn-notif.denied{border-color:var(--red);color:var(--red);cursor:not-allowed}
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:60px 24px 80px;
+  background:linear-gradient(145deg,#FFF5FB 0%,#FFF0EC 40%,#EFF6FF 100%);
+  overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 30% 40%,rgba(244,114,182,.18) 0%,transparent 70%),
+             radial-gradient(ellipse 60% 50% at 70% 60%,rgba(96,165,250,.15) 0%,transparent 70%);
+}
+.hero-badge{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--pink),var(--rose));
+  color:#fff;font-size:13px;font-weight:700;
+  padding:6px 18px;border-radius:99px;
+  margin-bottom:20px;letter-spacing:.5px;
+  box-shadow:0 4px 16px rgba(232,80,122,.3);
+  animation:bounceIn .8s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes bounceIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+.hero h1{
+  font-size:clamp(2rem,5vw,3.8rem);
+  font-weight:900;line-height:1.15;
+  background:linear-gradient(135deg,var(--pink) 0%,#7C3AED 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:12px;
+  animation:slideUp .9s ease both;animation-delay:.2s;
+}
+.hero h2{
+  font-size:clamp(1.1rem,2.5vw,1.5rem);
+  font-weight:700;color:var(--text2);
+  margin-bottom:8px;
+  animation:slideUp .9s ease both;animation-delay:.35s;
+}
+.hero-year{
+  font-size:clamp(1.3rem,3vw,1.8rem);
+  font-weight:800;color:var(--gold);
+  animation:slideUp .9s ease both;animation-delay:.5s;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.hero-stars{font-size:2rem;margin-top:24px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
-/* ── TABS ── */
-.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;gap:4px}
-.tab-btn{padding:9px 20px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
-.tab-btn .cnt{font-weight:400;font-size:11px;opacity:.6;margin-left:4px}
-.tab-btn.long.active{color:var(--green);border-bottom-color:var(--green)}
-.tab-btn.short.active{color:var(--red);border-bottom-color:var(--red)}
-.tab-btn:not(.active):hover{color:var(--text)}
+.scroll-hint{
+  position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  color:var(--text2);font-size:12px;font-weight:600;
+  animation:pulse-down 2s ease-in-out infinite;
+}
+.scroll-hint svg{width:20px;height:20px}
+@keyframes pulse-down{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
 
-/* ── CONTENT ── */
-.tab-pane{display:none;padding:16px 20px}
-.tab-pane.active{display:block}
+/* ═══════════════════════════════════════
+   SECTIONS
+═══════════════════════════════════════ */
+section{position:relative;z-index:1;padding:64px 20px}
+.container{max-width:1000px;margin:0 auto}
+.section-header{text-align:center;margin-bottom:48px}
+.section-badge{
+  display:inline-block;
+  padding:5px 16px;border-radius:99px;
+  font-size:12px;font-weight:700;letter-spacing:.5px;
+  margin-bottom:12px;
+}
+.section-title{
+  font-size:clamp(1.6rem,4vw,2.4rem);
+  font-weight:900;line-height:1.2;
+  margin-bottom:12px;
+}
+.section-sub{
+  font-size:1rem;color:var(--text2);font-weight:600;
+  max-width:500px;margin:0 auto;
+}
 
-/* ── CARDS ── */
-.cards{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;flex:1;min-width:130px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
-.card:hover{border-color:var(--blue)}
-.card.active-filter{border-color:var(--blue);background:rgba(88,166,255,.08)}
-.card-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)}
-.card-value{font-size:18px;font-weight:800;margin-top:4px}
-.card-sub{font-size:11px;color:var(--text2);margin-top:2px}
+/* ═══════════════════════════════════════
+   OPENING POEM
+═══════════════════════════════════════ */
+.poem-hero{
+  background:linear-gradient(135deg,#FFF0F5,#EFF6FF);
+  border-radius:24px;padding:40px;
+  text-align:center;
+  box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+}
+.poem-hero::before{
+  content:'"';position:absolute;top:-20px;left:20px;
+  font-size:12rem;color:var(--rose);opacity:.06;
+  font-family:Georgia,serif;line-height:1;
+}
+.poem-hero p{
+  font-size:1.15rem;font-weight:600;line-height:2;color:var(--text);
+  white-space:pre-line;
+}
+.poem-hero .poet{
+  margin-top:20px;font-size:.9rem;color:var(--pink);
+  font-weight:700;letter-spacing:.5px;
+}
 
-/* ── FILTER PANEL ── */
-.filter-panel{background:var(--bg3);border:1px solid var(--blue);border-radius:8px;padding:12px 14px;margin-bottom:10px;display:none}
-.filter-panel.open{display:block}
-.fp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.fp-title{font-size:12px;font-weight:700;color:var(--blue)}
-.fp-close{background:none;border:none;color:var(--text2);font-size:16px;cursor:pointer;padding:0 4px;line-height:1}
-.fp-close:hover{color:var(--text)}
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg4);cursor:pointer;font-size:12px;font-weight:600;transition:all .1s}
-.chip:hover{border-color:var(--blue);background:rgba(88,166,255,.1)}
-.chip-pct{font-family:'SF Mono',monospace;font-size:11px;opacity:.8}
-.fp-empty{color:var(--text2);font-size:12px}
+/* ═══════════════════════════════════════
+   STUDENT POEM CARDS
+═══════════════════════════════════════ */
+.poem-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:20px;
+}
+.poem-card{
+  background:#fff;
+  border-radius:20px;
+  padding:24px;
+  box-shadow:var(--shadow);
+  transition:transform .25s ease,box-shadow .25s ease;
+  position:relative;overflow:hidden;
+  border-top:4px solid;
+}
+.poem-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.poem-card .card-num{
+  position:absolute;top:16px;right:16px;
+  font-size:2.5rem;font-weight:900;opacity:.08;
+  line-height:1;
+}
+.poem-card .card-body{
+  font-size:.95rem;line-height:1.85;color:var(--text);
+  white-space:pre-line;font-weight:600;
+}
+.poem-card .students{
+  display:flex;flex-wrap:wrap;gap:6px;
+  margin-bottom:14px;
+}
+.student-chip{
+  background:var(--soft-pink);
+  color:var(--pink);
+  border-radius:99px;
+  padding:3px 12px;
+  font-size:12px;font-weight:700;
+}
 
-/* ── TABLE ── */
-.tbl-wrap{border:1px solid var(--border);border-radius:8px;overflow:hidden;overflow-x:auto}
-table{width:100%;border-collapse:collapse}
-thead{background:var(--bg3)}
-th{padding:9px 14px;text-align:right;color:var(--text2);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:1px solid var(--border)}
-th:first-child{text-align:left}
-tbody tr{border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s}
-tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:var(--bg4)}
-tbody tr.hl-bull{border-left:3px solid var(--green);background:var(--green3)}
-tbody tr.hl-bull:hover{background:var(--green2)}
-tbody tr.hl-bear{border-left:3px solid var(--red);background:var(--red3)}
-tbody tr.hl-bear:hover{background:var(--red2)}
-@keyframes rowflash{0%{background:rgba(88,166,255,.35)}100%{background:transparent}}
-tbody tr.flash{animation:rowflash 1.8s ease-out}
-tbody tr.hl-bull.flash{animation:rowflash 1.8s ease-out}
-tbody tr.hl-bear.flash{animation:rowflash 1.8s ease-out}
-td{padding:9px 14px;text-align:right;white-space:nowrap;font-size:13px}
-td:first-child{text-align:left}
+/* Colors cycle */
+.poem-card:nth-child(5n+1){border-top-color:var(--pink);} .poem-card:nth-child(5n+1) .card-num{color:var(--pink)}
+.poem-card:nth-child(5n+2){border-top-color:var(--gold);} .poem-card:nth-child(5n+2) .card-num{color:var(--gold)}
+.poem-card:nth-child(5n+3){border-top-color:var(--green);} .poem-card:nth-child(5n+3) .card-num{color:var(--green)}
+.poem-card:nth-child(5n+4){border-top-color:var(--blue);} .poem-card:nth-child(5n+4) .card-num{color:var(--blue)}
+.poem-card:nth-child(5n+5){border-top-color:var(--purple);} .poem-card:nth-child(5n+5) .card-num{color:var(--purple)}
 
-/* ── COIN CELL ── */
-.coin-cell{display:flex;align-items:center;gap:8px}
-.coin-rank{color:var(--text3);font-size:11px;width:22px;text-align:right;flex-shrink:0}
-.coin-base{font-weight:800;font-size:14px;color:var(--text)}
-.coin-tag{font-size:10px;color:var(--text3);margin-top:1px}
-.tv-link{color:var(--text3);font-size:11px;margin-left:4px;text-decoration:none;vertical-align:middle}
-.tv-link:hover{color:var(--blue)}
+/* ═══════════════════════════════════════
+   FAREWELL POEM
+═══════════════════════════════════════ */
+.farewell-section{
+  background:linear-gradient(135deg,#FFF5FB 0%,#EFF6FF 100%);
+}
+.farewell-poem{
+  max-width:700px;margin:0 auto;
+  background:#fff;border-radius:24px;padding:40px 48px;
+  box-shadow:var(--shadow);text-align:center;
+}
+.farewell-poem p{
+  font-size:1.1rem;line-height:2;font-weight:600;
+  color:var(--text);margin-bottom:20px;white-space:pre-line;
+}
+.farewell-poem .teacher{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;padding:8px 24px;border-radius:99px;
+  font-size:.95rem;font-weight:800;
+  box-shadow:0 4px 16px rgba(232,80,122,.3);
+}
 
-/* ── COLORS ── */
-.up{color:var(--green);font-weight:600}
-.dn{color:var(--red);font-weight:600}
-.neu{color:var(--text2)}
-.mono{font-family:'SF Mono','Fira Code',monospace}
+/* ═══════════════════════════════════════
+   HONOR SECTION
+═══════════════════════════════════════ */
+.honor-section{
+  background:linear-gradient(135deg,#FFFBF0 0%,#FFF5E0 100%);
+}
+.honor-box{
+  text-align:center;
+  background:#fff;border-radius:24px;padding:48px 32px;
+  box-shadow:var(--shadow);
+  border:2px solid var(--gold-light);
+}
+.honor-box .trophy{font-size:5rem;animation:float 2.5s ease-in-out infinite}
+.honor-box h3{font-size:2rem;font-weight:900;color:var(--gold);margin:20px 0 12px}
+.honor-box p{font-size:1.1rem;color:var(--text2);font-weight:600;max-width:400px;margin:0 auto}
+.honor-stars{font-size:2rem;margin-top:16px;letter-spacing:8px}
 
-/* ── RSI ── */
-.rsi{display:inline-block;padding:2px 6px;border-radius:4px;font-weight:700;font-size:12px;font-family:'SF Mono',monospace}
-.rsi-ob{background:var(--red2);color:var(--red)}
-.rsi-os{background:var(--green2);color:var(--green)}
-.rsi-hi{color:var(--orange)}
-.rsi-lo{color:#58c98a}
-.rsi-mid{color:var(--text2)}
-.rsi-sep{color:var(--text3);margin:0 2px;font-size:11px}
+/* ═══════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════ */
+.quiz-section{
+  background:linear-gradient(135deg,#EFF6FF 0%,#F5F3FF 100%);
+}
+.quiz-wrapper{
+  max-width:720px;margin:0 auto;
+}
+.quiz-nav{
+  display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+  margin-bottom:28px;
+}
+.quiz-dot{
+  width:36px;height:36px;border-radius:50%;
+  background:#fff;border:2px solid var(--blue-light);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:var(--text2);
+  cursor:pointer;transition:all .2s;
+}
+.quiz-dot.active{background:var(--blue);border-color:var(--blue);color:#fff;transform:scale(1.15)}
+.quiz-dot.answered{background:var(--green);border-color:var(--green);color:#fff}
 
-/* ── SIGNAL ── */
-.sig{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap}
-.sig-bull{background:var(--green2);color:var(--green)}
-.sig-bear{background:var(--red2);color:var(--red)}
-.sig-none{color:var(--text3)}
+.quiz-card{
+  background:#fff;border-radius:24px;padding:36px;
+  box-shadow:var(--shadow);
+  display:none;
+  animation:slideInQ .4s cubic-bezier(.34,1.2,.64,1) both;
+}
+.quiz-card.active{display:block}
+@keyframes slideInQ{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
 
-/* ── MISC ── */
-.empty-row td{text-align:center!important;padding:32px;color:var(--text2)}
-.spin{display:inline-block;animation:spin 1s linear infinite;margin-right:6px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.filter-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.3);border-radius:6px;margin-bottom:8px;font-size:12px;color:var(--blue)}
-.filter-bar button{padding:2px 8px;font-size:11px;border-color:var(--blue);color:var(--blue)}
-.filter-bar button:hover{background:var(--blue);color:#000}
+.quiz-q-num{
+  font-size:11px;font-weight:800;color:var(--blue);
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;
+}
+.quiz-q-text{
+  font-size:1.2rem;font-weight:800;line-height:1.5;
+  color:var(--text);margin-bottom:28px;
+}
+.quiz-options{
+  display:flex;flex-direction:column;gap:12px;
+  margin-bottom:28px;
+}
+.quiz-option{
+  display:flex;align-items:center;gap:14px;
+  background:var(--blue-light);border:2px solid transparent;
+  border-radius:14px;padding:14px 18px;
+  cursor:pointer;transition:all .2s;font-size:1rem;font-weight:700;
+}
+.quiz-option:hover{border-color:var(--blue);background:#DBEAFE}
+.quiz-option .opt-letter{
+  min-width:32px;height:32px;border-radius:50%;
+  background:var(--blue);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;flex-shrink:0;
+}
+.quiz-option.correct{background:var(--green-light);border-color:var(--green)}
+.quiz-option.correct .opt-letter{background:var(--green)}
+.quiz-option.wrong{background:#FEE2E2;border-color:#FCA5A5}
+.quiz-option.wrong .opt-letter{background:#EF4444}
+.quiz-option.reveal-correct{
+  background:var(--green-light);border-color:var(--green);
+  animation:pulseGreen .5s ease;
+}
+.quiz-option.reveal-correct .opt-letter{background:var(--green)}
+@keyframes pulseGreen{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
 
-@media(max-width:768px){
-  .hdr{padding:8px 12px;gap:8px}
-  .hdr-prices{gap:10px}
-  .tab-pane{padding:10px 12px}
-  th,td{padding:7px 8px;font-size:12px}
-  .cards{gap:8px}
-  .card{min-width:110px;padding:8px 10px}
-  .card-value{font-size:15px}
+.quiz-controls{
+  display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+}
+.quiz-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 20px;border-radius:12px;
+  font-size:.9rem;font-weight:800;cursor:pointer;
+  border:none;transition:all .2s;font-family:'Nunito',sans-serif;
+}
+.btn-timer{background:var(--gold-light);color:var(--gold)}
+.btn-timer:hover{background:var(--gold);color:#fff}
+.btn-timer.running{background:var(--gold);color:#fff;animation:timerPulse 1s ease-in-out infinite}
+@keyframes timerPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)}50%{box-shadow:0 0 0 8px rgba(245,158,11,0)}}
+.btn-answer{background:var(--purple-light);color:var(--purple)}
+.btn-answer:hover{background:var(--purple);color:#fff}
+.btn-next{background:linear-gradient(135deg,var(--pink),var(--rose));color:#fff;margin-left:auto}
+.btn-next:hover{transform:translateX(2px);box-shadow:0 4px 16px rgba(232,80,122,.4)}
+
+.timer-display{
+  font-size:1.6rem;font-weight:900;
+  min-width:60px;text-align:center;
+}
+.timer-display.warn{color:var(--pink);animation:timerBlink .5s ease-in-out infinite}
+@keyframes timerBlink{0%,100%{opacity:1}50%{opacity:.4}}
+
+.quiz-feedback{
+  display:none;padding:12px 16px;border-radius:12px;
+  font-size:.95rem;font-weight:700;margin-top:16px;text-align:center;
+}
+.quiz-feedback.show{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.quiz-feedback.correct-msg{background:var(--green-light);color:#065F46}
+.quiz-feedback.reveal-msg{background:var(--blue-light);color:#1E40AF}
+
+/* ═══════════════════════════════════════
+   PARENT HONOR
+═══════════════════════════════════════ */
+.parent-honor{
+  background:linear-gradient(135deg,#F5F3FF 0%,#FDF4FF 100%);
+}
+.parent-box{
+  text-align:center;
+  background:#fff;border-radius:24px;padding:48px 32px;
+  box-shadow:var(--shadow);
+}
+.parent-box .heart{font-size:5rem;animation:heartbeat 1.5s ease-in-out infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.parent-box h3{font-size:2rem;font-weight:900;color:var(--purple);margin:20px 0 12px}
+.parent-box p{font-size:1.1rem;color:var(--text2);font-weight:600;max-width:420px;margin:0 auto}
+
+/* ═══════════════════════════════════════
+   VIDEO SECTION
+═══════════════════════════════════════ */
+.video-section{
+  background:linear-gradient(135deg,#0F172A 0%,#1E1B4B 100%);
+  color:#fff;
+}
+.video-section .section-title{color:#fff}
+.video-section .section-sub{color:rgba(255,255,255,.6)}
+.video-placeholder{
+  max-width:640px;margin:0 auto;
+  background:rgba(255,255,255,.05);
+  border:2px dashed rgba(255,255,255,.2);
+  border-radius:20px;padding:60px 40px;
+  text-align:center;
+}
+.video-placeholder .play-icon{font-size:5rem;opacity:.5;animation:float 2s ease-in-out infinite}
+.video-placeholder p{color:rgba(255,255,255,.5);font-size:.95rem;font-weight:600;margin-top:12px}
+
+/* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+footer{
+  background:#1E0A2E;
+  color:rgba(255,255,255,.5);
+  text-align:center;padding:24px;
+  font-size:.85rem;font-weight:600;z-index:1;position:relative;
+}
+footer span{color:var(--rose)}
+
+/* ═══════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════ */
+.text-pink{color:var(--pink)}
+.text-gold{color:var(--gold)}
+.text-purple{color:var(--purple)}
+.divider{
+  display:flex;align-items:center;gap:16px;
+  max-width:200px;margin:0 auto 40px;
+}
+.divider::before,.divider::after{content:'';flex:1;height:2px;background:linear-gradient(90deg,transparent,var(--rose))}
+.divider::after{background:linear-gradient(90deg,var(--rose),transparent)}
+.divider span{font-size:1.2rem}
+
+/* responsive */
+@media(max-width:600px){
+  .poem-card{padding:20px}
+  .quiz-card{padding:24px 20px}
+  .farewell-poem{padding:28px 24px}
+  .quiz-controls{flex-direction:column;align-items:stretch}
+  .btn-next{margin-left:0}
 }
 </style>
 </head>
 <body>
 
-<header class="hdr">
-  <div class="logo">Q<em>· Futures Scanner</em></div>
+<!-- Floating confetti background -->
+<div class="confetti-bg" id="confettiBg"></div>
 
-  <!-- BTC / ETH realtime - 1 dòng -->
-  <div class="hdr-prices">
-    <span class="hdr-coin-name">BTC</span>
-    <span class="hdr-coin-price" id="hdr-btc-price">—</span>
-    <span class="hdr-coin-chg" id="hdr-btc-chg"></span>
-    <span class="hdr-divider">|</span>
-    <span class="hdr-coin-name">ETH</span>
-    <span class="hdr-coin-price" id="hdr-eth-price">—</span>
-    <span class="hdr-coin-chg" id="hdr-eth-chg"></span>
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<section class="hero">
+  <div class="hero-badge">✨ Năm học 2025 – 2026</div>
+  <h1>Lớp 4B2</h1>
+  <h2>Trường Tiểu học Vinschool Ocean Park</h2>
+  <div class="hero-year">🌸 Họp Phụ Huynh Học Sinh 🌸</div>
+  <div class="hero-stars">🌟 ⭐ 🌟</div>
+  <div class="scroll-hint">
+    <span>Cuộn xuống</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
   </div>
+</section>
 
-  <div class="hdr-mid">
-    <div class="dot" id="dot"></div>
-    <span id="status-txt">Chưa tải dữ liệu</span>
-  </div>
-  <div class="hdr-controls">
-    <label>Top</label>
-    <select id="topN">
-      <option value="20">20</option>
-      <option value="30" selected>30</option>
-      <option value="50">50</option>
-    </select>
-    <label>Vol min</label>
-    <select id="minVol">
-      <option value="10">$10M+</option>
-      <option value="50" selected>$50M+</option>
-      <option value="100">$100M+</option>
-      <option value="500">$500M+</option>
-    </select>
-    <button class="btn-r" id="btn-r" onclick="refresh()">↻ Làm mới</button>
-    <button class="btn-notif" id="btn-notif" onclick="toggleNotif()" title="Bật/tắt thông báo Chrome">🔔 Thông báo</button>
-  </div>
-</header>
-
-<div class="tabs">
-  <button class="tab-btn short active" onclick="switchTab('short')">
-    📉 SHORT <span class="cnt" id="short-cnt"></span>
-  </button>
-  <button class="tab-btn long" onclick="switchTab('long')">
-    📈 LONG <span class="cnt" id="long-cnt"></span>
-  </button>
-</div>
-
-<!-- TAB LONG -->
-<div class="tab-pane" id="pane-long">
-  <div class="cards" id="cards-long">
-    <div class="card" id="card-l-os" onclick="toggleFilter('long','os')">
-      <div class="card-label">🟢 RSI &lt; 20 (Quá bán)</div>
-      <div class="card-value" id="l-os" style="color:var(--green)">—</div>
-      <div class="card-sub">bấm để xem coin</div>
+<!-- ═══════════════════════════ OPENING POEM ═══════════════════════════ -->
+<section style="background:linear-gradient(135deg,#FFF0F5,#FFF5F0);">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:var(--soft-pink);color:var(--pink)">🎵 Thơ chào năm học</div>
+      <h2 class="section-title text-pink">Lời tạm biệt mùa hè</h2>
     </div>
-    <div class="card" style="cursor:default">
-      <div class="card-label">Giảm mạnh nhất 24h</div>
-      <div class="card-value" id="l-top24" style="color:var(--red)">—</div>
-      <div class="card-sub" id="l-top24-sub"></div>
-    </div>
-    <div class="card" style="cursor:default">
-      <div class="card-label">Giảm mạnh nhất 5m</div>
-      <div class="card-value" id="l-top5m" style="color:var(--red)">—</div>
-      <div class="card-sub" id="l-top5m-sub"></div>
+    <div class="poem-hero reveal reveal-delay-1">
+      <p>Xúc xắc xúc xẻ
+Khi nghe tiếng ve
+Lòng con rộn rã
+Chia tay năm học
+Lớp 4 thân yêu.
+
+Ngôi trường mến yêu
+Là Vinschool đó
+Ở đó luôn có
+Bao tình yêu thương</p>
+      <div class="poet">✦ Lớp 4B2 kính tặng ✦</div>
     </div>
   </div>
-  <!-- Filter panel -->
-  <div class="filter-panel" id="fp-long">
-    <div class="fp-header">
-      <span class="fp-title" id="fp-long-title"></span>
-      <button class="fp-close" onclick="closeFilter('long')">✕</button>
+</section>
+
+<!-- ═══════════════════════════ STUDENT POEMS ═══════════════════════════ -->
+<section style="background:var(--white)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:var(--soft-pink);color:var(--pink)">📝 Chân dung lớp học</div>
+      <h2 class="section-title text-pink">Những người bạn thân yêu</h2>
+      <p class="section-sub">Mỗi bạn một cá tính, mỗi bạn một tài năng riêng ✨</p>
     </div>
-    <div class="chips" id="fp-long-chips"></div>
-  </div>
-  <!-- Table -->
-  <div id="filter-bar-long"></div>
-  <div class="tbl-wrap">
-    <table>
-      <thead id="long-thead"></thead>
-      <tbody id="long-tbody">
-        <tr class="empty-row"><td colspan="8">Nhấn ↻ Làm mới để tải dữ liệu</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+    <div class="poem-grid">
 
-<!-- TAB SHORT (active mặc định) -->
-<div class="tab-pane active" id="pane-short">
-  <div class="cards" id="cards-short">
-    <div class="card" id="card-s-ob" onclick="toggleFilter('short','ob')">
-      <div class="card-label">🔴 RSI &gt; 90 (Quá mua)</div>
-      <div class="card-value" id="s-ob" style="color:var(--red)">—</div>
-      <div class="card-sub">bấm để xem coin</div>
+      <div class="poem-card reveal">
+        <div class="card-num">04</div>
+        <div class="students">
+          <span class="student-chip">Vỹ An</span>
+          <span class="student-chip">Diệu Anh</span>
+        </div>
+        <div class="card-body">Xếp theo danh sách
+Vỹ An đứng đầu
+H��c nhanh nhớ lâu
+Môn nào cũng giỏi
+Diệu Anh hiền hậu
+H��c hành cực chăm
+Kết quả cuối năm
+Nhiều môn Xuất sắc</div>
+      </div>
+
+      <div class="poem-card reveal reveal-delay-1">
+        <div class="card-num">02</div>
+        <div class="students">
+          <span class="student-chip">Thảo Nhi</span>
+        </div>
+        <div class="card-body">Suốt ngày thắc mắc
+Chính là Thảo Nhi
+Mỗi lần sắp thi
+"Cô ơi con hỏi" 🙋</div>
+      </div>
+
+      <div class="poem-card reveal reveal-delay-2">
+        <div class="card-num">14</div>
+        <div class="students">
+          <span class="student-chip">Gia Huy</span>
+          <span class="student-chip">Vân Khánh</span>
+          <span class="student-chip">Linh Nga</span>
+        </div>
+        <div class="card-body">Có tài ăn nói
+H��c hành cũng chăm
+Được khen cả năm
+Là Gia Huy đó
+Dáng người nho nhỏ
+Tính cũng hiền lành
+Không cần phải nhanh
+Đó là Vân Khánh
+Lấp la lấp lánh
+Ánh mắt rạng ngời
+Giọng vang khắp nơi
+MC – Linh Nga 🎤</div>
+      </div>
+
+      <div class="poem-card reveal">
+        <div class="card-num">08</div>
+        <div class="students">
+          <span class="student-chip">Ngọc Phúc</span>
+          <span class="student-chip">Đăng Khoa</span>
+          <span class="student-chip">Minh Anh</span>
+        </div>
+        <div class="card-body">Tính hay bày trò
+Là Trần Ngọc Phúc
+Nhưng học nghiêm túc
+Điểm luôn luôn cao
+Thấy ai cũng chào
+Đăng Khoa lễ phép
+Hay vẽ, hay chép
+Đó là Minh Anh
+Mỗi một bức tranh
+Là một câu chuyện 🎨</div>
+      </div>
+
+      <div class="poem-card reveal reveal-delay-1">
+        <div class="card-num">04</div>
+        <div class="students">
+          <span class="student-chip">Nhất Chi Mai</span>
+          <span class="student-chip">Minh Khang</span>
+          <span class="student-chip">Duy Khang</span>
+        </div>
+        <div class="card-body">Múa đẹp uyển chuyển
+Là Nhất Chi Mai 💃
+Rất hay diễn hài
+Là Minh Khang đó
+Mặt hay nhăn nhó
+Nhưng bài toán khó
+Tìm ngay Duy Khang
+Thiên tài toán học</div>
+      </div>
+
+      <div class="poem-card reveal reveal-delay-2">
+        <div class="card-num">02</div>
+        <div class="students">
+          <span class="student-chip">Thanh Lan</span>
+          <span class="student-chip">Gia Linh</span>
+          <span class="student-chip">Minh Hiếu</span>
+        </div>
+        <div class="card-body">Đồ đạc ngăn nắp
+Chăm chỉ làm gương
+Thanh Lan tinh tường
+Đoán ý cô giáo
+Vẽ đẹp, cao ráo
+Là bạn – Gia Linh
+H��c giỏi thông minh
+H��c sinh xuất sắc
+Tính tình nghiêm khắc
+Minh Hiếu chứ ai
+Nhưng rất có tài
+Trong môn Tin học 💻</div>
+      </div>
+
+      <div class="poem-card reveal">
+        <div class="card-num">08</div>
+        <div class="students">
+          <span class="student-chip">Tuấn Tú</span>
+          <span class="student-chip">Zelda</span>
+          <span class="student-chip">Minh Phương</span>
+          <span class="student-chip">Minh Nam</span>
+        </div>
+        <div class="card-body">Không hề sợ nhọc
+Chàng trai – Tuấn Tú
+Có việc cứ hú
+Tuấn Tú đến ngay
+H��c giỏi hát hay
+Là Zelda đó 🎵
+Thi bơi rất khó
+Đã có Minh Phương 🏊
+Mắt rất tinh tường
+Là Minh Nam đó
+Cô hỏi sao đó
+Luôn nói không sao.
+Nhưng bạn hỏi vào
+Kêu luôn: "Ai hỏi" 😄</div>
+      </div>
+
+      <div class="poem-card reveal reveal-delay-1">
+        <div class="card-num">02</div>
+        <div class="students">
+          <span class="student-chip">Quang Minh</span>
+          <span class="student-chip">Jeron</span>
+          <span class="student-chip">Như Kiên</span>
+        </div>
+        <div class="card-body">Toán – Khoa đều giỏi
+Là bạn Quang Minh
+Vẽ đẹp, thông minh
+Là Jeron đó 🌟
+Những bài Toán khó
+H�y hỏi Như Kiên
+Tính thì rất hiền
+Lại hay giúp đỡ</div>
+      </div>
+
+      <div class="poem-card reveal reveal-delay-2">
+        <div class="card-num">14</div>
+        <div class="students">
+          <span class="student-chip">Minh Thảo</span>
+          <span class="student-chip">Khánh Chi</span>
+        </div>
+        <div class="card-body">Tính tình cởi mở
+Minh Thảo chứ ai
+H�t hay vẽ tài
+Chăm đi sự kiện
+Khánh Chi hay tiện
+Để đồ khắp nơi
+Văn khó bằng trời
+Khánh Chi làm tốt 👏</div>
+      </div>
+
+      <div class="poem-card reveal">
+        <div class="card-num">04</div>
+        <div class="students">
+          <span class="student-chip">Trúc Linh</span>
+          <span class="student-chip">Đức Vượng</span>
+        </div>
+        <div class="card-body">Giải toán phút mốt
+Là bạn Trúc Linh ⚡
+Mắt tinh, thông minh
+Là Bạn Đức Vượng</div>
+      </div>
+
     </div>
-    <div class="card" style="cursor:default">
-      <div class="card-label">Tăng mạnh nhất 24h</div>
-      <div class="card-value" id="s-top24" style="color:var(--green)">—</div>
-      <div class="card-sub" id="s-top24-sub"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ FAREWELL POEM ═══════════════════════════ -->
+<section class="farewell-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:var(--purple-light);color:var(--purple)">💜 Lời chia tay</div>
+      <h2 class="section-title text-purple">Kỉ niệm trong tim</h2>
     </div>
-    <div class="card" style="cursor:default">
-      <div class="card-label">Tăng mạnh nhất 5m</div>
-      <div class="card-value" id="s-top5m" style="color:var(--green)">—</div>
-      <div class="card-sub" id="s-top5m-sub"></div>
+    <div class="farewell-poem reveal reveal-delay-1">
+      <p>Điểm 10 tươi đỏ
+Trên vở của con
+Đến mai chỉ còn
+Là những kỉ niệm</p>
+      <p>Giờ vàng đã điểm
+Chúng con cười tươi
+Chia tay năm học
+Không bạn nào khóc
+Dù phải chia xa</p>
+      <p>Nơi đây là nhà
+Của chúng con đó
+Khi gặp gian khó</p>
+      <div class="teacher">💝 Cô Liễu luôn ở đây – Tình yêu tràn đầy, dang tay chào đón 💝</div>
     </div>
   </div>
-  <div class="filter-panel" id="fp-short">
-    <div class="fp-header">
-      <span class="fp-title" id="fp-short-title"></span>
-      <button class="fp-close" onclick="closeFilter('short')">✕</button>
+</section>
+
+<!-- ═══════════════════════════ HONOR ═══════════════════════════ -->
+<section class="honor-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:var(--gold-light);color:var(--gold)">🏆 Thành tích</div>
+      <h2 class="section-title text-gold">Vinh danh Học sinh</h2>
+      <p class="section-sub">Năm học 2025 – 2026</p>
     </div>
-    <div class="chips" id="fp-short-chips"></div>
+    <div class="honor-box reveal reveal-delay-1">
+      <div class="trophy">🏆</div>
+      <h3>Lớp Xuất Sắc</h3>
+      <p>Lớp 4B2 tự hào đạt danh hiệu <strong>Lớp Xuất Sắc</strong> năm học 2025–2026</p>
+      <div class="honor-stars">⭐⭐⭐⭐⭐</div>
+    </div>
   </div>
-  <div id="filter-bar-short"></div>
-  <div class="tbl-wrap">
-    <table>
-      <thead id="short-thead"></thead>
-      <tbody id="short-tbody">
-        <tr class="empty-row"><td colspan="8">Nhấn ↻ Làm mới để tải dữ liệu</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+</section>
 
-<script>
-// ═══════════════════════════════
-//  STATE
-// ═══════════════════════════════
-const S = {
-  longList:[], shortList:[],
-  details:{},
-  validPerps: null,
-  loading:false,
-  timer:null,
-  activeFilter:{ long:null, short:null },
-  notifEnabled: localStorage.getItem('notif')==='1',
-  prevSignals: {}  // { symbol: { divergence, rsiOB, rsiOS } }
-};
+<!-- ═══════════════════════════ QUIZ ═══════════════════════════ -->
+<section class="quiz-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:var(--blue-light);color:var(--blue)">🎯 Trò chơi</div>
+      <h2 class="section-title" style="color:var(--blue)">Quiz dành cho Phụ huynh</h2>
+      <p class="section-sub">Bạn biết gì về lớp 4B2? Thử thách ngay! 🎉</p>
+    </div>
 
-// ═══════════════════════════════
-//  SETTINGS
-// ═══════════════════════════════
-function cfg(){
-  return {
-    topN:    parseInt(document.getElementById('topN').value),
-    minVolM: parseInt(document.getElementById('minVol').value),
-    rsiPer:  14,
-  };
-}
+    <div class="quiz-wrapper reveal reveal-delay-1">
+      <div class="quiz-nav">
+        <div class="quiz-dot active" onclick="gotoQ(0)">1</div>
+        <div class="quiz-dot" onclick="gotoQ(1)">2</div>
+        <div class="quiz-dot" onclick="gotoQ(2)">3</div>
+        <div class="quiz-dot" onclick="gotoQ(3)">4</div>
+        <div class="quiz-dot" onclick="gotoQ(4)">5</div>
+      </div>
 
-// ═══════════════════════════════
-//  RSI(14)
-// ═══════════════════════════════
-// ─── RSI single value ───
-function calcRSI(closes, n){
-  if(closes.length < n+1) return null;
-  let g=0,l=0;
-  for(let i=1;i<=n;i++){const d=closes[i]-closes[i-1];if(d>=0)g+=d;else l-=d;}
-  let ag=g/n,al=l/n;
-  for(let i=n+1;i<closes.length;i++){
-    const d=closes[i]-closes[i-1];
-    ag=(ag*(n-1)+Math.max(d,0))/n;
-    al=(al*(n-1)+Math.max(-d,0))/n;
-  }
-  if(al===0) return 100;
-  return parseFloat((100-100/(1+ag/al)).toFixed(2));
-}
-
-// ═══════════════════════════════
-//  FETCH VALID PERPS (chỉ lấy coin thực tế có trên Binance Futures)
-// ═══════════════════════════════
-async function fetchValidPerps(){
-  const res = await fetch('https://fapi.binance.com/fapi/v1/exchangeInfo');
-  const data = await res.json();
-  return new Set(
-    data.symbols
-      .filter(s => s.contractType==='PERPETUAL' && s.status==='TRADING' && s.quoteAsset==='USDT')
-      .map(s => s.symbol)
-  );
-}
-
-// ═══════════════════════════════
-//  FETCH TICKERS
-// ═══════════════════════════════
-async function fetchTickers(){
-  const res = await fetch('https://fapi.binance.com/fapi/v1/ticker/24hr');
-  const data = await res.json();
-  const c = cfg();
-  const stables = new Set(['USDC','BUSD','TUSD','FDUSD','DAI','USDP','USTC','USDD']);
-
-  return data
-    .filter(t =>
-      t.symbol.endsWith('USDT') &&
-      S.validPerps.has(t.symbol) &&            // phải có trong danh sách hợp lệ
-      !stables.has(t.symbol.replace('USDT','')) &&
-      parseFloat(t.quoteVolume) >= c.minVolM*1e6
-    )
-    .map(t => ({
-      symbol:    t.symbol,
-      base:      t.symbol.replace('USDT',''),
-      price:     parseFloat(t.lastPrice),
-      change24h: parseFloat(t.priceChangePercent),
-      volM:      parseFloat(t.quoteVolume)/1e6,
-    }));
-}
-
-// ═══════════════════════════════
-//  UPDATE HEADER BTC/ETH
-// ═══════════════════════════════
-function updateHeaderPrices(allTickers){
-  ['BTC','ETH'].forEach(base => {
-    const t = allTickers.find(x=>x.symbol===base+'USDT');
-    if(!t) return;
-    const side = base.toLowerCase();
-    const priceEl = document.getElementById(`hdr-${side}-price`);
-    const chgEl   = document.getElementById(`hdr-${side}-chg`);
-    priceEl.textContent = fPrice(t.price);
-    chgEl.textContent   = fPct(t.change24h);
-    chgEl.className = 'hdr-coin-chg ' + (t.change24h>=0?'up':'dn');
-  });
-}
-
-// ═══════════════════════════════
-//  FETCH DETAILS (klines 5m)
-// ═══════════════════════════════
-async function fetchDetails(symbol, price){
-  try{
-    const N = 14;
-    const LIM = N + 5; // 19 nến đủ để tính RSI(14)
-
-    // Fetch 2 khung thời gian song song
-    const [k5m, k15m] = await Promise.all([
-      fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=5m&limit=28`).then(r=>r.json()),
-      fetch(`https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=15m&limit=${LIM}`).then(r=>r.json()),
-    ]);
-
-    const rsiOf = (klines) => {
-      if(!Array.isArray(klines)||klines.length<N+2) return null;
-      const cc = klines.slice(0,-1).map(k=>parseFloat(k[4]));
-      if(cc.length<N+1) return null;
-      return calcRSI([...cc, price], N);
-    };
-
-    const rsi5m  = rsiOf(k5m);
-    const rsi15m = rsiOf(k15m);
-
-    // % 5m và % 1h từ klines 5m
-    const cc5 = Array.isArray(k5m) ? k5m.slice(0,-1).map(k=>parseFloat(k[4])) : [];
-    const prevClose = cc5.length ? cc5[cc5.length-1] : price;
-    const chg5m = prevClose>0 ? (price-prevClose)/prevClose*100 : 0;
-    const ref1h = cc5.length>=13 ? cc5[cc5.length-13] : cc5[0];
-    const chg1h = ref1h>0 ? (price-ref1h)/ref1h*100 : 0;
-
-    return { rsi5m, rsi15m, chg5m, chg1h };
-  }catch(e){ return null; }
-}
-
-// ═══════════════════════════════
-//  FORMAT
-// ═══════════════════════════════
-function fPct(v,d=2){
-  if(v==null)return'—';
-  return(v>=0?'+':'')+v.toFixed(d)+'%';
-}
-function fPrice(p){
-  if(p>=10000)return p.toLocaleString('en',{maximumFractionDigits:1});
-  if(p>=100)  return p.toFixed(2);
-  if(p>=1)    return p.toFixed(3);
-  if(p>=0.01) return p.toFixed(4);
-  return p.toFixed(6);
-}
-function fVol(m){
-  return m>=1000?'$'+(m/1000).toFixed(1)+'B':'$'+Math.round(m)+'M';
-}
-function pCls(v){return v>0?'up':v<0?'dn':'neu';}
-
-// RSI badge — ngưỡng cứng 90/20
-function rsiTag(rsi){
-  if(rsi==null) return '<span class="rsi rsi-mid">...</span>';
-  const cls = rsi>90?'rsi-ob':rsi<20?'rsi-os':rsi>=60?'rsi-hi':rsi<=40?'rsi-lo':'rsi-mid';
-  return `<span class="rsi ${cls}">${rsi.toFixed(1)}</span>`;
-}
-
-// Tín hiệu: liệt kê TF nào vượt ngưỡng
-function sigBadge(det){
-  if(!det) return '<span class="sig-none">...</span>';
-  const TFS = ['5m','15m'];
-  const VALS = [det.rsi5m, det.rsi15m];
-  const ob = TFS.filter((_,i)=>VALS[i]!=null&&VALS[i]>90);
-  const os = TFS.filter((_,i)=>VALS[i]!=null&&VALS[i]<20);
-  if(ob.length) return `<span class="sig sig-bear">🔴 ${ob.join(' · ')}</span>`;
-  if(os.length) return `<span class="sig sig-bull">🟢 ${os.join(' · ')}</span>`;
-  return '<span class="sig-none">—</span>';
-}
-
-function hasSignal(det, side){
-  if(!det) return false;
-  const v = [det.rsi5m, det.rsi15m];
-  return side==='short' ? v.some(r=>r!=null&&r>90) : v.some(r=>r!=null&&r<20);
-}
-
-// ═══════════════════════════════
-//  SCROLL & HIGHLIGHT ROW
-// ═══════════════════════════════
-function scrollToRow(symbol){
-  const row = document.getElementById('row-'+symbol);
-  if(!row) return;
-  row.scrollIntoView({behavior:'smooth', block:'center'});
-  row.classList.remove('flash');
-  void row.offsetWidth;
-  row.classList.add('flash');
-  setTimeout(()=>row.classList.remove('flash'), 2000);
-}
-
-// ═══════════════════════════════
-//  FILTER PANEL
-// ═══════════════════════════════
-function toggleFilter(side, type){
-  const current = S.activeFilter[side];
-  if(current===type){closeFilter(side);return;}
-  S.activeFilter[side]=type;
-
-  document.querySelectorAll(`#cards-${side} .card`).forEach(c=>c.classList.remove('active-filter'));
-  const cardId = side==='long'?'card-l-os':'card-s-ob';
-  document.getElementById(cardId)?.classList.add('active-filter');
-
-  const list = side==='long'?S.longList:S.shortList;
-  let matching, title;
-  if(type==='os'){
-    matching = list.filter(x=>hasSignal(S.details[x.symbol],'long'));
-    title='🟢 RSI < 20 (Quá bán)';
-  }else{
-    matching = list.filter(x=>hasSignal(S.details[x.symbol],'short'));
-    title='🔴 RSI > 90 (Quá mua)';
-  }
-
-  document.getElementById(`fp-${side}-title`).textContent=`${title} · ${matching.length} coin`;
-  const chipsEl=document.getElementById(`fp-${side}-chips`);
-  if(!matching.length){
-    chipsEl.innerHTML='<span class="fp-empty">Không có coin nào đáp ứng điều kiện này.</span>';
-  }else{
-    chipsEl.innerHTML=matching.map(x=>{
-      const d=S.details[x.symbol];
-      const rsiLine = d ? `<span class="chip-pct">${['5m','15m'].map((tf,i)=>{
-        const v=[d.rsi5m,d.rsi15m][i];
-        return v!=null?`<span style="font-size:10px;color:var(--text2)">${tf}:</span>${rsiTag(v)}`:'';
-      }).join(' ')}</span>` : '';
-      return`<div class="chip" onclick="scrollToRow('${x.symbol}')">
-        <span>${x.base}</span>
-        <span class="chip-pct ${pCls(x.change24h)}">${fPct(x.change24h)}</span>
-        ${rsiLine}
-      </div>`;
-    }).join('');
-  }
-  document.getElementById(`fp-${side}`).classList.add('open');
-}
-
-function closeFilter(side){
-  S.activeFilter[side]=null;
-  document.getElementById(`fp-${side}`).classList.remove('open');
-  document.querySelectorAll(`#cards-${side} .card`).forEach(c=>c.classList.remove('active-filter'));
-}
-
-// ═══════════════════════════════
-//  RENDER TABLE
-// ═══════════════════════════════
-const THEAD=`<tr>
-  <th style="text-align:left;min-width:130px">Coin</th>
-  <th>Giá USDT</th>
-  <th title="Biến động 5 phút">% 5m</th>
-  <th title="Biến động 1 giờ">% 1h</th>
-  <th title="Biến động 24 giờ">% 24h</th>
-  <th title="RSI(14) khung 5 phút">RSI 5m</th>
-  <th title="RSI(14) khung 15 phút">RSI 15m</th>
-  <th title="Tín hiệu: RSI > 90 hoặc < 20">Tín hiệu</th>
-  <th title="Khối lượng 24h">KL 24h</th>
-</tr>`;
-
-function renderTable(side, list){
-  document.getElementById(`${side}-thead`).innerHTML=THEAD;
-  const tbody=document.getElementById(`${side}-tbody`);
-  if(!list.length){
-    tbody.innerHTML='<tr class="empty-row"><td colspan="9">Không có dữ liệu</td></tr>';
-    return;
-  }
-
-  const sorted=[
-    ...list.filter(c=>hasSignal(S.details[c.symbol], side)),
-    ...list.filter(c=>!hasSignal(S.details[c.symbol], side)),
-  ];
-
-  tbody.innerHTML=sorted.map((c,i)=>{
-    const det=S.details[c.symbol];
-    const tv=`https://www.tradingview.com/chart/?symbol=BINANCE:${c.symbol}.P`;
-    const chg5m=det?.chg5m??null;
-    const chg1h=det?.chg1h??null;
-    const hlCls = hasSignal(det,side) ? (side==='short'?'hl-bear':'hl-bull') : '';
-    const loading='<span class="rsi rsi-mid">...</span>';
-
-    return`<tr id="row-${c.symbol}" class="${hlCls}">
-      <td>
-        <div class="coin-cell">
-          <span class="coin-rank">${i+1}</span>
-          <div>
-            <div class="coin-base">
-              ${c.base}
-              <a class="tv-link" href="${tv}" target="_blank" onclick="event.stopPropagation()" title="Mở TradingView">↗</a>
-            </div>
-            <div class="coin-tag">USDT · PERP</div>
+      <!-- Q1 -->
+      <div class="quiz-card active" id="qcard-0">
+        <div class="quiz-q-num">Câu 1 / 5</div>
+        <div class="quiz-q-text">Trong Đại nhạc hội diễn ra vào ngày 24/5/2026, lớp 4B2 đã giành được giải gì?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="selectOpt(this,0,'A',false)">
+            <div class="opt-letter">A</div>
+            <span>Biên đạo và dàn dựng xuất sắc</span>
+          </div>
+          <div class="quiz-option" onclick="selectOpt(this,0,'B',true)">
+            <div class="opt-letter">B</div>
+            <span>Ý tưởng sáng tạo</span>
+          </div>
+          <div class="quiz-option" onclick="selectOpt(this,0,'C',false)">
+            <div class="opt-letter">C</div>
+            <span>Ý tưởng dàn dựng và sáng tạo xuất sắc</span>
           </div>
         </div>
-      </td>
-      <td class="mono">${fPrice(c.price)}</td>
-      <td class="${pCls(chg5m)}">${chg5m==null?'...':fPct(chg5m)}</td>
-      <td class="${pCls(chg1h)}">${chg1h==null?'...':fPct(chg1h)}</td>
-      <td class="${pCls(c.change24h)}" style="font-weight:700">${fPct(c.change24h)}</td>
-      <td>${det?rsiTag(det.rsi5m):loading}</td>
-      <td>${det?rsiTag(det.rsi15m):loading}</td>
-      <td>${sigBadge(det)}</td>
-      <td class="neu mono">${fVol(c.volM)}</td>
-    </tr>`;
-  }).join('');
-}
+        <div class="quiz-feedback" id="qfb-0"></div>
+        <div class="quiz-controls">
+          <button class="quiz-btn btn-timer" id="qtimer-0" onclick="startTimer(0)">⏱ Bấm giờ (30s)</button>
+          <span class="timer-display" id="qtime-0"></span>
+          <button class="quiz-btn btn-answer" onclick="revealAnswer(0)">💡 Hiển thị đáp án</button>
+          <button class="quiz-btn btn-next" onclick="gotoQ(1)">Câu tiếp →</button>
+        </div>
+      </div>
 
-// ═══════════════════════════════
-//  SUMMARY CARDS
-// ═══════════════════════════════
-function updateCards(side,list){
-  if(side==='long'){
-    const os=list.filter(c=>hasSignal(S.details[c.symbol],'long')).length;
-    const t24=list.length?list.reduce((a,b)=>b.change24h<a.change24h?b:a):null;
-    const b5=list.filter(x=>S.details[x.symbol]);
-    const t5m=b5.length?b5.reduce((a,b)=>S.details[b.symbol].chg5m<S.details[a.symbol].chg5m?b:a):null;
-    document.getElementById('l-os').textContent=os?`${os} coin`:'0';
-    document.getElementById('l-top24').textContent=t24?fPct(t24.change24h):'—';
-    document.getElementById('l-top24-sub').textContent=t24?t24.base:'';
-    document.getElementById('l-top5m').textContent=t5m?fPct(S.details[t5m.symbol].chg5m):'—';
-    document.getElementById('l-top5m-sub').textContent=t5m?t5m.base:'';
-    document.getElementById('long-cnt').textContent=`(${list.length})`;
-  }else{
-    const ob=list.filter(c=>hasSignal(S.details[c.symbol],'short')).length;
-    const t24=list.length?list.reduce((a,b)=>b.change24h>a.change24h?b:a):null;
-    const b5=list.filter(x=>S.details[x.symbol]);
-    const t5m=b5.length?b5.reduce((a,b)=>S.details[b.symbol].chg5m>S.details[a.symbol].chg5m?b:a):null;
-    document.getElementById('s-ob').textContent=ob?`${ob} coin`:'0';
-    document.getElementById('s-top24').textContent=t24?fPct(t24.change24h):'—';
-    document.getElementById('s-top24-sub').textContent=t24?t24.base:'';
-    document.getElementById('s-top5m').textContent=t5m?fPct(S.details[t5m.symbol].chg5m):'—';
-    document.getElementById('s-top5m-sub').textContent=t5m?t5m.base:'';
-    document.getElementById('short-cnt').textContent=`(${list.length})`;
+      <!-- Q2 -->
+      <div class="quiz-card" id="qcard-1">
+        <div class="quiz-q-num">Câu 2 / 5</div>
+        <div class="quiz-q-text">Lớp 4B2 có bao nhiêu bạn nam, bao nhiêu bạn nữ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="selectOpt(this,1,'A',false)">
+            <div class="opt-letter">A</div>
+            <span>15 nam – 11 nữ</span>
+          </div>
+          <div class="quiz-option" onclick="selectOpt(this,1,'B',true)">
+            <div class="opt-letter">B</div>
+            <span>14 nam – 12 nữ</span>
+          </div>
+          <div class="quiz-option" onclick="selectOpt(this,1,'C',false)">
+            <div class="opt-letter">C</div>
+            <span>13 nam – 13 nữ</span>
+          </div>
+        </div>
+        <div class="quiz-feedback" id="qfb-1"></div>
+        <div class="quiz-controls">
+          <button class="quiz-btn btn-timer" id="qtimer-1" onclick="startTimer(1)">⏱ Bấm giờ (30s)</button>
+          <span class="timer-display" id="qtime-1"></span>
+          <button class="quiz-btn btn-answer" onclick="revealAnswer(1)">💡 Hiển thị đáp án</button>
+          <button class="quiz-btn btn-next" onclick="gotoQ(2)">Câu tiếp →</button>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="quiz-card" id="qcard-2">
+        <div class="quiz-q-num">Câu 3 / 5</div>
+        <div class="quiz-q-text">Trong Ngày hội thể thao, lớp 4B2 đã giành giải gì?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="selectOpt(this,2,'A',false)">
+            <div class="opt-letter">A</div>
+            <span>Nhất 🥇</span>
+          </div>
+          <div class="quiz-option" onclick="selectOpt(this,2,'B',true)">
+            <div class="opt-letter">B</div>
+            <span>Nhì 🥈</span>
+          </div>
+          <div class="quiz-option" onclick="selectOpt(this,2,'C',false)">
+            <div class="opt-letter">C</div>
+            <span>Ba 🥉</span>
+          </div>
+        </div>
+        <div class="quiz-feedback" id="qfb-2"></div>
+        <div class="quiz-controls">
+          <button class="quiz-btn btn-timer" id="qtimer-2" onclick="startTimer(2)">⏱ Bấm giờ (30s)</button>
+          <span class="timer-display" id="qtime-2"></span>
+          <button class="quiz-btn btn-answer" onclick="revealAnswer(2)">💡 Hiển thị đáp án</button>
+          <button class="quiz-btn btn-next" onclick="gotoQ(3)">Câu tiếp →</button>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="quiz-card" id="qcard-3">
+        <div class="quiz-q-num">Câu 4 / 5</div>
+        <div class="quiz-q-text">Năm học 2025 – 2026 lớp 4B02 đã đạt được danh hiệu gì?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="selectOpt(this,3,'A',false)">
+            <div class="opt-letter">A</div>
+            <span>Lớp Tiến Bộ</span>
+          </div>
+          <div class="quiz-option" onclick="selectOpt(this,3,'B',true)">
+            <div class="opt-letter">B</div>
+            <span>Lớp Xuất Sắc 🏆</span>
+          </div>
+          <div class="quiz-option" onclick="selectOpt(this,3,'C',false)">
+            <div class="opt-letter">C</div>
+            <span>Lớp Tiên Tiến</span>
+          </div>
+        </div>
+        <div class="quiz-feedback" id="qfb-3"></div>
+        <div class="quiz-controls">
+          <button class="quiz-btn btn-timer" id="qtimer-3" onclick="startTimer(3)">⏱ Bấm giờ (30s)</button>
+          <span class="timer-display" id="qtime-3"></span>
+          <button class="quiz-btn btn-answer" onclick="revealAnswer(3)">💡 Hiển thị đáp án</button>
+          <button class="quiz-btn btn-next" onclick="gotoQ(4)">Câu tiếp →</button>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="quiz-card" id="qcard-4">
+        <div class="quiz-q-num">Câu 5 / 5</div>
+        <div class="quiz-q-text">Trong năm học lớp 4, lớp 4B2 đã đi trải nghiệm ở đâu?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="selectOpt(this,4,'A',false)">
+            <div class="opt-letter">A</div>
+            <span>Hoàng Thành Thăng Long</span>
+          </div>
+          <div class="quiz-option" onclick="selectOpt(this,4,'B',true)">
+            <div class="opt-letter">B</div>
+            <span>Công viên Thủ Lệ 🦁</span>
+          </div>
+          <div class="quiz-option" onclick="selectOpt(this,4,'C',false)">
+            <div class="opt-letter">C</div>
+            <span>Vườn Bách Thảo 🌿</span>
+          </div>
+        </div>
+        <div class="quiz-feedback" id="qfb-4"></div>
+        <div class="quiz-controls">
+          <button class="quiz-btn btn-timer" id="qtimer-4" onclick="startTimer(4)">⏱ Bấm giờ (30s)</button>
+          <span class="timer-display" id="qtime-4"></span>
+          <button class="quiz-btn btn-answer" onclick="revealAnswer(4)">💡 Hiển thị đáp án</button>
+          <button class="quiz-btn btn-next" onclick="gotoQ(0)" style="background:linear-gradient(135deg,var(--green),#059669)">🔄 Làm lại</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ PARENT HONOR ═══════════════════════════ -->
+<section class="parent-honor">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:var(--purple-light);color:var(--purple)">💜 Tri ân</div>
+      <h2 class="section-title text-purple">Vinh danh Phụ huynh</h2>
+      <p class="section-sub">Năm học 2025 – 2026</p>
+    </div>
+    <div class="parent-box reveal reveal-delay-1">
+      <div class="heart">💜</div>
+      <h3>Cảm ơn Quý Phụ huynh</h3>
+      <p>Trân trọng sự đồng hành và tin tưởng của quý phụ huynh trong suốt năm học 2025 – 2026. Chúc quý phụ huynh và các con một mùa hè thật vui và ý nghĩa! 🌻</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ VIDEO ═══════════════════════════ -->
+<section class="video-section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.7)">🎬 Kỉ niệm</div>
+      <h2 class="section-title">Video tổng kết năm học</h2>
+      <p class="section-sub">Nhìn lại một năm đầy ắp kỉ niệm của lớp 4B2 💕</p>
+    </div>
+    <div class="video-placeholder reveal reveal-delay-1">
+      <div class="play-icon">▶️</div>
+      <p>Video tổng kết năm học 2025 – 2026<br>Lớp 4B2 · Vinschool Ocean Park</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>🌸</span> Lớp 4B2 · Trường Tiểu học Vinschool Ocean Park · Năm học 2025–2026 <span>🌸</span>
+</footer>
+
+<script>
+/* ─── CONFETTI BACKGROUND ─── */
+(function(){
+  const bg = document.getElementById('confettiBg');
+  const colors=['#F472B6','#FCD34D','#6EE7B7','#93C5FD','#C4B5FD','#FCA5A5'];
+  const sizes=[8,10,14,18,20];
+  for(let i=0;i<25;i++){
+    const s=document.createElement('span');
+    const sz=sizes[Math.floor(Math.random()*sizes.length)];
+    s.style.cssText=`
+      width:${sz}px;height:${sz}px;
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${8+Math.random()*12}s;
+      animation-delay:${Math.random()*10}s;
+    `;
+    bg.appendChild(s);
   }
-  if(S.activeFilter[side]) toggleFilter(side, S.activeFilter[side]);
-}
+})();
 
-// ═══════════════════════════════
-//  MAIN REFRESH
-// ═══════════════════════════════
-async function refresh(){
-  if(S.loading)return;
-  S.loading=true;
-  clearTimeout(S.timer);
-  const dot=document.getElementById('dot');
-  const txt=document.getElementById('status-txt');
-  const btn=document.getElementById('btn-r');
-  dot.className='dot ld';
-  txt.textContent='Đang tải...';
-  btn.disabled=true;
-  ['long','short'].forEach(side=>{
-    document.getElementById(`${side}-tbody`).innerHTML=
-      `<tr class="empty-row"><td colspan="8"><span class="spin">⟳</span> Đang tải từ Binance Futures...</td></tr>`;
+/* ─── SCROLL REVEAL ─── */
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')});
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+/* ─── QUIZ STATE ─── */
+const timers={};
+const answered={};
+let currentQ=0;
+
+function gotoQ(idx){
+  document.querySelectorAll('.quiz-card').forEach((c,i)=>{
+    c.classList.toggle('active',i===idx);
   });
-  try{
-    // 1. Lấy danh sách perp hợp lệ (cache lại, không fetch lại mỗi lần)
-    if(!S.validPerps){
-      txt.textContent='Đang xác thực danh sách Futures...';
-      S.validPerps=await fetchValidPerps();
+  document.querySelectorAll('.quiz-dot').forEach((d,i)=>{
+    d.classList.toggle('active',i===idx);
+  });
+  currentQ=idx;
+  // stop timer of previous
+  Object.keys(timers).forEach(k=>{
+    if(parseInt(k)!==idx && timers[k]){
+      clearInterval(timers[k]);
+      timers[k]=null;
     }
-
-    // 2. Tickers
-    txt.textContent='Đang tải giá...';
-    const all=await fetchTickers();
-
-    // Cập nhật BTC/ETH header
-    updateHeaderPrices(all);
-
-    const c=cfg();
-    // LONG: giảm mạnh nhất → cơ hội Long
-    S.longList =[...all].sort((a,b)=>a.change24h-b.change24h).slice(0,c.topN);
-    // SHORT: tăng mạnh nhất → cơ hội Short
-    S.shortList=[...all].sort((a,b)=>b.change24h-a.change24h).slice(0,c.topN);
-
-    renderTable('long',S.longList);
-    renderTable('short',S.shortList);
-    updateCards('long',S.longList);
-    updateCards('short',S.shortList);
-    txt.textContent=`Đang tính RSI(14)...`;
-
-    // 3. Details - unique coins, batch 10
-    const uniq=[...new Map(
-      [...S.longList,...S.shortList].map(c=>[c.symbol,c])
-    ).values()];
-
-    for(let i=0;i<uniq.length;i+=10){
-      await Promise.all(
-        uniq.slice(i,i+10).map(async c=>{
-          const d=await fetchDetails(c.symbol,c.price);
-          if(d) S.details[c.symbol]=d;
-        })
-      );
-      renderTable('long',S.longList);
-      renderTable('short',S.shortList);
-      updateCards('long',S.longList);
-      updateCards('short',S.shortList);
-    }
-
-    // Kiểm tra tín hiệu mới và gửi thông báo
-    checkSignals(S.shortList,'short');
-    checkSignals(S.longList,'long');
-
-    const now=new Date();
-    dot.className='dot on';
-    txt.textContent=`Cập nhật ${now.toLocaleTimeString('vi-VN')} · Tự làm mới sau 30s`;
-    S.timer=setTimeout(refresh,30000);
-  }catch(e){
-    dot.className='dot err';
-    txt.textContent='❌ Lỗi kết nối Binance (thử VPN nếu bị chặn)';
-    console.error(e);
-  }
-  btn.disabled=false;
-  S.loading=false;
-}
-
-// ═══════════════════════════════
-//  NOTIFICATIONS
-// ═══════════════════════════════
-function updateNotifBtn(){
-  const btn = document.getElementById('btn-notif');
-  if(!('Notification' in window)){
-    btn.textContent='🔕 Không hỗ trợ';
-    btn.classList.add('denied');
-    return;
-  }
-  if(Notification.permission==='denied'){
-    btn.textContent='🔕 Bị chặn';
-    btn.classList.add('denied');
-    btn.title='Vào Settings > Privacy > Notifications để bật lại';
-    return;
-  }
-  if(S.notifEnabled && Notification.permission==='granted'){
-    btn.textContent='🔔 Đang bật';
-    btn.className='btn-notif on';
-  }else{
-    btn.textContent='🔕 Thông báo';
-    btn.className='btn-notif';
-  }
-}
-
-async function toggleNotif(){
-  if(!('Notification' in window)) return;
-  if(Notification.permission==='denied'){
-    alert('Chrome đang chặn thông báo từ trang này.\n\nĐể bật lại:\n1. Click icon 🔒 bên trái địa chỉ web\n2. Notifications → Allow\n3. Reload trang');
-    return;
-  }
-  if(!S.notifEnabled){
-    const perm = await Notification.requestPermission();
-    if(perm==='granted'){
-      S.notifEnabled=true;
-      localStorage.setItem('notif','1');
-      // Test notification
-      new Notification('Q · Futures Scanner 🔔', {
-        body: 'Thông báo đã được bật! Bạn sẽ nhận cảnh báo khi có tín hiệu Đảo chiều, Quá mua, Quá bán.',
-        icon: 'https://favi.one/b.png'
-      });
-    }
-  }else{
-    S.notifEnabled=false;
-    localStorage.setItem('notif','0');
-  }
-  updateNotifBtn();
-}
-
-function sendNotif(title, body, tag){
-  if(!S.notifEnabled || Notification.permission!=='granted') return;
-  try{
-    const n = new Notification(title, { body, tag, renotify:true, icon:'https://favi.one/b.png' });
-    n.onclick=()=>{ window.focus(); n.close(); };
-  }catch(e){}
-}
-
-function checkSignals(list, side){
-  const TFS = ['5m','15m'];
-  list.forEach(coin=>{
-    const det = S.details[coin.symbol];
-    if(!det) return;
-    const prev = S.prevSignals[coin.symbol] || {};
-
-    const vals = [det.rsi5m, det.rsi15m];
-    const obTfs = TFS.filter((_,i)=>vals[i]!=null&&vals[i]>90);
-    const osTfs = TFS.filter((_,i)=>vals[i]!=null&&vals[i]<20);
-    const prevOb = prev.obTfs||'';
-    const prevOs = prev.osTfs||'';
-
-    if(obTfs.length && obTfs.join()!==prevOb && side==='short'){
-      sendNotif(
-        `🔴 RSI Quá mua · ${coin.base}`,
-        `Khung ${obTfs.join(', ')} vượt 90 · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
-        `ob-${coin.symbol}`
-      );
-    }
-    if(osTfs.length && osTfs.join()!==prevOs && side==='long'){
-      sendNotif(
-        `🟢 RSI Quá bán · ${coin.base}`,
-        `Khung ${osTfs.join(', ')} xuống dưới 20 · Giá ${fPrice(coin.price)} · % 24h ${fPct(coin.change24h)}`,
-        `os-${coin.symbol}`
-      );
-    }
-
-    S.prevSignals[coin.symbol] = { obTfs: obTfs.join(), osTfs: osTfs.join() };
   });
 }
 
-// ═══════════════════════════════
-//  TAB SWITCH
-// ═══════════════════════════════
-function switchTab(side){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-  document.querySelector(`.tab-btn.${side}`).classList.add('active');
-  document.getElementById(`pane-${side}`).classList.add('active');
+function startTimer(qi){
+  const btn=document.getElementById(`qtimer-${qi}`);
+  const disp=document.getElementById(`qtime-${qi}`);
+  if(timers[qi]){
+    clearInterval(timers[qi]);
+    timers[qi]=null;
+    btn.textContent='⏱ Bấm giờ (30s)';
+    btn.classList.remove('running');
+    disp.textContent='';
+    disp.classList.remove('warn');
+    return;
+  }
+  let sec=30;
+  disp.textContent=sec+'s';
+  disp.style.color='var(--gold)';
+  btn.textContent='⏹ Dừng';
+  btn.classList.add('running');
+  timers[qi]=setInterval(()=>{
+    sec--;
+    if(sec<0){
+      clearInterval(timers[qi]);timers[qi]=null;
+      btn.textContent='⏱ Bấm giờ (30s)';
+      btn.classList.remove('running');
+      disp.textContent='Hết giờ! ⏰';
+      disp.style.color='var(--pink)';
+      disp.classList.remove('warn');
+      return;
+    }
+    disp.textContent=sec+'s';
+    if(sec<=10){disp.classList.add('warn');disp.style.color='var(--pink)';}
+    else{disp.classList.remove('warn');}
+  },1000);
 }
 
-// ═══════════════════════════════
-//  INIT
-// ═══════════════════════════════
-updateNotifBtn();
-refresh();
+function selectOpt(el,qi,letter,isCorrect){
+  if(answered[qi]) return;
+  answered[qi]=true;
+  document.querySelectorAll('.quiz-dot')[qi].classList.add('answered');
+  // Mark all options
+  const opts=el.closest('.quiz-options').querySelectorAll('.quiz-option');
+  opts.forEach(o=>{o.style.pointerEvents='none';});
+  if(isCorrect){
+    el.classList.add('correct');
+    showFeedback(qi,'🎉 Chính xác! Bạn trả lời đúng rồi!','correct-msg');
+    launchConfetti();
+  } else {
+    el.classList.add('wrong');
+    // highlight correct
+    opts.forEach(o=>{
+      const letter2=o.querySelector('.opt-letter').textContent.trim();
+      if(letter2==='B') o.classList.add('reveal-correct');
+    });
+    showFeedback(qi,'😊 Chưa đúng! Đáp án đúng là B.','reveal-msg');
+  }
+  // stop timer
+  if(timers[qi]){clearInterval(timers[qi]);timers[qi]=null;}
+  const btn=document.getElementById(`qtimer-${qi}`);
+  btn.disabled=true;btn.style.opacity='.5';
+}
+
+function revealAnswer(qi){
+  if(timers[qi]){clearInterval(timers[qi]);timers[qi]=null;}
+  answered[qi]=true;
+  document.querySelectorAll('.quiz-dot')[qi].classList.add('answered');
+  const card=document.getElementById(`qcard-${qi}`);
+  const opts=card.querySelectorAll('.quiz-option');
+  opts.forEach(o=>{
+    o.style.pointerEvents='none';
+    const letter=o.querySelector('.opt-letter').textContent.trim();
+    if(letter==='B') o.classList.add('reveal-correct');
+    else o.style.opacity='.5';
+  });
+  showFeedback(qi,'💡 Đáp án đúng là: B (được tô xanh lá ở trên)','reveal-msg');
+  document.getElementById(`qtimer-${qi}`).disabled=true;
+  document.getElementById(`qtimer-${qi}`).style.opacity='.5';
+}
+
+function showFeedback(qi,msg,cls){
+  const fb=document.getElementById(`qfb-${qi}`);
+  fb.textContent=msg;fb.className=`quiz-feedback ${cls} show`;
+}
+
+/* ─── CONFETTI BURST ─── */
+function launchConfetti(){
+  const container=document.querySelector('.quiz-wrapper');
+  const colors=['#F472B6','#FCD34D','#6EE7B7','#93C5FD'];
+  for(let i=0;i<20;i++){
+    const el=document.createElement('div');
+    const sz=6+Math.random()*8;
+    el.style.cssText=`
+      position:fixed;
+      left:${30+Math.random()*40}%;
+      top:${20+Math.random()*20}%;
+      width:${sz}px;height:${sz}px;
+      background:${colors[Math.floor(Math.random()*4)]};
+      border-radius:${Math.random()>.5?'50%':'3px'};
+      pointer-events:none;z-index:9999;
+      animation:confettiFall ${1+Math.random()}s ease-out forwards;
+      animation-delay:${Math.random()*.3}s;
+    `;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2000);
+  }
+}
+const style2=document.createElement('style');
+style2.textContent=`@keyframes confettiFall{
+  0%{transform:translateY(0) rotate(0);opacity:1}
+  100%{transform:translateY(200px) rotate(720deg);opacity:0}
+}`;
+document.head.appendChild(style2);
 </script>
 </body>
 </html>
