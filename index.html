@@ -1,366 +1,1007 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lớp 4B2 · Họp Phụ Huynh 2025–2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lễ Tổng Kết Năm Học · Lớp 4B02 · Vinschool Ocean Park</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Nunito',sans-serif;background:#1a0a0a;overflow:hidden;height:100vh}
-
-/* ── SLIDESHOW ── */
-#deck{
-  width:100vw;height:100vh;
-  display:flex;align-items:center;justify-content:center;
-  position:relative;
-}
-.slide{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;
-  transition:opacity .5s ease, transform .5s ease;
-  transform:translateX(60px);
-}
-.slide.active{opacity:1;pointer-events:auto;transform:translateX(0)}
-.slide.exit-left{opacity:0;transform:translateX(-60px)}
-.slide.exit-right{opacity:0;transform:translateX(60px)}
-
-/* ── SLIDE INNER ── */
-.slide-inner{
-  width:min(96vw,1280px);
-  height:min(96vh,720px);
-  position:relative;
-  border-radius:16px;
-  overflow:hidden;
-  box-shadow:0 20px 60px rgba(0,0,0,.6);
+:root {
+  --cream: #FFF8EE;
+  --cream-2: #FFEFD9;
+  --peach: #FFD8B5;
+  --pink: #FFB5C5;
+  --pink-soft: #FFE4EB;
+  --sky: #B8E0F6;
+  --sky-soft: #E4F3FB;
+  --mint: #B7E4C7;
+  --mint-soft: #E6F4EA;
+  --gold: #F5B65A;
+  --gold-deep: #D89627;
+  --navy: #3A4E7A;
+  --navy-soft: #6B7DA8;
+  --ink: #2E3242;
+  --muted: #7A7891;
+  --line: #F1E5D2;
+  --shadow: 0 8px 24px rgba(58, 78, 122, 0.08), 0 2px 6px rgba(58, 78, 122, 0.04);
+  --shadow-lg: 0 18px 48px rgba(58, 78, 122, 0.16), 0 4px 12px rgba(58, 78, 122, 0.08);
+  --r-sm: 14px;
+  --r-md: 22px;
+  --r-lg: 32px;
+  --r-xl: 44px;
 }
 
-/* ── NAVIGATION ── */
-.nav-btn{
-  position:fixed;top:50%;z-index:100;
-  width:52px;height:52px;border-radius:50%;
-  background:rgba(255,255,255,.15);backdrop-filter:blur(8px);
-  border:2px solid rgba(255,255,255,.3);
-  color:#fff;font-size:22px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .2s;transform:translateY(-50%);
-  user-select:none;
-}
-.nav-btn:hover{background:rgba(255,255,255,.3);transform:translateY(-50%) scale(1.1)}
-#prev{left:16px}
-#next{right:16px}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
 
-/* Dots */
-#dots{
-  position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
-  display:flex;gap:6px;flex-wrap:wrap;max-width:90vw;
-  justify-content:center;z-index:100;
-}
-.dot{
-  width:8px;height:8px;border-radius:50%;
-  background:rgba(255,255,255,.3);cursor:pointer;
-  transition:all .2s;
-}
-.dot.active{background:#fff;transform:scale(1.4)}
-.dot:hover{background:rgba(255,255,255,.7)}
-
-/* Counter */
-#counter{
-  position:fixed;top:14px;right:60px;
-  color:rgba(255,255,255,.6);font-size:13px;font-weight:700;
-  z-index:100;
+body {
+  font-family: 'Quicksand', 'Nunito', system-ui, -apple-system, sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 500;
 }
 
-/* Keyboard hint */
-#hint{
-  position:fixed;bottom:40px;right:16px;
-  color:rgba(255,255,255,.4);font-size:11px;font-weight:600;
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: radial-gradient(circle, rgba(245, 182, 90, 0.08) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* ── SLIDE TYPE: FULL IMAGE ── */
-.slide-img{
-  width:100%;height:100%;object-fit:cover;display:block;
+h1, h2, h3, h4 {
+  font-family: 'Baloo 2', 'Quicksand', sans-serif;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+p { margin: 0; }
+
+/* ===== DECK SHELL ===== */
+.deck {
+  position: fixed; inset: 0;
+  overflow: hidden;
+  background: var(--cream);
+}
+.slides {
+  position: relative;
+  height: 100%; width: 100%;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 60px 6vw 90px;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold) transparent;
+}
+.slide.active {
+  display: flex;
+  opacity: 1;
+  transform: none;
+  animation: slideEnter 0.4s ease both;
+}
+@keyframes slideEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+.slide.leaving-left {
+  display: flex;
+  opacity: 0;
+  transform: translateX(-40px);
+}
+.slide.leaving-right {
+  display: flex;
+  opacity: 0;
+  transform: translateX(40px);
+}
+.slide::-webkit-scrollbar { width: 6px; }
+.slide::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 999px; }
+
+@media (max-height: 720px) {
+  .slide { justify-content: flex-start; padding-top: 40px; }
 }
 
-/* ── SLIDE TYPE: TITLE ── */
-.slide-title{
-  width:100%;height:100%;
-  background:linear-gradient(135deg,#FBF4E4 0%,#F0E8D5 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:40px;text-align:center;
-  position:relative;overflow:hidden;
+/* ===== HUD ===== */
+.hud {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  z-index: 50; pointer-events: none;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 16px 22px;
 }
-.slide-title::before{
-  content:'';position:absolute;
-  width:400px;height:400px;border-radius:50%;
-  background:radial-gradient(circle,rgba(156,178,134,.3),transparent 70%);
-  top:-100px;right:-100px;
+.hud > * { pointer-events: auto; }
+.hud-progress {
+  flex: 1;
+  background: rgba(255, 248, 238, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 999px;
+  padding: 10px 18px;
+  display: flex; align-items: center; gap: 14px;
+  box-shadow: var(--shadow);
+  max-width: 520px;
+  margin-right: 14px;
 }
-.slide-title::after{
-  content:'';position:absolute;
-  width:300px;height:300px;border-radius:50%;
-  background:radial-gradient(circle,rgba(252,129,129,.2),transparent 70%);
-  bottom:-80px;left:-80px;
+.hud-counter {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 600;
+  color: var(--navy);
+  white-space: nowrap;
+  font-size: 14px;
 }
-.title-logo{height:56px;margin-bottom:20px;position:relative;z-index:1}
-.title-school{font-size:clamp(13px,1.8vw,18px);font-weight:700;color:#7C6C50;letter-spacing:.5px;margin-bottom:12px;position:relative;z-index:1}
-.title-event{font-size:clamp(24px,3.5vw,42px);font-weight:900;color:#C85A5A;line-height:1.2;margin-bottom:16px;position:relative;z-index:1}
-.title-class{
-  display:inline-block;
-  background:linear-gradient(135deg,#9CB286,#7A9B66);
-  color:#fff;font-size:clamp(28px,4vw,52px);font-weight:900;
-  padding:8px 32px;border-radius:99px;
-  box-shadow:0 6px 20px rgba(156,178,134,.4);
-  position:relative;z-index:1;margin-bottom:16px;
+.hud-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--cream-2);
+  border-radius: 999px;
+  overflow: hidden;
 }
-.title-year{font-size:clamp(16px,2vw,22px);font-weight:700;color:#B08050;position:relative;z-index:1}
-.title-photo{
-  position:absolute;bottom:0;right:0;
-  height:75%;object-fit:contain;opacity:.2;
-  z-index:0;
+.hud-bar > span {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, var(--pink), var(--gold));
+  width: 0;
+  transition: width 0.4s ease;
+  border-radius: 999px;
 }
-
-/* ── SLIDE TYPE: POEM (student) ── */
-.slide-poem{
-  width:100%;height:100%;
-  background:linear-gradient(135deg,#FBF4E4 0%,#F5EDD5 100%);
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  position:relative;overflow:hidden;
-}
-.poem-photos{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:12px;padding:28px 20px 28px 32px;
-  position:relative;
-}
-.poem-photo-row{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
-.photo-wrap{
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-}
-.photo-frame{
-  border-radius:50%;overflow:hidden;
-  border:4px solid;
-  box-shadow:0 4px 20px rgba(0,0,0,.15);
-  flex-shrink:0;
-}
-.photo-frame img{width:100%;height:100%;object-fit:cover;display:block}
-.photo-name{
-  font-size:12px;font-weight:800;
-  padding:2px 10px;border-radius:99px;
-  white-space:nowrap;
-}
-.poem-text-side{
-  display:flex;flex-direction:column;justify-content:center;
-  padding:28px 32px 28px 20px;
-  position:relative;z-index:1;
-}
-.poem-num{
-  font-size:72px;font-weight:900;opacity:.08;
-  position:absolute;top:16px;right:24px;
-  line-height:1;
-}
-.poem-lines{
-  font-size:clamp(14px,1.8vw,20px);
-  line-height:2;font-weight:600;
-  color:#4A3A2A;white-space:pre-line;
-}
-/* Decorative circles */
-.deco-circle{
-  position:absolute;border-radius:50%;opacity:.3;
+.hud-title {
+  font-size: 12px; font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden; text-overflow: ellipsis;
 }
 
-/* ── SLIDE TYPE: OPENING POEM ── */
-.slide-open-poem{
-  width:100%;height:100%;
-  background:#FBF4E4;
-  display:grid;grid-template-columns:1fr 1fr;
-  position:relative;
+.arrow-btn {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: 0;
+  background: white;
+  color: var(--navy);
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  display: grid; place-items: center;
+  transition: all 0.2s ease;
+  font-family: 'Baloo 2', sans-serif;
 }
-.open-photo{width:100%;height:100%;object-fit:cover;opacity:.7}
-.open-text{
-  display:flex;flex-direction:column;justify-content:center;
-  padding:40px 40px 40px 32px;
-  background:rgba(251,244,228,.95);
+.arrow-btn:hover { background: var(--gold); color: white; transform: translateY(-2px); }
+.arrow-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.arrow-btn:disabled:hover { background: white; color: var(--navy); transform: none; }
+
+/* Side arrow buttons */
+.side-arrow {
+  position: fixed; top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  color: var(--navy);
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  display: grid; place-items: center;
+  transition: all 0.2s ease;
+  font-family: 'Baloo 2', sans-serif;
+  opacity: 0.65;
 }
-.open-text p{
-  font-size:clamp(15px,1.8vw,20px);
-  line-height:2;font-weight:600;color:#4A3A2A;
-  white-space:pre-line;
+.side-arrow:hover { background: var(--gold); color: white; opacity: 1; transform: translateY(-50%) scale(1.08); }
+.side-arrow.left { left: 18px; }
+.side-arrow.right { right: 18px; }
+.side-arrow:disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
+
+@media (max-width: 640px) { .side-arrow { display: none; } }
+
+/* ===== TOP MINI BRAND ===== */
+.top-brand {
+  position: fixed; top: 16px; left: 22px; z-index: 40;
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255, 248, 238, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 999px;
+  padding: 6px 16px 6px 6px;
+  box-shadow: var(--shadow);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.top-brand img {
+  width: 30px; height: 30px;
+  background: white; border-radius: 50%; padding: 2px;
+  object-fit: contain;
 }
 
-/* ── SLIDE TYPE: HONOR ── */
-.slide-honor{
-  width:100%;height:100%;
-  background:linear-gradient(135deg,#FBF4E4,#F0E8D5);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:48px;
-  position:relative;overflow:hidden;
+/* ===== KEY-HINT ===== */
+.key-hint {
+  position: fixed; top: 16px; right: 22px; z-index: 40;
+  background: rgba(255, 248, 238, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px; font-weight: 600;
+  color: var(--muted);
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 6px;
 }
-.honor-badge{
-  font-size:clamp(20px,3vw,36px);font-weight:900;
-  color:#9CB286;letter-spacing:2px;margin-bottom:12px;
-}
-.honor-title{
-  font-size:clamp(26px,4vw,52px);font-weight:900;
-  color:#8B7355;margin-bottom:8px;
-}
-.honor-year{font-size:clamp(14px,2vw,20px);color:#B08050;font-weight:700}
-.honor-stars{font-size:2.5rem;margin-top:20px;letter-spacing:10px;animation:sparkle 2s ease-in-out infinite}
-@keyframes sparkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.05)}}
-
-/* ── SLIDE TYPE: QUIZ ── */
-.slide-quiz-title{
-  width:100%;height:100%;
-  background:linear-gradient(135deg,#9CB286 0%,#7A9B66 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:48px;
-}
-.slide-quiz-title h2{
-  font-size:clamp(18px,3vw,36px);font-weight:800;color:rgba(255,255,255,.9);
-  margin-bottom:20px;letter-spacing:1px;
-}
-.slide-quiz-title h1{
-  font-size:clamp(32px,6vw,80px);font-weight:900;color:#fff;
-  line-height:1.1;text-shadow:0 4px 20px rgba(0,0,0,.2);
+.kbd {
+  display: inline-grid; place-items: center;
+  min-width: 22px; height: 22px;
+  background: white;
+  border-radius: 6px;
+  font-family: 'Baloo 2', monospace;
+  font-size: 12px;
+  color: var(--navy);
+  padding: 0 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
-.slide-quiz-q{
-  width:100%;height:100%;
-  background:#FBF4E4;
-  display:flex;flex-direction:column;
-  padding:28px 36px;
-  position:relative;overflow:hidden;
-}
-.quiz-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:16px;
-}
-.quiz-num{
-  background:#9CB286;color:#fff;
-  font-size:13px;font-weight:800;
-  padding:4px 14px;border-radius:99px;letter-spacing:.5px;
-}
-.quiz-timer-area{display:flex;align-items:center;gap:10px}
-.q-text{
-  font-size:clamp(16px,2.5vw,26px);font-weight:800;
-  color:#4A3A2A;line-height:1.4;margin-bottom:20px;
-  text-align:center;
-}
-.quiz-opts{
-  display:grid;grid-template-columns:1fr 1fr 1fr;
-  gap:12px;flex:1;max-height:280px;
-}
-.q-opt{
-  background:#fff;border:3px solid #E8DCC8;
-  border-radius:16px;padding:16px 12px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:8px;cursor:pointer;transition:all .2s;text-align:center;
-}
-.q-opt:hover{border-color:#9CB286;transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.1)}
-.q-opt .opt-letter{
-  width:34px;height:34px;border-radius:50%;
-  background:#E8DCC8;color:#8B7355;
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px;font-weight:800;flex-shrink:0;
-}
-.q-opt .opt-text{
-  font-size:clamp(13px,1.6vw,17px);font-weight:700;color:#4A3A2A;line-height:1.3;
-}
-.q-opt.correct{background:#d4edda;border-color:#9CB286;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
-.q-opt.correct .opt-letter{background:#9CB286;color:#fff}
-.q-opt.wrong{background:#fde8e8;border-color:#FC8181;opacity:.7}
-.q-opt.wrong .opt-letter{background:#FC8181;color:#fff}
-.q-opt.revealed{background:#EBF5E4;border-color:#9CB286}
-.q-opt.revealed .opt-letter{background:#9CB286;color:#fff}
-@keyframes popIn{0%{transform:scale(.95)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+@media (max-width: 720px) { .key-hint, .top-brand { display: none; } }
 
-.quiz-footer{
-  display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap;
+/* ===== COMMON CONTENT ===== */
+.kicker {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold-deep);
 }
-.q-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:8px 18px;border-radius:10px;border:none;
-  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;
-  cursor:pointer;transition:all .2s;
+.kicker::before, .kicker::after {
+  content: ''; width: 28px; height: 2px;
+  background: var(--gold); border-radius: 2px;
 }
-.btn-time{background:#FFBD59;color:#7A5A0A}
-.btn-time:hover{background:#F0A800;color:#fff}
-.btn-time.running{animation:timerPulse 1s ease-in-out infinite}
-@keyframes timerPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,189,89,.4)}50%{box-shadow:0 0 0 8px rgba(255,189,89,0)}}
-.btn-reveal{background:#E8DCC8;color:#8B7355}
-.btn-reveal:hover{background:#9CB286;color:#fff}
-.timer-val{
-  font-size:20px;font-weight:900;
-  color:#FFBD59;min-width:50px;text-align:center;
+.center-head { text-align: center; margin-bottom: 32px; }
+.center-head .kicker { margin-bottom: 14px; }
+.center-head h2 {
+  font-size: clamp(28px, 4vw, 48px);
+  color: var(--navy);
+  margin-bottom: 12px;
+  line-height: 1.15;
 }
-.timer-val.warn{color:#FC8181;animation:blink .5s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.quiz-msg{
-  font-size:14px;font-weight:700;
-  padding:8px 16px;border-radius:10px;
-  display:none;
+.center-head p {
+  max-width: 640px; margin: 0 auto;
+  color: var(--muted);
+  font-size: clamp(15px, 1.5vw, 17px);
 }
-.quiz-msg.show{display:block}
-.quiz-msg.ok{background:#d4edda;color:#2d6a4f}
-.quiz-msg.hint{background:#d0e8fa;color:#1e4d78}
 
-/* ── SLIDE VIDEO/PH ── */
-.slide-closing{
-  width:100%;height:100%;
-  background:linear-gradient(135deg,#4A3A2A,#2A1A0A);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:48px;
-  position:relative;overflow:hidden;
-}
-.slide-closing h2{font-size:clamp(14px,2vw,20px);color:rgba(255,255,255,.6);font-weight:700;margin-bottom:12px;letter-spacing:1px}
-.slide-closing h1{font-size:clamp(26px,4vw,52px);font-weight:900;color:#FFBD59;margin-bottom:20px}
-.slide-closing p{font-size:clamp(14px,1.8vw,18px);color:rgba(255,255,255,.7);font-weight:600;max-width:500px;line-height:1.7}
-.closing-icon{font-size:5rem;margin-bottom:20px;animation:float 3s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.container-wide { max-width: 1180px; margin: 0 auto; width: 100%; }
+.container-narrow { max-width: 880px; margin: 0 auto; width: 100%; }
 
-/* ── RESPONSIVE ── */
-@media(max-width:640px){
-  .slide-poem{grid-template-columns:1fr}
-  .poem-photos{padding:16px;max-height:220px;justify-content:center}
-  .poem-photo-row{gap:8px}
-  .poem-text-side{padding:12px 20px 20px}
-  .poem-lines{font-size:13px;line-height:1.8}
-  .quiz-opts{grid-template-columns:1fr;max-height:none}
-  .slide-poem .poem-text-side{display:none}
-  .slide-open-poem{grid-template-columns:1fr}
-  .open-photo{display:none}
+/* ===== SLIDE: COVER ===== */
+.cover {
+  text-align: center;
+  position: relative;
 }
+.cover .eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: white; border-radius: 999px;
+  padding: 8px 18px; font-size: 12.5px; font-weight: 700;
+  color: var(--gold-deep); letter-spacing: 0.5px;
+  box-shadow: var(--shadow); margin-bottom: 22px;
+}
+.cover .eyebrow::before {
+  content: ''; width: 8px; height: 8px; background: var(--gold); border-radius: 50%;
+}
+.cover h1 {
+  font-size: clamp(34px, 5.5vw, 64px);
+  line-height: 1.05;
+  color: var(--navy);
+  margin-bottom: 12px;
+}
+.cover h1 .accent { color: var(--gold-deep); display: block; }
+.cover .sub {
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: var(--muted);
+  max-width: 520px;
+  margin: 0 auto 28px;
+}
+.cover .photo {
+  max-width: 640px; margin: 0 auto;
+  background: white; padding: 12px;
+  border-radius: var(--r-lg); box-shadow: var(--shadow-lg);
+  transform: rotate(-1deg);
+}
+.cover .photo img {
+  width: 100%; aspect-ratio: 16/9; object-fit: cover;
+  border-radius: 22px;
+}
+.cover .photo .caption {
+  text-align: center; padding: 14px 12px 4px;
+  color: var(--navy); letter-spacing: 1.5px; font-weight: 700;
+  font-size: 12px;
+}
+.sticker { position: absolute; font-size: 32px; pointer-events: none; user-select: none; }
+
+/* ===== SECTION DIVIDER ===== */
+.section-divider {
+  text-align: center;
+  background: linear-gradient(135deg, var(--gold), #F09E4B);
+  color: white;
+  border-radius: var(--r-xl);
+  padding: 64px 48px;
+  max-width: 880px; margin: 0 auto;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+.section-divider.blue { background: linear-gradient(135deg, #6FA8DC, #5B86D9); }
+.section-divider.pink { background: linear-gradient(135deg, #F4A6B5, #E97A8C); }
+.section-divider::before, .section-divider::after {
+  content: ''; position: absolute;
+  width: 200px; height: 200px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 50%;
+}
+.section-divider::before { top: -60px; left: -60px; }
+.section-divider::after  { bottom: -80px; right: -60px; }
+.section-divider .roman {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 28px; font-weight: 700;
+  background: rgba(255,255,255,0.25);
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  display: inline-grid; place-items: center;
+  margin-bottom: 18px;
+  position: relative;
+}
+.section-divider .label { font-size: 12px; letter-spacing: 2px; font-weight: 700; margin-bottom: 12px; position: relative; opacity: 0.9; }
+.section-divider h2 {
+  font-size: clamp(30px, 5vw, 54px);
+  margin-bottom: 16px;
+  position: relative;
+}
+.section-divider p { position: relative; font-size: clamp(15px, 1.6vw, 18px); opacity: 0.95; max-width: 640px; margin: 0 auto; }
+
+/* ===== STICKY NOTES ===== */
+.sticky-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+@media (max-width: 860px) { .sticky-grid { grid-template-columns: 1fr; } }
+.sticky-note {
+  border-radius: var(--r-lg);
+  padding: 28px 26px;
+  box-shadow: var(--shadow);
+}
+.sticky-note:nth-child(1) { background: linear-gradient(160deg, #FFF, #FFE4EB); transform: rotate(-1.5deg); }
+.sticky-note:nth-child(2) { background: linear-gradient(160deg, #FFF, #E6F4EA); transform: rotate(1deg); }
+.sticky-note:nth-child(3) { background: linear-gradient(160deg, #FFF, #FFEFD9); transform: rotate(-1deg); }
+.sticky-num {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700; font-size: 48px;
+  color: var(--gold-deep); line-height: 1; margin-bottom: 10px;
+}
+.sticky-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 18px; color: var(--navy); margin-bottom: 14px;
+}
+.sticky-poem {
+  font-size: 15px;
+  color: var(--ink);
+  white-space: pre-line;
+  line-height: 1.8;
+}
+
+/* ===== POEM + PHOTO (2 col) ===== */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 40px;
+  align-items: center;
+}
+@media (max-width: 920px) { .two-col { grid-template-columns: 1fr; gap: 24px; } }
+.two-col.reverse { grid-template-columns: 1.1fr 1fr; }
+.two-col.reverse .text-block { order: 2; }
+.two-col.reverse .photo-block { order: 1; }
+@media (max-width: 920px) {
+  .two-col.reverse .text-block, .two-col.reverse .photo-block { order: initial; }
+}
+
+.text-block {
+  background: white;
+  padding: 32px 32px;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+}
+.text-block .small-cap {
+  font-size: 12px; font-weight: 700; color: var(--pink);
+  letter-spacing: 1.8px; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.text-block h3 {
+  font-size: clamp(22px, 2.8vw, 32px);
+  color: var(--navy);
+  margin-bottom: 18px;
+  line-height: 1.15;
+}
+.text-block .poem {
+  font-size: clamp(14px, 1.4vw, 17px);
+  color: var(--ink);
+  white-space: pre-line;
+  line-height: 1.85;
+}
+
+.photo-block {
+  background: white;
+  padding: 12px;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  transform: rotate(1deg);
+}
+.photo-block img {
+  width: 100%; aspect-ratio: 4/3; object-fit: cover;
+  border-radius: 22px;
+}
+.photo-block .caption {
+  text-align: center; padding: 12px 8px 4px;
+  color: var(--navy); letter-spacing: 1.5px; font-weight: 700; font-size: 11.5px;
+}
+
+/* ===== ROLL CALL ===== */
+.roll-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: white;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700; font-size: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(216, 150, 39, 0.3);
+}
+
+.photos-grid {
+  display: grid; gap: 14px;
+}
+.photos-grid.cols-1 { grid-template-columns: 1fr; }
+.photos-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.photos-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.photos-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+.student-card {
+  background: white;
+  padding: 8px 8px 12px;
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+  text-align: center;
+  transition: transform 0.25s ease;
+}
+.student-card:hover { transform: translateY(-3px); }
+.student-card img {
+  width: 100%; aspect-ratio: 1/1; object-fit: cover;
+  border-radius: 16px;
+}
+.student-card .name {
+  margin-top: 8px; font-size: 12px;
+  font-weight: 700; color: var(--navy);
+  letter-spacing: 0.5px;
+}
+
+/* ===== AGENDA ===== */
+.agenda-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+@media (max-width: 980px) { .agenda-grid { grid-template-columns: repeat(2, 1fr); } }
+.agenda-card {
+  background: white;
+  padding: 28px 22px;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.agenda-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink), var(--gold));
+  color: white;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700; font-size: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 20px rgba(255, 181, 197, 0.4);
+}
+.agenda-card h4 {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 18px; color: var(--navy);
+  margin-bottom: 6px;
+}
+.agenda-card p { font-size: 13.5px; color: var(--muted); }
+
+/* ===== FOCUS / TIEU DIEM ===== */
+.focus-card {
+  background: linear-gradient(135deg, var(--navy), #5165A0);
+  color: white;
+  border-radius: var(--r-xl);
+  padding: 48px 40px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+@media (max-width: 860px) { .focus-card { grid-template-columns: 1fr; padding: 32px 26px; } }
+.focus-card::before {
+  content: ''; position: absolute;
+  width: 240px; height: 240px;
+  background: rgba(245, 182, 90, 0.15);
+  border-radius: 50%;
+  top: -100px; right: -100px;
+}
+.focus-kicker {
+  display: inline-flex; padding: 6px 14px; border-radius: 999px;
+  background: rgba(245, 182, 90, 0.2);
+  color: var(--gold); font-weight: 700; font-size: 11.5px;
+  letter-spacing: 1.5px; margin-bottom: 16px;
+}
+.focus-card h3 {
+  font-size: clamp(26px, 4vw, 40px); line-height: 1.15;
+  margin-bottom: 14px;
+}
+.focus-card h3 .accent { color: var(--gold); display: block; }
+.focus-card .quote { font-style: italic; color: rgba(255,255,255,0.85); font-size: clamp(15px, 1.5vw, 18px); margin-bottom: 12px; }
+.focus-card .meta { font-size: 12px; letter-spacing: 1.5px; color: var(--gold); font-weight: 700; text-transform: uppercase; }
+.focus-photo {
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+  aspect-ratio: 4/3;
+  position: relative; z-index: 1;
+}
+.focus-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ===== SUBJECT ===== */
+.subject-card {
+  max-width: 720px; margin: 0 auto;
+  background: white;
+  border-radius: var(--r-lg);
+  padding: 36px 36px;
+  box-shadow: var(--shadow);
+  border-top: 8px solid var(--gold);
+}
+.subject-card.s-toan { border-color: #6FA8DC; }
+.subject-card.s-tv   { border-color: #E89B9B; }
+.subject-card.s-ls   { border-color: #D4A574; }
+.subject-card.s-kh   { border-color: #95C99F; }
+.subject-card.s-ta   { border-color: #F4C36B; }
+.subject-card .icon {
+  width: 72px; height: 72px; border-radius: 22px;
+  display: grid; place-items: center; font-size: 36px;
+  margin-bottom: 18px;
+}
+.s-toan .icon { background: #E6F0FA; }
+.s-tv   .icon { background: #FBE6E6; }
+.s-ls   .icon { background: #FAF0DE; }
+.s-kh   .icon { background: #E6F3E9; }
+.s-ta   .icon { background: #FFF1D6; }
+.subject-card h3 {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(22px, 2.8vw, 30px); color: var(--navy);
+  margin-bottom: 22px;
+}
+.scores {
+  display: flex; gap: 18px; margin-bottom: 22px;
+}
+.score-pill {
+  flex: 1;
+  background: var(--cream);
+  border-radius: var(--r-md);
+  padding: 18px;
+  text-align: center;
+}
+.score-pill .label {
+  font-size: 12px; font-weight: 700; color: var(--muted);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.score-pill .value {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(36px, 5vw, 52px); font-weight: 700;
+  color: var(--navy); line-height: 1;
+}
+.score-pill.k2 .value { color: var(--gold-deep); }
+.comment {
+  background: var(--pink-soft);
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 15px; font-weight: 600;
+  color: var(--navy); text-align: center;
+}
+
+/* ===== ADVICE ===== */
+.advice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+@media (max-width: 860px) { .advice-grid { grid-template-columns: 1fr; } }
+.advice-card {
+  background: white;
+  padding: 32px 28px;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  border-left: 6px solid var(--pink);
+}
+.advice-card.b2 { border-color: var(--sky); }
+.advice-card .small-cap {
+  font-size: 12px; font-weight: 700; color: var(--pink);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.advice-card.b2 .small-cap { color: var(--navy-soft); }
+.advice-card h4 {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(20px, 2.4vw, 26px);
+  color: var(--navy); margin-bottom: 14px;
+}
+.advice-card p { color: var(--ink); font-size: 15.5px; line-height: 1.85; }
+
+/* ===== QUIZ ===== */
+.quiz-box {
+  max-width: 880px; margin: 0 auto; width: 100%;
+  background: white;
+  border-radius: var(--r-xl);
+  padding: 36px 36px 28px;
+  box-shadow: var(--shadow-lg);
+}
+.quiz-top {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+.quiz-progress-bar {
+  flex: 1; min-width: 180px;
+}
+.quiz-progress-bar .label {
+  font-size: 11.5px; font-weight: 700;
+  color: var(--muted); letter-spacing: 1.5px;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.quiz-bar {
+  height: 6px; background: var(--cream-2);
+  border-radius: 999px; overflow: hidden;
+}
+.quiz-bar > span {
+  display: block; height: 100%;
+  background: linear-gradient(90deg, var(--pink), var(--gold));
+  width: 0;
+  transition: width 0.4s ease;
+  border-radius: 999px;
+}
+
+.quiz-timer {
+  position: relative;
+  width: 68px; height: 68px;
+  flex-shrink: 0;
+}
+.quiz-timer svg { transform: rotate(-90deg); }
+.quiz-timer .ring-bg { stroke: var(--cream-2); }
+.quiz-timer .ring-fg {
+  stroke: var(--gold);
+  stroke-dasharray: 175.93;
+  stroke-dashoffset: 0;
+}
+.quiz-timer.warn .ring-fg { stroke: #E07A5F; }
+.quiz-timer .num {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-family: 'Baloo 2', sans-serif; font-weight: 700;
+  font-size: 22px; color: var(--navy);
+}
+.quiz-timer.warn .num { color: #E07A5F; }
+.quiz-timer.idle .ring-fg { stroke: var(--cream-2); }
+.quiz-timer.idle .num { color: var(--muted); }
+
+.quiz-question {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(20px, 2.6vw, 26px);
+  color: var(--navy);
+  line-height: 1.3;
+  margin: 4px 0 22px;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+@media (max-width: 760px) { .quiz-options { grid-template-columns: 1fr; } }
+.quiz-option {
+  background: var(--cream);
+  border: 3px solid transparent;
+  border-radius: var(--r-md);
+  padding: 18px 16px;
+  cursor: pointer;
+  text-align: left;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+  transition: all 0.2s ease;
+  display: flex; gap: 12px; align-items: flex-start;
+  position: relative;
+}
+.quiz-option:hover:not(.locked) {
+  background: white;
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+.quiz-option .opt-label {
+  display: grid; place-items: center;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: white; color: var(--navy);
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700; font-size: 15px;
+  flex-shrink: 0;
+}
+.quiz-option.selected { border-color: var(--navy); background: white; }
+.quiz-option.correct {
+  background: var(--mint-soft); border-color: #5BA976;
+}
+.quiz-option.correct .opt-label { background: #5BA976; color: white; }
+.quiz-option.wrong {
+  background: var(--pink-soft); border-color: #D26B6B;
+}
+.quiz-option.wrong .opt-label { background: #D26B6B; color: white; }
+.quiz-option.locked { cursor: default; }
+.quiz-option .check-mark {
+  position: absolute; top: 8px; right: 10px;
+  font-size: 16px; opacity: 0;
+}
+.quiz-option.correct .check-mark { opacity: 1; color: #5BA976; }
+
+.quiz-feedback {
+  background: var(--cream-2);
+  border-radius: var(--r-md);
+  padding: 14px 18px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 18px;
+  display: none;
+  font-size: 14.5px;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.right { background: var(--mint-soft); color: #2E6B45; }
+.quiz-feedback.miss  { background: var(--pink-soft); color: #8B3D3D; }
+.quiz-feedback .big { font-family: 'Baloo 2', sans-serif; font-size: 18px; display: block; margin-bottom: 4px; }
+
+.quiz-actions {
+  display: flex; gap: 10px; justify-content: center;
+  flex-wrap: wrap;
+}
+.btn {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary { background: var(--gold); color: white; box-shadow: 0 4px 14px rgba(216, 150, 39, 0.35); }
+.btn-primary:hover { background: var(--gold-deep); transform: translateY(-2px); }
+.btn-primary:disabled { background: var(--cream-2); color: var(--muted); cursor: not-allowed; box-shadow: none; transform: none; }
+.btn-ghost { background: var(--cream-2); color: var(--navy); }
+.btn-ghost:hover { background: var(--peach); }
+.btn-ghost:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-go { background: linear-gradient(135deg, #5BA976, #4A9966); color: white; box-shadow: 0 4px 14px rgba(91,169,118,0.35); }
+.btn-go:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+.quiz-score-pill {
+  background: var(--gold);
+  color: white;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+
+/* ===== VIDEO ===== */
+.video-card {
+  max-width: 880px; margin: 0 auto; width: 100%;
+  background: white;
+  padding: 20px;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+}
+.video-frame {
+  aspect-ratio: 16/9;
+  background: linear-gradient(135deg, var(--navy), #5165A0);
+  border-radius: var(--r-md);
+  display: grid; place-items: center;
+  color: white; text-align: center; padding: 20px;
+}
+.video-frame .play {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: grid; place-items: center;
+  font-size: 32px; margin-bottom: 18px;
+}
+.video-frame h3 { font-family: 'Baloo 2', sans-serif; font-size: clamp(20px, 2.6vw, 28px); margin-bottom: 6px; }
+.video-frame p { color: rgba(255,255,255,0.8); font-size: 13.5px; }
+
+/* ===== WISH ===== */
+.wish-card {
+  max-width: 880px; margin: 0 auto; width: 100%;
+  background: white;
+  border-radius: var(--r-xl);
+  padding: 48px 36px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, #FFE4EB, #FFEFD9, #E4F3FB);
+}
+.wish-inner {
+  background: white;
+  border-radius: var(--r-lg);
+  padding: 36px 24px;
+}
+.wish-emoji { font-size: 44px; margin-bottom: 14px; }
+.wish-card h2 {
+  font-size: clamp(28px, 4.5vw, 46px);
+  color: var(--navy);
+  line-height: 1.15;
+  margin-bottom: 14px;
+}
+.wish-card h2 .accent { color: var(--gold-deep); }
+.wish-card p {
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: var(--muted);
+  font-style: italic;
+}
+.wish-logo {
+  margin-top: 22px;
+  display: inline-flex; flex-direction: column; align-items: center; gap: 8px;
+  color: var(--navy);
+  font-size: 11.5px; letter-spacing: 1.5px; font-weight: 700;
+}
+.wish-logo img { width: 44px; height: 44px; object-fit: contain; }
+
+/* ===== SUMMER PLAN ===== */
+.summer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+@media (max-width: 760px) { .summer-grid { grid-template-columns: 1fr; } }
+.summer-card {
+  background: white;
+  padding: 24px 22px;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.summer-icon {
+  flex-shrink: 0;
+  width: 56px; height: 56px;
+  border-radius: 18px;
+  display: grid; place-items: center;
+  font-size: 26px;
+  background: var(--cream-2);
+}
+.summer-card:nth-child(1) .summer-icon { background: #E6F0FA; }
+.summer-card:nth-child(2) .summer-icon { background: #FBE6E6; }
+.summer-card:nth-child(3) .summer-icon { background: #FAF0DE; }
+.summer-card:nth-child(4) .summer-icon { background: #E6F3E9; }
+.summer-card h4 {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 17px; color: var(--navy); margin-bottom: 4px;
+}
+.summer-card p { font-size: 13.5px; color: var(--muted); line-height: 1.7; }
+
 </style>
 </head>
 <body>
 
-<div id="deck"></div>
-<button class="nav-btn" id="prev">&#8592;</button>
-<button class="nav-btn" id="next">&#8594;</button>
-<div id="dots"></div>
-<div id="counter"></div>
-<div id="hint">← → để điều hướng</div>
+<!-- ===== TOP BRAND ===== -->
+<div class="top-brand">
+  <img src="images/logo.png" alt="Vinschool"/>
+  Lễ Tổng Kết · 4B02
+</div>
+<div class="key-hint">
+  <span class="kbd">←</span><span class="kbd">→</span> để chuyển slide
+</div>
 
-<script>
-// ═══════════════════════════════
-//  SLIDE DATA
-// ═══════════════════════════════
-const SLIDES = [
+<!-- ===== SIDE ARROWS ===== -->
+<button class="side-arrow left" id="sideLeft" aria-label="Slide trước">←</button>
+<button class="side-arrow right" id="sideRight" aria-label="Slide sau">→</button>
 
-// ── 1. TITLE ──
-{type:'title'},
+<!-- ===== DECK ===== -->
+<div class="deck">
+  <div class="slides" id="slides">
 
-// ── 2. VĂN NGHỆ ──
-{type:'img', src:'images/slide2.jpg', alt:'Văn nghệ chào mừng'},
+    <!-- 1: COVER -->
+    <section class="slide" data-title="Trang bìa">
+      <div class="cover container-wide">
+        <span class="sticker" style="top:10%; left:8%;">🎓</span>
+        <span class="sticker" style="top:14%; right:10%;">⭐</span>
+        <span class="sticker" style="top:30%; left:15%; font-size:26px;">🎈</span>
+        <span class="sticker" style="bottom:18%; right:8%; font-size:30px;">🌸</span>
 
-// ── 3. BÌA THƠ ──
-{type:'img', src:'images/slide3.jpg', alt:'Thơ 4B2'},
+        <div class="eyebrow">TRƯỜNG TIỂU HỌC VINSCHOOL OCEAN PARK</div>
+        <h1>HỌP PHỤ HUYNH HỌC SINH<span class="accent">Năm học 2025-2026</span></h1>
+        <p class="sub">Lớp 4B02 — cùng nhìn lại một năm học đáng nhớ.</p>
+        <div class="photo">
+          <img src="images/cover.jpg" alt="Lớp 4B02"/>
+          <div class="caption">LỚP 4B02 · TẬP THỂ THÂN YÊU</div>
+        </div>
+      </div>
+    </section>
 
-// ── 4. BÀI THƠ ĐẦU - class photo + opening poem ──
-{type:'open-poem',
- photo:'images/slide4-bg.jpg',
- text:`Xúc xắc xúc xẻ
+    <!-- 2: VĂN NGHỆ CHÀO MỪNG -->
+    <section class="slide" data-title="Văn nghệ chào mừng">
+      <div class="section-divider">
+        <div class="roman">I</div>
+        <div class="label">CHƯƠNG TRÌNH · MỞ MÀN</div>
+        <h2>VĂN NGHỆ CHÀO MỪNG</h2>
+        <p>Lời ca tiếng hát thay cho lời chào yêu thương, thay cho lời cảm ơn đến các gia đình 4B02.</p>
+      </div>
+    </section>
+
+    <!-- 3: VỀ 4B02 -->
+    <section class="slide" data-title="Về 4B02">
+      <div class="container-wide">
+        <div class="center-head">
+          <div class="kicker">Giới thiệu</div>
+          <h2>Về 4B02</h2>
+          <p>Một tập thể nhỏ với rất nhiều điều đáng nhớ.</p>
+        </div>
+        <div class="sticky-grid">
+          <div class="sticky-note">
+            <div class="sticky-num">01</div>
+            <div class="sticky-title">Mái nhà chung</div>
+            <div class="sticky-poem">Ngôi trường mến yêu
+Là Vinschool đó
+Ở đó luôn có
+Bao tình yêu thương.</div>
+          </div>
+          <div class="sticky-note">
+            <div class="sticky-num">02</div>
+            <div class="sticky-title">Tinh thần học tập</div>
+            <div class="sticky-poem">Xếp theo danh sách
+Vỹ An đứng đầu
+Học nhanh nhớ lâu
+Môn nào cũng giỏi…</div>
+          </div>
+          <div class="sticky-note">
+            <div class="sticky-num">03</div>
+            <div class="sticky-title">Khoảnh khắc cuối năm</div>
+            <div class="sticky-poem">Giờ vàng đã điểm
+Chúng con cười tươi
+Chia tay năm học
+Không bạn nào khóc…</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4: KHI NGHE TIẾNG VE -->
+    <section class="slide" data-title="Khi nghe tiếng ve">
+      <div class="container-wide two-col">
+        <div class="text-block">
+          <div class="small-cap">Lời mở</div>
+          <h3>Khi nghe tiếng ve…</h3>
+          <div class="poem">Xúc xắc xúc xẻ
 Khi nghe tiếng ve
 Lòng con rộn rã
 Chia tay năm học
@@ -369,532 +1010,816 @@ Lớp 4 thân yêu.
 Ngôi trường mến yêu
 Là Vinschool đó
 Ở đó luôn có
-Bao tình yêu thương`},
+Bao tình yêu thương.</div>
+        </div>
+        <div class="photo-block">
+          <img src="images/slide4-bg.jpg" alt="Lớp 4B02 trên sân khấu"/>
+          <div class="caption">SÂN KHẤU · LỚP 4B02</div>
+        </div>
+      </div>
+    </section>
 
-// ── 5. VỸ AN + DIỆU ANH ──
-{type:'poem', num:'04',
- students:[
-   {name:'Vỹ An',    photo:'images/p11.jpg'},
-   {name:'Diệu Anh', photo:'images/p10.jpg'},
- ],
- colors:['#9CB286','#FC8181'],
- text:`Xếp theo danh sách
+    <!-- 5: VỸ AN + DIỆU ANH -->
+    <section class="slide" data-title="Điểm danh 01">
+      <div class="container-wide two-col">
+        <div class="text-block">
+          <div class="roll-num">01</div>
+          <div class="small-cap">Xếp theo danh sách</div>
+          <h3>Vỹ An & Diệu Anh</h3>
+          <div class="poem">Xếp theo danh sách
 Vỹ An đứng đầu
-H��c nhanh nhớ lâu
-Môn nào cũng giỏi
-Diệu Anh hiền hậu
-H��c hành cực chăm
-Kết quả cuối năm
-Nhiều môn Xuất sắc`},
+Học nhanh nhớ lâu
+Môn nào cũng giỏi.
 
-// ── 6. THẢO NHI ──
-{type:'poem', num:'02',
- students:[{name:'Thảo Nhi', photo:'images/p12.jpg'}],
- colors:['#FFBD59'],
- text:`Suốt ngày thắc mắc
+Diệu Anh hiền hậu
+Học hành cực chăm
+Kết quả cuối năm
+Nhiều môn Xuất sắc.</div>
+        </div>
+        <div class="photos-grid cols-2">
+          <div class="student-card"><img src="images/p10.jpg" alt="Vỹ An"/><div class="name">VỸ AN</div></div>
+          <div class="student-card"><img src="images/p11.jpg" alt="Diệu Anh"/><div class="name">DIỆU ANH</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6: THẢO NHI -->
+    <section class="slide" data-title="Điểm danh 02">
+      <div class="container-wide two-col reverse">
+        <div class="text-block">
+          <div class="roll-num">02</div>
+          <div class="small-cap">Cô học trò tò mò</div>
+          <h3>Thảo Nhi</h3>
+          <div class="poem">Suốt ngày thắc mắc
 Chính là Thảo Nhi
 Mỗi lần sắp thi
-"Cô ơi con hỏi"`},
+“Cô ơi con hỏi”.</div>
+        </div>
+        <div class="photos-grid cols-1" style="max-width: 380px; margin: 0 auto;">
+          <div class="student-card"><img src="images/p12.jpg" alt="Thảo Nhi"/><div class="name">THẢO NHI</div></div>
+        </div>
+      </div>
+    </section>
 
-// ── 7. GIA HUY + VÂN KHÁNH + LINH NGA ──
-{type:'poem', num:'14',
- students:[
-   {name:'Gia Huy',   photo:'images/p13.jpg'},
-   {name:'Vân Khánh', photo:'images/p14.jpg'},
-   {name:'Linh Nga',  photo:'images/p15.jpg'},
- ],
- colors:['#9CB286','#FC8181','#FFBD59'],
- text:`Có tài ăn nói
-H��c hành cũng chăm
+    <!-- 7: GIA HUY + VÂN KHÁNH + LINH NGA -->
+    <section class="slide" data-title="Điểm danh 03">
+      <div class="container-wide two-col">
+        <div class="text-block">
+          <div class="roll-num">03</div>
+          <div class="small-cap">Ba nhân vật — ba sắc màu</div>
+          <h3>Gia Huy · Vân Khánh · Linh Nga</h3>
+          <div class="poem">Có tài ăn nói
+Học hành cũng chăm
 Được khen cả năm
-Là Gia Huy đó
+Là Gia Huy đó.
+
 Dáng người nho nhỏ
 Tính cũng hiền lành
 Không cần phải nhanh
-Đó là Vân Khánh
+Đó là Vân Khánh.
+
 Lấp la lấp lánh
 Ánh mắt rạng ngời
 Giọng vang khắp nơi
-MC - Linh Nga`},
+MC — Linh Nga.</div>
+        </div>
+        <div class="photos-grid cols-3">
+          <div class="student-card"><img src="images/p13.jpg" alt="Gia Huy"/><div class="name">GIA HUY</div></div>
+          <div class="student-card"><img src="images/p14.jpg" alt="Vân Khánh"/><div class="name">VÂN KHÁNH</div></div>
+          <div class="student-card"><img src="images/p15.jpg" alt="Linh Nga"/><div class="name">LINH NGA</div></div>
+        </div>
+      </div>
+    </section>
 
-// ── 8. NGỌC PHÚC + ĐĂNG KHOA + MINH ANH ──
-{type:'poem', num:'08',
- students:[
-   {name:'Ngọc Phúc', photo:'images/p16.jpg'},
-   {name:'Đăng Khoa', photo:'images/p17.jpg'},
-   {name:'Minh Anh',  photo:'images/p18.jpg'},
- ],
- colors:['#FFBD59','#9CB286','#FC8181'],
- text:`Tính hay bày trò
+    <!-- 8: NGỌC PHÚC + ĐĂNG KHOA + MINH ANH -->
+    <section class="slide" data-title="Điểm danh 04">
+      <div class="container-wide two-col reverse">
+        <div class="text-block">
+          <div class="roll-num">04</div>
+          <div class="small-cap">Những nghệ sĩ nhỏ</div>
+          <h3>Trần Ngọc Phúc · Đăng Khoa · Minh Anh</h3>
+          <div class="poem">Tính hay bày trò
 Là Trần Ngọc Phúc
 Nhưng học nghiêm túc
 Điểm luôn luôn cao.
+
 Thấy ai cũng chào
 Đăng Khoa lễ phép
 Hay vẽ, hay chép
-Đó là Minh Anh
-Mỗi một bức tranh
-Là một câu chuyện`},
+Đó là Minh Anh.
 
-// ── 9. NHẤT CHI MAI + MINH KHANG + DUY KHANG ──
-{type:'poem', num:'04',
- students:[
-   {name:'Nhất Chi Mai', photo:'images/p22.jpg'},
-   {name:'Minh Khang',   photo:'images/p21.jpg'},
-   {name:'Duy Khang',    photo:'images/p23.jpg'},
- ],
- colors:['#FC8181','#9CB286','#FFBD59'],
- text:`Múa đẹp uyển chuyển
+Mỗi một bức tranh
+Là một câu chuyện.</div>
+        </div>
+        <div class="photos-grid cols-3">
+          <div class="student-card"><img src="images/p16.jpg" alt="Trần Ngọc Phúc"/><div class="name">NGỌC PHÚC</div></div>
+          <div class="student-card"><img src="images/p17.jpg" alt="Đăng Khoa"/><div class="name">ĐĂNG KHOA</div></div>
+          <div class="student-card"><img src="images/p18.jpg" alt="Minh Anh"/><div class="name">MINH ANH</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9: NHẤT CHI MAI + MINH KHANG + DUY KHANG -->
+    <section class="slide" data-title="Điểm danh 05">
+      <div class="container-wide two-col">
+        <div class="text-block">
+          <div class="roll-num">05</div>
+          <div class="small-cap">Nghệ thuật & tư duy</div>
+          <h3>Nhất Chi Mai · Minh Khang · Duy Khang</h3>
+          <div class="poem">Múa đẹp uyển chuyển
 Là Nhất Chi Mai
 Rất hay diễn hài
-Là Minh Khang đó
+Là Minh Khang đó.
+
 Mặt hay nhăn nhó
 Nhưng bài toán khó
 Tìm ngay Duy Khang
-Thiên tài toán học`},
+Thiên tài toán học.</div>
+        </div>
+        <div class="photos-grid cols-3">
+          <div class="student-card"><img src="images/p21.jpg" alt="Nhất Chi Mai"/><div class="name">NHẤT CHI MAI</div></div>
+          <div class="student-card"><img src="images/p22.jpg" alt="Minh Khang"/><div class="name">MINH KHANG</div></div>
+          <div class="student-card"><img src="images/p23.jpg" alt="Duy Khang"/><div class="name">DUY KHANG</div></div>
+        </div>
+      </div>
+    </section>
 
-// ── 10. THANH LAN + GIA LINH + MINH HIẾU ──
-{type:'poem', num:'02',
- students:[
-   {name:'Thanh Lan',  photo:'images/p24.jpg'},
-   {name:'Gia Linh',   photo:'images/p25.jpg'},
-   {name:'Minh Hiếu',  photo:'images/p26.jpg'},
- ],
- colors:['#9CB286','#FC8181','#FFBD59'],
- text:`Đồ đạc ngăn nắp
+    <!-- 10: THANH LAN + GIA LINH + MINH HIẾU -->
+    <section class="slide" data-title="Điểm danh 06">
+      <div class="container-wide two-col reverse">
+        <div class="text-block">
+          <div class="roll-num">06</div>
+          <div class="small-cap">Gương mặt mẫu mực</div>
+          <h3>Thanh Lan · Gia Linh · Minh Hiếu</h3>
+          <div class="poem">Đồ đạc ngăn nắp
 Chăm chỉ làm gương
 Thanh Lan tinh tường
-Đoán ý cô giáo
+Đoán ý cô giáo.
+
 Vẽ đẹp, cao ráo
-Là bạn - Gia Linh
-H��c giỏi thông minh
-H��c sinh xuất sắc
+Là bạn — Gia Linh
+Học giỏi thông minh
+Học sinh xuất sắc.
+
 Tính tình nghiêm khắc
 Minh Hiếu chứ ai
 Nhưng rất có tài
-Trong môn Tin học`},
+Trong môn Tin học.</div>
+        </div>
+        <div class="photos-grid cols-3">
+          <div class="student-card"><img src="images/p24.jpg" alt="Thanh Lan"/><div class="name">THANH LAN</div></div>
+          <div class="student-card"><img src="images/p25.jpg" alt="Gia Linh"/><div class="name">GIA LINH</div></div>
+          <div class="student-card"><img src="images/p26.jpg" alt="Minh Hiếu"/><div class="name">MINH HIẾU</div></div>
+        </div>
+      </div>
+    </section>
 
-// ── 11. TUẤN TÚ + ZELDA + MINH PHƯƠNG + MINH NAM ──
-{type:'poem', num:'08',
- students:[
-   {name:'Tuấn Tú',    photo:'images/p27.jpg'},
-   {name:'Zelda',      photo:'images/p28.jpg'},
-   {name:'Minh Phương',photo:'images/p29.jpg'},
-   {name:'Minh Nam',   photo:'images/p30.jpg'},
- ],
- colors:['#FFBD59','#9CB286','#FC8181','#A78BFA'],
- text:`Không hề sợ nhọc
-Chàng trai - Tuấn Tú
+    <!-- 11: TUẤN TÚ + ZELDA + MINH PHƯƠNG + MINH NAM -->
+    <section class="slide" data-title="Điểm danh 07">
+      <div class="container-wide two-col">
+        <div class="text-block">
+          <div class="roll-num">07</div>
+          <div class="small-cap">Bộ tứ tài năng</div>
+          <h3>Tuấn Tú · Zelda · Minh Phương · Minh Nam</h3>
+          <div class="poem">Không hề sợ nhọc
+Chàng trai — Tuấn Tú
 Có việc cứ hú
-Tuấn Tú đến ngay
-H��c giỏi hát hay
+Tuấn Tú đến ngay.
+
+Học giỏi hát hay
 Là Zelda đó
 Thi bơi rất khó
-Đã có Minh Phương
+Đã có Minh Phương.
+
 Mắt rất tinh tường
 Là Minh Nam đó
 Cô hỏi sao đó
 Luôn nói không sao.
 Nhưng bạn hỏi vào
-kêu luôn: "Ai hỏi"`},
+kêu luôn: “Ai hỏi”.</div>
+        </div>
+        <div class="photos-grid cols-4">
+          <div class="student-card"><img src="images/p27.jpg" alt="Tuấn Tú"/><div class="name">TUẤN TÚ</div></div>
+          <div class="student-card"><img src="images/p28.jpg" alt="Zelda"/><div class="name">ZELDA</div></div>
+          <div class="student-card"><img src="images/p29.jpg" alt="Minh Phương"/><div class="name">MINH PHƯƠNG</div></div>
+          <div class="student-card"><img src="images/p30.jpg" alt="Minh Nam"/><div class="name">MINH NAM</div></div>
+        </div>
+      </div>
+    </section>
 
-// ── 12. QUANG MINH + JERON + NHƯ KIÊN ──
-{type:'poem', num:'02',
- students:[
-   {name:'Quang Minh', photo:'images/p31.jpg'},
-   {name:'Jeron',      photo:'images/p32.jpg'},
-   {name:'Như Kiên',   photo:'images/p33.jpg'},
- ],
- colors:['#FC8181','#FFBD59','#9CB286'],
- text:`Toán - Khoa đều giỏi
+    <!-- 12: QUANG MINH + JERON + NHƯ KIÊN -->
+    <section class="slide" data-title="Điểm danh 08">
+      <div class="container-wide two-col reverse">
+        <div class="text-block">
+          <div class="roll-num">08</div>
+          <div class="small-cap">Toán, nghệ & tấm lòng</div>
+          <h3>Quang Minh · Jeron · Như Kiên</h3>
+          <div class="poem">Toán — Khoa đều giỏi
 Là bạn Quang Minh
 Vẽ đẹp, thông minh
-Là Jeron đó
-Những bài Toán khó
-H�y hỏi Như Kiên
-Tính thì rất hiền
-Lại hay giúp đỡ`},
+Là Jeron đó.
 
-// ── 13. MINH THẢO + KHÁNH CHI ──
-{type:'poem', num:'14',
- students:[
-   {name:'Minh Thảo', photo:'images/p34.jpg'},
-   {name:'Khánh Chi', photo:'images/p35.jpg'},
- ],
- colors:['#9CB286','#FC8181'],
- text:`Tính tình cởi mở
+Những bài Toán khó
+Hãy hỏi Như Kiên
+Tính thì rất hiền
+Lại hay giúp đỡ.</div>
+        </div>
+        <div class="photos-grid cols-3">
+          <div class="student-card"><img src="images/p31.jpg" alt="Quang Minh"/><div class="name">QUANG MINH</div></div>
+          <div class="student-card"><img src="images/p32.jpg" alt="Jeron"/><div class="name">JERON</div></div>
+          <div class="student-card"><img src="images/p33.jpg" alt="Như Kiên"/><div class="name">NHƯ KIÊN</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13: MINH THẢO + KHÁNH CHI -->
+    <section class="slide" data-title="Điểm danh 09">
+      <div class="container-wide two-col">
+        <div class="text-block">
+          <div class="roll-num">09</div>
+          <div class="small-cap">Hát hay, văn giỏi</div>
+          <h3>Minh Thảo · Khánh Chi</h3>
+          <div class="poem">Tính tình cởi mở
 Minh Thảo chứ ai
-H�t hay vẽ tài
-Chăm đi sự kiện
+Hát hay vẽ tài
+Chăm đi sự kiện.
+
 Khánh Chi hay tiện
 Để đồ khắp nơi
 Văn khó bằng trời
-Khánh Chi làm tốt.`},
+Khánh Chi làm tốt.</div>
+        </div>
+        <div class="photos-grid cols-2">
+          <div class="student-card"><img src="images/p34.jpg" alt="Minh Thảo"/><div class="name">MINH THẢO</div></div>
+          <div class="student-card"><img src="images/p35.jpg" alt="Khánh Chi"/><div class="name">KHÁNH CHI</div></div>
+        </div>
+      </div>
+    </section>
 
-// ── 14. TRÚC LINH + ĐỨC VƯỢNG ──
-{type:'poem', num:'04',
- students:[
-   {name:'Trúc Linh',  photo:'images/p36.jpg'},
-   {name:'Đức Vượng',  photo:'images/p37.jpg'},
- ],
- colors:['#FFBD59','#9CB286'],
- text:`Giải toán phút mốt
+    <!-- 14: TRÚC LINH + ĐỨC VƯỢNG -->
+    <section class="slide" data-title="Điểm danh 10">
+      <div class="container-wide two-col reverse">
+        <div class="text-block">
+          <div class="roll-num">10</div>
+          <div class="small-cap">Khép lại điểm danh</div>
+          <h3>Trúc Linh · Đức Vượng</h3>
+          <div class="poem">Giải toán phút mốt
 Là bạn Trúc Linh
 Mắt tinh, thông minh
-Là Bạn Đức Vượng`},
+Là Bạn Đức Vượng.</div>
+        </div>
+        <div class="photos-grid cols-2">
+          <div class="student-card"><img src="images/p36.jpg" alt="Trúc Linh"/><div class="name">TRÚC LINH</div></div>
+          <div class="student-card"><img src="images/p37.jpg" alt="Đức Vượng"/><div class="name">ĐỨC VƯỢNG</div></div>
+        </div>
+      </div>
+    </section>
 
-// ── 15. FAREWELL POEM ──
-{type:'open-poem',
- photo:'images/slide4-bg.jpg',
- text:`Điểm 10 tươi đỏ
+    <!-- 15: LỜI TẠM BIỆT -->
+    <section class="slide" data-title="Lời tạm biệt">
+      <div class="container-wide two-col">
+        <div class="text-block">
+          <div class="small-cap">Khoảnh khắc · Lời tạm biệt</div>
+          <h3>Lời tạm biệt</h3>
+          <div class="poem">Điểm 10 tươi đỏ
 Trên vở của con
 Đến mai chỉ còn
-Là những kỉ niệm
+Là những kỉ niệm.
 
 Giờ vàng đã điểm
 Chúng con cười tươi
 Chia tay năm học
-Không bạn nào khóc
-Dù phải chia xa
+Không bạn nào khóc.
 
+Dù phải chia xa
 Nơi đây là nhà
-Của chúng con đó
+Của chúng con đó.
+
 Khi gặp gian khó
 Cô Liễu ở đây
 Tình yêu tràn đầy
-Dang tay chào đón.`},
-
-// ── 16. NỘI DUNG ──
-{type:'img', src:'images/slide16.jpg', alt:'Nội dung buổi họp'},
-
-// ── 17. TIÊU ĐIỂM GD ──
-{type:'img', src:'images/slide17.jpg', alt:'Tiêu điểm giáo dục'},
-
-// ── 18-22. KẾT QUẢ HỌC TẬP ──
-{type:'img', src:'images/slide18.jpg', alt:'Kết quả Toán học'},
-{type:'img', src:'images/slide19.jpg', alt:'Kết quả Tiếng Việt'},
-{type:'img', src:'images/slide20.jpg', alt:'Kết quả Lịch sử - Địa lý'},
-{type:'img', src:'images/slide21.jpg', alt:'Kết quả Khoa học'},
-{type:'img', src:'images/slide22.jpg', alt:'Kết quả Tiếng Anh'},
-
-// ── 23. VINH DANH HỌC SINH ──
-{type:'honor', badge:'VINH DANH', title:'HỌC SINH', year:'Năm học: 2025 - 2026', color:'#9CB286'},
-
-// ── 24. GÓC NHÌN THẲNG ──
-{type:'img', src:'images/slide24.jpg', alt:'Góc nhìn thẳng'},
-
-// ── 25. QUIZ TITLE ──
-{type:'quiz-title'},
-
-// ── 26-30. QUIZ QUESTIONS ──
-{type:'quiz', id:0, num:'Câu 1 / 5',
- q:'TRONG ĐẠI NHẠC HỘI DIỄN RA VÀO NGÀY 24/5/2026, LỚP 4B2 ĐÃ GIÀNH ĐƯỢC GIẢI GÌ?',
- opts:['Biên đạo và dàn dựng xuất sắc','Ý tưởng sáng tạo','Ý tưởng dàn dựng và sáng tạo xuất sắc'],
- ans:1},
-
-{type:'quiz', id:1, num:'Câu 2 / 5',
- q:'LỚP 4B2 CÓ BAO NHIÊU BẠN NAM, BAO NHIÊU BẠN NỮ?',
- opts:['15 nam – 11 nữ','14 nam – 12 nữ','13 nam – 13 nữ'],
- ans:1},
-
-{type:'quiz', id:2, num:'Câu 3 / 5',
- q:'TRONG NGÀY HỘI THỂ THAO, LỚP 4B2 ĐÃ GIÀNH GIẢI GÌ?',
- opts:['NHẤT','NHÌ','BA'],
- ans:1},
-
-{type:'quiz', id:3, num:'Câu 4 / 5',
- q:'NĂM HỌC 2025 – 2026 LỚP 4B02 ĐÃ ĐẠT ĐƯỢC DANH HIỆU GÌ?',
- opts:['LỚP TIẾN BỘ','LỚP XUẤT SẮC','LỚP TIÊN TIẾN'],
- ans:1},
-
-{type:'quiz', id:4, num:'Câu 5 / 5',
- q:'TRONG NĂM HỌC LỚP 4, LỚP 4B2 ĐÃ ĐI TRẢI NGHIỆM Ở ĐÂU?',
- opts:['HOÀNG THÀNH THĂNG LONG','CÔNG VIÊN THỦ LỆ','VƯỜN BÁCH THẢO'],
- ans:1},
-
-// ── 31. VINH DANH PHỤ HUYNH ──
-{type:'honor', badge:'VINH DANH', title:'PHỤ HUYNH', year:'Năm học: 2025 - 2026', color:'#C85A5A'},
-
-// ── 32. VIDEO ──
-{type:'video'},
-
-// ── 33. CLOSING ──
-{type:'img', src:'images/slide33.jpg', alt:'Chúc mừng'},
-
-// ── 34. HÀNH TRANG ──
-{type:'img', src:'images/slide34.jpg', alt:'Hành trang lên lớp 5'},
-
-];
-
-// ═══════════════════════════════
-//  BUILD SLIDES
-// ═══════════════════════════════
-const deck = document.getElementById('deck');
-const dotsEl = document.getElementById('dots');
-const counterEl = document.getElementById('counter');
-
-function buildSlide(data, idx) {
-  const wrap = document.createElement('div');
-  wrap.className = 'slide';
-  wrap.id = `slide-${idx}`;
-
-  const inner = document.createElement('div');
-  inner.className = 'slide-inner';
-
-  switch(data.type) {
-    case 'title':
-      inner.innerHTML = `
-        <div class="slide-title">
-          <img src="images/logo.png" class="title-logo" alt="Vinschool">
-          <div class="title-school">Trường Tiểu học Vinschool Ocean Park</div>
-          <div class="title-event">HỌP PHỤ HUYNH HỌC SINH</div>
-          <div class="title-class">Lớp 4B2</div>
-          <div class="title-year">Năm học 2025 – 2026</div>
-        </div>`;
-      break;
-
-    case 'img':
-      inner.innerHTML = `<img src="${data.src}" alt="${data.alt}" class="slide-img">`;
-      break;
-
-    case 'open-poem':
-      inner.innerHTML = `
-        <div class="slide-open-poem">
-          <img src="${data.photo}" class="open-photo" alt="">
-          <div class="open-text"><p>${data.text}</p></div>
-        </div>`;
-      break;
-
-    case 'poem': {
-      const n = data.students.length;
-      const photoSize = n >= 4 ? 90 : n === 3 ? 110 : n === 2 ? 130 : 160;
-      const photos = data.students.map((s,i) => `
-        <div class="photo-wrap">
-          <div class="photo-frame" style="width:${photoSize}px;height:${photoSize}px;border-color:${data.colors[i%data.colors.length]}">
-            <img src="${s.photo}" alt="${s.name}" loading="lazy">
-          </div>
-          <span class="photo-name" style="background:${data.colors[i%data.colors.length]}20;color:${data.colors[i%data.colors.length]}">${s.name}</span>
-        </div>`).join('');
-
-      inner.innerHTML = `
-        <div class="slide-poem">
-          <div class="deco-circle" style="width:180px;height:180px;background:${data.colors[0]};top:-60px;left:-60px"></div>
-          <div class="deco-circle" style="width:120px;height:120px;background:${(data.colors[1]||data.colors[0])};bottom:-40px;right:40px"></div>
-          <div class="poem-photos">
-            <div class="poem-photo-row">${photos}</div>
-          </div>
-          <div class="poem-text-side">
-            <div class="poem-num">${data.num}</div>
-            <div class="poem-lines">${data.text}</div>
-          </div>
-        </div>`;
-      break;
-    }
-
-    case 'honor':
-      inner.innerHTML = `
-        <div class="slide-honor">
-          <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,${data.color}22,transparent);top:-100px;right:-100px"></div>
-          <div class="honor-badge" style="color:${data.color}">✦ ${data.badge} ✦</div>
-          <div class="honor-title">${data.title}</div>
-          <div class="honor-year">${data.year}</div>
-          <div class="honor-stars">⭐⭐⭐⭐⭐</div>
-        </div>`;
-      break;
-
-    case 'quiz-title':
-      inner.innerHTML = `
-        <div class="slide-quiz-title">
-          <h2>🎯 DÀNH CHO PHỤ HUYNH</h2>
-          <h1>QUIZ VUI</h1>
-        </div>`;
-      break;
-
-    case 'quiz':
-      inner.innerHTML = buildQuizSlide(data);
-      break;
-
-    case 'video':
-      inner.innerHTML = `
-        <div class="slide-closing">
-          <div class="closing-icon">🎬</div>
-          <h2>KỈ NIỆM</h2>
-          <h1>VIDEO TỔNG KẾT NĂM HỌC</h1>
-          <p>Nhìn lại một năm đầy ắp kỉ niệm của lớp 4B2 💕<br>Năm học 2025 – 2026</p>
-        </div>`;
-      break;
-  }
-
-  wrap.appendChild(inner);
-  deck.appendChild(wrap);
-
-  // Dot
-  const dot = document.createElement('div');
-  dot.className = 'dot';
-  dot.onclick = () => goTo(idx);
-  dotsEl.appendChild(dot);
-}
-
-function buildQuizSlide(d) {
-  const opts = d.opts.map((t,i) => `
-    <div class="q-opt" id="qopt-${d.id}-${i}" onclick="selectOpt(${d.id},${i},${i===d.ans})">
-      <div class="opt-letter">${['A','B','C'][i]}</div>
-      <div class="opt-text">${t}</div>
-    </div>`).join('');
-  return `
-    <div class="slide-quiz-q">
-      <div class="quiz-header">
-        <span class="quiz-num">${d.num}</span>
-        <div class="quiz-timer-area">
-          <button class="q-btn btn-time" id="qbtn-${d.id}" onclick="toggleTimer(${d.id})">⏱ Bấm giờ</button>
-          <span class="timer-val" id="qval-${d.id}"></span>
+Dang tay chào đón.</div>
+        </div>
+        <div class="photo-block">
+          <img src="images/slide4-bg.jpg" alt="Lớp 4B02 tổng kết"/>
+          <div class="caption">LỚP 4B02 · LỜI TẠM BIỆT</div>
         </div>
       </div>
-      <div class="q-text">${d.q}</div>
-      <div class="quiz-opts">${opts}</div>
-      <div class="quiz-footer">
-        <button class="q-btn btn-reveal" onclick="revealAns(${d.id},${d.ans})">💡 Hiển thị đáp án</button>
-        <div class="quiz-msg" id="qmsg-${d.id}"></div>
+    </section>
+
+    <!-- 16: NỘI DUNG -->
+    <section class="slide" data-title="Nội dung">
+      <div class="container-wide">
+        <div class="center-head">
+          <div class="kicker">Chương trình</div>
+          <h2>Nội dung</h2>
+          <p>Bốn nội dung chính trong buổi họp phụ huynh hôm nay.</p>
+        </div>
+        <div class="agenda-grid">
+          <div class="agenda-card"><div class="agenda-num">01</div><h4>Kết quả hoạt động</h4><p>của Nhà trường trong năm học vừa qua.</p></div>
+          <div class="agenda-card"><div class="agenda-num">02</div><h4>Kết quả học tập</h4><p>và rèn luyện của lớp 4B02.</p></div>
+          <div class="agenda-card"><div class="agenda-num">03</div><h4>Chương trình</h4><p>hoạt động hè 2026.</p></div>
+          <div class="agenda-card"><div class="agenda-num">04</div><h4>Ban phụ huynh</h4><p>và các trao đổi cuối chương trình.</p></div>
+        </div>
       </div>
-    </div>`;
-}
+    </section>
 
-SLIDES.forEach((s,i) => buildSlide(s,i));
+    <!-- 17: TIÊU ĐIỂM GIÁO DỤC -->
+    <section class="slide" data-title="Tiêu điểm giáo dục">
+      <div class="container-wide">
+        <div class="focus-card">
+          <div>
+            <div class="focus-kicker">PHẦN II · KẾT QUẢ HỌC TẬP</div>
+            <h3>Tiêu điểm <span class="accent">giáo dục</span></h3>
+            <p class="quote">“Hành trình chinh phục và trưởng thành.”</p>
+            <p class="meta">Năm học 2025 — 2026 · Lớp 4B02</p>
+          </div>
+          <div class="focus-photo"><img src="images/cover.jpg" alt="Lớp 4B02"/></div>
+        </div>
+      </div>
+    </section>
 
-// ═══════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════
-let cur = 0;
-const total = SLIDES.length;
-const timers = {};
-const answered = {};
+    <!-- 18: TOÁN -->
+    <section class="slide" data-title="Toán Học">
+      <div class="subject-card s-toan">
+        <div class="icon">📐</div>
+        <div class="small-cap" style="color:#6FA8DC; font-size:12px; letter-spacing:1.5px; font-weight:700; text-transform:uppercase; margin-bottom:6px;">Kết quả học tập</div>
+        <h3>Môn Toán Học</h3>
+        <div class="scores">
+          <div class="score-pill"><div class="label">Kì I</div><div class="value">8.4</div></div>
+          <div class="score-pill k2"><div class="label">Kì II</div><div class="value">8.4</div></div>
+        </div>
+        <div class="comment">Duy trì phong độ ổn định</div>
+      </div>
+    </section>
 
-function goTo(idx, dir = 0) {
-  if(idx < 0 || idx >= total) return;
-  const prev = document.getElementById(`slide-${cur}`);
-  const next = document.getElementById(`slide-${idx}`);
-  if(!prev || !next) return;
-  prev.classList.remove('active');
-  prev.classList.add(dir >= 0 ? 'exit-left' : 'exit-right');
-  setTimeout(() => prev.classList.remove('exit-left','exit-right'), 500);
-  next.classList.add('active');
-  // Pause timers when navigating away
-  if(timers[cur]) { clearInterval(timers[cur]); timers[cur] = null; const bt = document.getElementById(`qbtn-${cur}`); if(bt) bt.classList.remove('running'); }
-  cur = idx;
-  updateUI();
-}
-function prev() { goTo(cur-1, -1); }
-function next() { goTo(cur+1, 1); }
+    <!-- 19: TIẾNG VIỆT -->
+    <section class="slide" data-title="Tiếng Việt">
+      <div class="subject-card s-tv">
+        <div class="icon">📖</div>
+        <div class="small-cap" style="color:#E89B9B; font-size:12px; letter-spacing:1.5px; font-weight:700; text-transform:uppercase; margin-bottom:6px;">Kết quả học tập</div>
+        <h3>Môn Tiếng Việt</h3>
+        <div class="scores">
+          <div class="score-pill"><div class="label">Kì I</div><div class="value">8.6</div></div>
+          <div class="score-pill k2"><div class="label">Kì II</div><div class="value">9.1</div></div>
+        </div>
+        <div class="comment">Tiến bộ vượt bậc</div>
+      </div>
+    </section>
 
-function updateUI() {
-  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===cur));
-  document.querySelectorAll('.slide').forEach((s,i) => {
-    if(i !== cur) s.classList.remove('active');
+    <!-- 20: LỊCH SỬ - ĐỊA LÝ -->
+    <section class="slide" data-title="Lịch sử - Địa lý">
+      <div class="subject-card s-ls">
+        <div class="icon">🧭</div>
+        <div class="small-cap" style="color:#B8924D; font-size:12px; letter-spacing:1.5px; font-weight:700; text-transform:uppercase; margin-bottom:6px;">Kết quả học tập</div>
+        <h3>Môn Lịch Sử — Địa Lý</h3>
+        <div class="scores">
+          <div class="score-pill"><div class="label">Kì I</div><div class="value">8.4</div></div>
+          <div class="score-pill k2"><div class="label">Kì II</div><div class="value">8.9</div></div>
+        </div>
+        <div class="comment">Nỗ lực đáng khen</div>
+      </div>
+    </section>
+
+    <!-- 21: KHOA HỌC -->
+    <section class="slide" data-title="Khoa học">
+      <div class="subject-card s-kh">
+        <div class="icon">🌿</div>
+        <div class="small-cap" style="color:#5BA976; font-size:12px; letter-spacing:1.5px; font-weight:700; text-transform:uppercase; margin-bottom:6px;">Kết quả học tập</div>
+        <h3>Môn Khoa Học</h3>
+        <div class="scores">
+          <div class="score-pill"><div class="label">Kì I</div><div class="value">8.2</div></div>
+          <div class="score-pill k2"><div class="label">Kì II</div><div class="value">8.5</div></div>
+        </div>
+        <div class="comment">Cải thiện tốt</div>
+      </div>
+    </section>
+
+    <!-- 22: TIẾNG ANH -->
+    <section class="slide" data-title="Tiếng Anh">
+      <div class="subject-card s-ta">
+        <div class="icon">📚</div>
+        <div class="small-cap" style="color:#D89627; font-size:12px; letter-spacing:1.5px; font-weight:700; text-transform:uppercase; margin-bottom:6px;">Kết quả học tập</div>
+        <h3>Môn Tiếng Anh</h3>
+        <div class="scores">
+          <div class="score-pill"><div class="label">Kì I</div><div class="value">9.2</div></div>
+          <div class="score-pill k2"><div class="label">Kì II</div><div class="value">9.0</div></div>
+        </div>
+        <div class="comment">Năng lực xuất sắc</div>
+      </div>
+    </section>
+
+    <!-- 23: VINH DANH HỌC SINH -->
+    <section class="slide" data-title="Vinh danh Học sinh">
+      <div class="section-divider">
+        <div class="roman">III</div>
+        <div class="label">PHẦN III · TRAO THƯỞNG</div>
+        <h2>VINH DANH HỌC SINH</h2>
+        <p>Tri ân nỗ lực, ghi nhận thành quả của các con suốt một năm học. Năm học 2025 — 2026.</p>
+      </div>
+    </section>
+
+    <!-- 24: GÓC NHÌN THẲNG -->
+    <section class="slide" data-title="Góc nhìn thẳng">
+      <div class="container-wide">
+        <div class="center-head">
+          <div class="kicker">Lời khuyên</div>
+          <h2>Góc nhìn thẳng</h2>
+          <p>Đối diện thực trạng và tương lai.</p>
+        </div>
+        <div class="advice-grid">
+          <div class="advice-card">
+            <div class="small-cap">Lời khuyên về nỗ lực</div>
+            <h4>Học cách làm chủ cảm xúc</h4>
+            <p>Biết nhường nhịn và lắng nghe. Biến những hiểu lầm của tuổi học trò thành sự thấu hiểu và sẻ chia.</p>
+          </div>
+          <div class="advice-card b2">
+            <div class="small-cap">Lời khuyên về sự tự tin</div>
+            <h4>Hành trang bước vào lớp 5</h4>
+            <p>Đòi hỏi sự chủ động. Tự tin vững bước, không ngại đặt câu hỏi và dám chinh phục những thử thách mới.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 25: QUIZ INTRO -->
+    <section class="slide" data-title="Quiz · Giới thiệu">
+      <div class="section-divider blue">
+        <div class="roman">IV</div>
+        <div class="label">TƯƠNG TÁC</div>
+        <h2>QUIZ DÀNH CHO PHỤ HUYNH</h2>
+        <p>5 câu hỏi nho nhỏ để cùng nhau nhìn lại một năm của các con. Mỗi câu phụ huynh chủ động bấm <strong>“Bắt đầu đếm giờ”</strong> rồi suy nghĩ trong 20 giây.</p>
+      </div>
+    </section>
+
+    <!-- 26-30: 5 QUIZ QUESTIONS - rendered dynamically via JS template -->
+    <section class="slide quiz-slide" data-title="Quiz · Câu 1" data-q="0"></section>
+    <section class="slide quiz-slide" data-title="Quiz · Câu 2" data-q="1"></section>
+    <section class="slide quiz-slide" data-title="Quiz · Câu 3" data-q="2"></section>
+    <section class="slide quiz-slide" data-title="Quiz · Câu 4" data-q="3"></section>
+    <section class="slide quiz-slide" data-title="Quiz · Câu 5" data-q="4"></section>
+
+    <!-- 31: VINH DANH PHỤ HUYNH -->
+    <section class="slide" data-title="Vinh danh Phụ huynh">
+      <div class="section-divider blue">
+        <div class="roman">V</div>
+        <div class="label">PHẦN V · TRI ÂN</div>
+        <h2>VINH DANH PHỤ HUYNH</h2>
+        <p>Xin trân trọng cảm ơn Quý Phụ huynh đã luôn đồng hành cùng các con và Nhà trường. Năm học 2025 — 2026.</p>
+      </div>
+    </section>
+
+    <!-- 32: VIDEO -->
+    <section class="slide" data-title="Video tổng kết">
+      <div class="container-narrow">
+        <div class="center-head">
+          <div class="kicker">Phần VI · Nhìn lại một năm</div>
+          <h2>Video tổng kết năm học</h2>
+          <p>Hành trình một năm học của lớp 4B02 — gói gọn trong vài phút.</p>
+        </div>
+        <div class="video-card">
+          <div class="video-frame">
+            <div class="play">▶</div>
+            <h3>VIDEO TỔNG KẾT NĂM HỌC</h3>
+            <p>Năm học 2025 — 2026 · Lớp 4B02</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 33: LỜI CHÚC -->
+    <section class="slide" data-title="Lời chúc mùa hè">
+      <div class="wish-card">
+        <div class="wish-inner">
+          <div class="wish-emoji">🌻🎈🌈</div>
+          <h2>Chúc các con <span class="accent">một mùa hè rực rỡ và ý nghĩa!</span></h2>
+          <p>Trân trọng cảm ơn Quý Phụ huynh đã luôn đồng hành.</p>
+          <div class="wish-logo">
+            <img src="images/logo.png" alt="Vinschool"/>
+            TRƯỜNG TIỂU HỌC VINSCHOOL OCEAN PARK · LỚP 4B02
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 34: HÀNH TRANG LÊN LỚP 5 -->
+    <section class="slide" data-title="Hành trang lên lớp 5">
+      <div class="container-wide">
+        <div class="center-head">
+          <div class="kicker">Chương trình · Hè 2026</div>
+          <h2>Hành trang lên lớp 5</h2>
+          <p>Đề xuất các thói quen học tập hè để các con vững vàng bước vào lớp 5.</p>
+        </div>
+        <div class="summer-grid">
+          <div class="summer-card"><div class="summer-icon">🧮</div><div><h4>Dành 15 phút mỗi ngày</h4><p>Ôn tập bảng cửu chương và các bài toán đố cơ bản.</p></div></div>
+          <div class="summer-card"><div class="summer-icon">🎧</div><div><h4>Xem phim hoạt hình tiếng Anh</h4><p>Hoặc nghe nhạc, đọc truyện ngắn để duy trì phản xạ.</p></div></div>
+          <div class="summer-card"><div class="summer-icon">📖</div><div><h4>Đọc ít nhất 3 cuốn sách</h4><p>Mở rộng vốn từ Tiếng Việt và rèn luyện tư duy.</p></div></div>
+          <div class="summer-card"><div class="summer-icon">🌱</div><div><h4>Khuyến khích con tự thử kĩ năng mới</h4><p>Bơi, nấu ăn cơ bản, nhà cửa và học cách quản lý bản thân.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- ===== HUD ===== -->
+<div class="hud">
+  <div class="hud-progress">
+    <div class="hud-counter"><span id="cur">1</span> / <span id="total">34</span></div>
+    <div class="hud-bar"><span id="bar"></span></div>
+    <div class="hud-title" id="title">Trang bìa</div>
+  </div>
+  <button class="arrow-btn" id="prev" aria-label="Trước">←</button>
+  <button class="arrow-btn" id="next" aria-label="Sau">→</button>
+</div>
+
+<script>
+// ===== QUIZ DATA =====
+const QUESTIONS = [
+  { q:'Trong Đại nhạc hội diễn ra vào ngày 24/5/2026, lớp 4B02 đã giành được giải gì?',
+    opts:['Biên đạo và dàn dựng xuất sắc','Ý tưởng sáng tạo','Ý tưởng dàn dựng và sáng tạo xuất sắc'],
+    correct:0 },
+  { q:'Lớp 4B02 có bao nhiêu bạn nam, bao nhiêu bạn nữ?',
+    opts:['15 nam — 11 nữ','14 nam — 12 nữ','13 nam — 13 nữ'],
+    correct:1 },
+  { q:'Trong Ngày hội thể thao, lớp 4B02 đã giành giải gì?',
+    opts:['Giải Nhất','Giải Nhì','Giải Ba'],
+    correct:0 },
+  { q:'Năm học 2025 — 2026, lớp 4B02 đã đạt được danh hiệu gì?',
+    opts:['Lớp Tiến Bộ','Lớp Xuất Sắc','Lớp Tiên Tiến'],
+    correct:1 },
+  { q:'Trong năm học lớp 4, lớp 4B02 đã đi trải nghiệm ở đâu?',
+    opts:['Hoàng Thành Thăng Long','Công viên Thủ Lệ','Vườn Bách Thảo'],
+    correct:0 }
+];
+const TIME_PER_Q = 20;
+const CIRC = 2 * Math.PI * 28; // r=28 -> 175.93
+
+// Per-quiz state, keyed by index
+const quizState = QUESTIONS.map(() => ({
+  picked: -1, started: false, revealed: false, scored: false, timer: null, timeLeft: TIME_PER_Q,
+}));
+let totalScore = 0;
+
+// ===== RENDER QUIZ SLIDES =====
+function renderQuizSlides() {
+  document.querySelectorAll('.quiz-slide').forEach(slide => {
+    const qi = +slide.dataset.q;
+    const Q = QUESTIONS[qi];
+    const opts = ['A', 'B', 'C'];
+    slide.innerHTML = `
+      <div class="quiz-box">
+        <div class="quiz-top">
+          <div class="quiz-progress-bar">
+            <div class="label">CÂU <strong>${qi+1}</strong> / 5
+              <span class="quiz-score-pill" style="margin-left:8px;">★ Điểm: <span data-score>0</span>/5</span>
+            </div>
+            <div class="quiz-bar"><span style="width:${((qi)/5*100)}%"></span></div>
+          </div>
+          <div class="quiz-timer idle" data-timer>
+            <svg width="68" height="68">
+              <circle cx="34" cy="34" r="28" stroke-width="6" fill="none" class="ring-bg"/>
+              <circle cx="34" cy="34" r="28" stroke-width="6" fill="none" stroke-linecap="round" class="ring-fg" data-ring/>
+            </svg>
+            <div class="num" data-num>${TIME_PER_Q}</div>
+          </div>
+        </div>
+
+        <div class="quiz-question">${Q.q}</div>
+
+        <div class="quiz-options" data-opts>
+          ${Q.opts.map((opt, i) => `
+            <button class="quiz-option" data-opt="${i}">
+              <span class="opt-label">${opts[i]}</span>
+              <span>${opt}</span>
+              <span class="check-mark">✓</span>
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="quiz-feedback" data-fb></div>
+
+        <div class="quiz-actions">
+          <button class="btn btn-go" data-start>▶ Bắt đầu đếm giờ</button>
+          <button class="btn btn-ghost" data-reveal>Xem đáp án</button>
+          <button class="btn btn-primary" data-next>Câu tiếp theo →</button>
+        </div>
+      </div>
+    `;
+
+    // Wire up
+    const $$ = sel => slide.querySelector(sel);
+    const optEls = slide.querySelectorAll('[data-opt]');
+    const startBtn = $$('[data-start]');
+    const revealBtn = $$('[data-reveal]');
+    const nextBtn = $$('[data-next]');
+
+    optEls.forEach(o => {
+      o.onclick = () => {
+        if (quizState[qi].revealed) return;
+        quizState[qi].picked = +o.dataset.opt;
+        optEls.forEach(x => x.classList.remove('selected'));
+        o.classList.add('selected');
+      };
+    });
+
+    startBtn.onclick = () => startQuiz(qi);
+    revealBtn.onclick = () => revealQuiz(qi, false);
+    nextBtn.onclick = () => goTo(currentIdx + 1);
   });
-  counterEl.textContent = `${cur+1} / ${total}`;
 }
 
-document.getElementById('prev').onclick = prev;
-document.getElementById('next').onclick = next;
-document.addEventListener('keydown', e => {
-  if(e.key==='ArrowLeft' || e.key==='ArrowUp') prev();
-  if(e.key==='ArrowRight' || e.key==='ArrowDown' || e.key===' ') { e.preventDefault(); next(); }
-});
-// Touch swipe
-let touchX = 0;
-document.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
-document.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - touchX;
-  if(Math.abs(dx) > 40) dx < 0 ? next() : prev();
-});
+function startQuiz(qi) {
+  const slide = document.querySelector(`.quiz-slide[data-q="${qi}"]`);
+  const st = quizState[qi];
+  if (st.started || st.revealed) return;
+  st.started = true;
+  st.timeLeft = TIME_PER_Q;
 
-// ═══════════════════════════════
-//  QUIZ LOGIC
-// ═══════════════════════════════
-function toggleTimer(qi) {
-  const btn = document.getElementById(`qbtn-${qi}`);
-  const val = document.getElementById(`qval-${qi}`);
-  if(timers[qi]) {
-    clearInterval(timers[qi]); timers[qi]=null;
-    btn.textContent='⏱ Bấm giờ'; btn.classList.remove('running');
-    val.textContent=''; val.classList.remove('warn');
-    return;
-  }
-  let s=30; val.textContent=s+'s'; val.style.color='#FFBD59';
-  btn.textContent='⏹ Dừng'; btn.classList.add('running');
-  timers[qi]=setInterval(()=>{
-    s--;
-    if(s<0){
-      clearInterval(timers[qi]);timers[qi]=null;
-      btn.textContent='⏱ Bấm giờ';btn.classList.remove('running');
-      val.textContent='Hết giờ!';val.classList.remove('warn');
-      return;
+  const timer = slide.querySelector('[data-timer]');
+  const ring = slide.querySelector('[data-ring]');
+  const num = slide.querySelector('[data-num]');
+  const startBtn = slide.querySelector('[data-start]');
+
+  timer.classList.remove('idle', 'warn');
+  startBtn.disabled = true;
+  startBtn.innerText = '⏱ Đang đếm…';
+
+  ring.style.strokeDasharray = CIRC;
+  ring.style.strokeDashoffset = 0;
+  ring.style.transition = 'none';
+  // force reflow
+  ring.getBoundingClientRect();
+  ring.style.transition = `stroke-dashoffset ${TIME_PER_Q}s linear`;
+  ring.style.strokeDashoffset = CIRC;
+
+  num.innerText = st.timeLeft;
+  st.timer = setInterval(() => {
+    st.timeLeft--;
+    num.innerText = st.timeLeft;
+    if (st.timeLeft <= 5) timer.classList.add('warn');
+    if (st.timeLeft <= 0) {
+      clearInterval(st.timer);
+      st.timer = null;
+      revealQuiz(qi, true);
     }
-    val.textContent=s+'s';
-    if(s<=10){val.classList.add('warn');val.style.color='#FC8181';}
-  },1000);
+  }, 1000);
 }
 
-function selectOpt(qi,optIdx,isCorrect){
-  if(answered[qi]) return;
-  answered[qi]=true;
-  if(timers[qi]){clearInterval(timers[qi]);timers[qi]=null;document.getElementById(`qbtn-${qi}`)?.classList.remove('running');}
-  for(let i=0;i<3;i++){
-    const el=document.getElementById(`qopt-${qi}-${i}`);
-    if(!el) continue;
-    el.style.pointerEvents='none';
-    if(i===optIdx) el.classList.add(isCorrect?'correct':'wrong');
-  }
-  const msg=document.getElementById(`qmsg-${qi}`);
-  if(isCorrect){
-    msg.textContent='🎉 Chính xác!'; msg.className='quiz-msg ok show';
-    confetti();
+function stopQuizTimer(qi) {
+  const st = quizState[qi];
+  if (st.timer) { clearInterval(st.timer); st.timer = null; }
+}
+
+function revealQuiz(qi, timedOut) {
+  const slide = document.querySelector(`.quiz-slide[data-q="${qi}"]`);
+  const st = quizState[qi];
+  if (st.revealed) return;
+  st.revealed = true;
+  stopQuizTimer(qi);
+
+  const Q = QUESTIONS[qi];
+  const optEls = slide.querySelectorAll('[data-opt]');
+  optEls.forEach((o, i) => {
+    o.classList.add('locked');
+    if (i === Q.correct) o.classList.add('correct');
+    if (st.picked === i && i !== Q.correct) o.classList.add('wrong');
+  });
+
+  const fb = slide.querySelector('[data-fb]');
+  const correctText = Q.opts[Q.correct];
+  if (st.picked === Q.correct) {
+    if (!st.scored) { totalScore++; st.scored = true; }
+    fb.className = 'quiz-feedback show right';
+    fb.innerHTML = `<span class="big">Chính xác! 🎉</span>Đáp án đúng: <strong>${correctText}</strong>.`;
+    launchConfetti();
+  } else if (timedOut && st.picked === -1) {
+    fb.className = 'quiz-feedback show miss';
+    fb.innerHTML = `<span class="big">Hết giờ! ⏰</span>Đáp án đúng: <strong>${correctText}</strong>.`;
   } else {
-    const ansOpt=document.getElementById(`qopt-${qi}-1`); // always B (index 1)
-    if(ansOpt) ansOpt.classList.add('revealed');
-    msg.textContent='😊 Chưa đúng! Đáp án đúng là B.'; msg.className='quiz-msg hint show';
+    fb.className = 'quiz-feedback show miss';
+    fb.innerHTML = `<span class="big">Chưa đúng! 💡</span>Đáp án đúng: <strong>${correctText}</strong>.`;
   }
+
+  slide.querySelector('[data-start]').disabled = true;
+  slide.querySelector('[data-reveal]').disabled = true;
+  updateAllScoreBadges();
 }
 
-function revealAns(qi, ansIdx){
-  if(timers[qi]){clearInterval(timers[qi]);timers[qi]=null;document.getElementById(`qbtn-${qi}`)?.classList.remove('running');}
-  answered[qi]=true;
-  for(let i=0;i<3;i++){
-    const el=document.getElementById(`qopt-${qi}-${i}`);
-    if(!el) continue;
-    el.style.pointerEvents='none';
-    if(i===ansIdx) el.classList.add('revealed');
-    else el.style.opacity='.5';
-  }
-  const msg=document.getElementById(`qmsg-${qi}`);
-  msg.textContent=`💡 Đáp án đúng: ${['A','B','C'][ansIdx]}`; msg.className='quiz-msg hint show';
+function updateAllScoreBadges() {
+  document.querySelectorAll('[data-score]').forEach(el => el.innerText = totalScore);
 }
 
-// ═══════════════════════════════
-//  CONFETTI
-// ═══════════════════════════════
-function confetti(){
-  const cols=['#9CB286','#FFBD59','#FC8181','#60A5FA','#A78BFA'];
-  for(let i=0;i<18;i++){
+// ===== DECK CONTROLLER =====
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let currentIdx = 0;
+const slidesEl = document.getElementById('slides');
+const curEl = document.getElementById('cur');
+const totalEl = document.getElementById('total');
+const titleEl = document.getElementById('title');
+const barEl = document.getElementById('bar');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const sideLeft = document.getElementById('sideLeft');
+const sideRight = document.getElementById('sideRight');
+
+function goTo(idx) {
+  // Stop any running quiz timer when leaving a quiz slide
+  if (slides[currentIdx]?.classList.contains('quiz-slide')) {
+    const qi = +slides[currentIdx].dataset.q;
+    stopQuizTimer(qi);
+  }
+
+  idx = Math.max(0, Math.min(totalSlides - 1, idx));
+  const prevIdx = currentIdx;
+  currentIdx = idx;
+
+  // Activate/deactivate slides
+  slides.forEach((s, i) => {
+    s.classList.remove('active', 'leaving-left', 'leaving-right');
+    if (i === idx) s.classList.add('active');
+  });
+
+  curEl.innerText = idx + 1;
+  totalEl.innerText = totalSlides;
+  titleEl.innerText = slides[idx].dataset.title || '';
+  barEl.style.width = ((idx + 1) / totalSlides * 100) + '%';
+  prevBtn.disabled = idx === 0;
+  nextBtn.disabled = idx === totalSlides - 1;
+  sideLeft.disabled = idx === 0;
+  sideRight.disabled = idx === totalSlides - 1;
+
+  if (location.hash !== '#' + (idx + 1)) {
+    history.replaceState(null, '', '#' + (idx + 1));
+  }
+
+  slides[idx].scrollTop = 0;
+}
+
+function next() { goTo(currentIdx + 1); }
+function prev() { goTo(currentIdx - 1); }
+
+// Keyboard
+window.addEventListener('keydown', (e) => {
+  // ignore when typing in an input
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  switch (e.key) {
+    case 'ArrowRight':
+    case 'PageDown':
+    case ' ':
+      e.preventDefault(); next(); break;
+    case 'ArrowLeft':
+    case 'PageUp':
+      e.preventDefault(); prev(); break;
+    case 'Home':
+      e.preventDefault(); goTo(0); break;
+    case 'End':
+      e.preventDefault(); goTo(totalSlides - 1); break;
+  }
+});
+
+prevBtn.onclick = prev;
+nextBtn.onclick = next;
+sideLeft.onclick = prev;
+sideRight.onclick = next;
+
+// Touch swipe
+let touchStartX = null;
+window.addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX;
+}, { passive: true });
+window.addEventListener('touchend', (e) => {
+  if (touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 50) {
+    if (dx < 0) next(); else prev();
+  }
+  touchStartX = null;
+}, { passive: true });
+
+// Init
+renderQuizSlides();
+const initialIdx = parseInt(location.hash.replace('#', ''), 10);
+goTo(isNaN(initialIdx) ? 0 : initialIdx - 1);
+
+function launchConfetti() {
+  const cols=['#F5B65A','#FFB5C5','#B8E0F6','#B7E4C7','#A78BFA','#FDD068'];
+  for(let i=0;i<22;i++){
     const el=document.createElement('div');
-    const sz=5+Math.random()*8;
-    el.style.cssText=`position:fixed;left:${25+Math.random()*50}%;top:${15+Math.random()*25}%;
-      width:${sz}px;height:${sz}px;background:${cols[Math.floor(Math.random()*5)]};
-      border-radius:${Math.random()>.5?'50%':'2px'};pointer-events:none;z-index:9999;
-      animation:cfFall ${.8+Math.random()*.8}s ease-out ${Math.random()*.3}s forwards`;
+    const sz=5+Math.random()*9;
+    el.style.cssText=`position:fixed;left:${20+Math.random()*60}%;top:${10+Math.random()*30}%;
+      width:${sz}px;height:${sz}px;background:${cols[~~(Math.random()*6)]};
+      border-radius:${Math.random()>.5?'50%':'3px'};pointer-events:none;z-index:9999;
+      animation:confettiFall ${.7+Math.random()*.9}s ease-out ${Math.random()*.25}s forwards`;
     document.body.appendChild(el);
-    setTimeout(()=>el.remove(),1500);
+    setTimeout(()=>el.remove(),1600);
   }
 }
-const cfStyle=document.createElement('style');
-cfStyle.textContent='@keyframes cfFall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(180px) rotate(540deg)}}';
-document.head.appendChild(cfStyle);
-
-// ═══════════════════════════════
-//  INIT
-// ═══════════════════════════════
-document.getElementById(`slide-0`).classList.add('active');
-updateUI();
+const _cfStyle=document.createElement('style');
+_cfStyle.textContent='@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(160px) rotate(480deg)}}';
+document.head.appendChild(_cfStyle);
 </script>
+
 </body>
 </html>
