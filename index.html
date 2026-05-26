@@ -168,27 +168,9 @@ p { margin: 0; }
 @media (max-width: 640px) { .side-arrow { display: none; } }
 
 /* ===== TOP MINI BRAND ===== */
-.top-brand {
-  position: fixed; top: 16px; left: 22px; z-index: 40;
-  display: flex; align-items: center; gap: 10px;
-  background: rgba(255,255,255, 0.92);
-  backdrop-filter: blur(12px);
-  border-radius: 999px;
-  padding: 6px 16px 6px 6px;
-  box-shadow: 0 4px 16px rgba(38,57,110,.12);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--navy);
-}
-.top-brand img {
-  width: 30px; height: 30px;
-  background: white; border-radius: 50%; padding: 2px;
-  object-fit: contain;
-}
 
 /* ===== KEY-HINT ===== */
 
-@media (max-width: 720px) { .top-brand { display: none; } }
 
 /* ===== COMMON CONTENT ===== */
 .kicker {
@@ -414,25 +396,10 @@ p { margin: 0; }
 .photos-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
 .photos-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
 .photos-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
-.student-card {
-  background: white;
-  padding: 10px 10px 14px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  border-radius: var(--r-md);
-  box-shadow: var(--shadow);
-  text-align: center;
-  transition: transform 0.25s ease;
-}
-.student-card:hover { transform: translateY(-6px) scale(1.03); box-shadow: var(--shadow-lg); }
-.student-card img {
-  width: 100%; aspect-ratio: 1/1; object-fit: cover;
-  border-radius: 18px;
-}
-.student-card .name {
-  margin-top: 10px; font-size: 13px;
-  font-weight: 800; color: var(--navy);
-  letter-spacing: 0.5px;
-}
+
+
+
+
 
 /* ===== AGENDA ===== */
 .agenda-grid {
@@ -468,7 +435,7 @@ p { margin: 0; }
 
 /* ===== FOCUS / TIEU DIEM ===== */
 .focus-card {
-  background: linear-gradient(135deg, #1C2E5E 0%, #344A8A 60%, #4458A6 100%);
+  background: linear-gradient(135deg, #0F1D3E 0%, #1C2E5E 40%, #2D4890 70%, #1A3572 100%);
   color: white;
   border-radius: var(--r-xl);
   padding: 60px 52px;
@@ -495,11 +462,13 @@ p { margin: 0; }
   letter-spacing: 1.5px; margin-bottom: 16px;
 }
 .focus-card h3 {
-  font-size: clamp(30px, 4.5vw, 48px); line-height: 1.15;
-  margin-bottom: 14px;
+  font-size: clamp(36px, 5.5vw, 60px); line-height: 1.1;
+  margin-bottom: 18px;
+  text-shadow: 0 2px 20px rgba(0,0,0,.2);
+  letter-spacing: -0.02em;
 }
 .focus-card h3 .accent { color: var(--gold); display: block; }
-.focus-card .quote { font-style: italic; color: rgba(255,255,255,0.85); font-size: clamp(16px, 1.8vw, 22px); margin-bottom: 12px; }
+.focus-card .quote { font-style: italic; color: rgba(255,255,255,0.95); font-size: clamp(18px, 2.2vw, 26px); margin-bottom: 16px; font-weight: 600; }
 .focus-card .meta { font-size: 12px; letter-spacing: 1.5px; color: var(--gold); font-weight: 700; text-transform: uppercase; }
 .focus-photo {
   border-radius: var(--r-lg);
@@ -780,7 +749,7 @@ p { margin: 0; }
 }
 .video-frame {
   aspect-ratio: 16/9;
-  background: linear-gradient(135deg, #1C2E5E 0%, #344A8A 60%, #4458A6 100%);
+  background: linear-gradient(135deg, #0F1D3E 0%, #1C2E5E 40%, #2D4890 70%, #1A3572 100%);
   border-radius: var(--r-md);
   display: grid; place-items: center;
   color: white; text-align: center; padding: 20px;
@@ -943,16 +912,96 @@ p { margin: 0; }
   background: #1a1a1a;
   display: block;
 }
+
+/* Prevent name wrapping */
+.text-block h3 { overflow-wrap: normal; hyphens: none; }
+.student-card .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ===== VINH DANH HỌC SINH ===== */
+.vinh-danh-hs {
+  text-align: center;
+  background: linear-gradient(135deg, #D4700E 0%, #E8851A 30%, #F5A623 60%, #FFBD59 100%);
+  color: white;
+  border-radius: var(--r-xl);
+  padding: 72px 48px;
+  max-width: 1000px; margin: 0 auto; width: 100%;
+  box-shadow: 0 24px 60px rgba(200,100,0,.35);
+  position: relative; overflow: hidden;
+}
+.vinh-danh-deco {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,.1);
+}
+.vinh-danh-deco-1 { width: 280px; height: 280px; top: -120px; left: -80px; }
+.vinh-danh-deco-2 { width: 200px; height: 200px; bottom: -80px; right: -60px; }
+.vinh-danh-deco-3 { width: 140px; height: 140px; top: 40px; right: 60px; background: rgba(255,255,255,.07); }
+.vinh-danh-trophy {
+  font-size: clamp(56px, 8vw, 96px);
+  display: block; margin-bottom: 16px;
+  position: relative; z-index: 1;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,.2));
+  animation: trophyFloat 3s ease-in-out infinite;
+}
+@keyframes trophyFloat {
+  0%,100%{transform:translateY(0) rotate(-3deg)}
+  50%{transform:translateY(-12px) rotate(3deg)}
+}
+.vinh-danh-label {
+  font-size: clamp(11px, 1.2vw, 14px); font-weight: 700;
+  letter-spacing: 3px; opacity: .85;
+  margin-bottom: 16px; position: relative; z-index: 1;
+  text-transform: uppercase;
+}
+.vinh-danh-title {
+  font-size: clamp(40px, 6.5vw, 80px); font-weight: 900;
+  line-height: 1.1; margin-bottom: 20px;
+  position: relative; z-index: 1;
+  text-shadow: 0 3px 24px rgba(0,0,0,.25);
+  letter-spacing: 0.02em;
+}
+.vinh-danh-year {
+  font-size: clamp(16px, 2vw, 22px); font-weight: 700;
+  opacity: .9; margin-bottom: 20px;
+  position: relative; z-index: 1;
+}
+.vinh-danh-stars {
+  font-size: clamp(20px, 3vw, 32px);
+  letter-spacing: 8px; position: relative; z-index: 1;
+}
+
+/* ===== STUDENT PHOTOS — CIRCULAR FRAMES ===== */
+.student-card {
+  background: transparent;
+  box-shadow: none;
+  border-top: none !important;
+  padding: 8px 8px 14px;
+}
+.student-card img {
+  width: 100%; aspect-ratio: 1/1; object-fit: cover;
+  border-radius: 50%;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: block;
+}
+.student-card:hover img { transform: scale(1.06); }
+.student-card .name {
+  margin-top: 10px; font-size: 13px;
+  font-weight: 800; color: var(--navy);
+  letter-spacing: 0.3px; text-align: center;
+}
+/* Colorful rings cycling */
+.photos-grid .student-card:nth-child(1) img { box-shadow: 0 0 0 5px var(--pink),   0 6px 24px rgba(255,143,171,.3); }
+.photos-grid .student-card:nth-child(2) img { box-shadow: 0 0 0 5px var(--gold),   0 6px 24px rgba(245,166,35,.3); }
+.photos-grid .student-card:nth-child(3) img { box-shadow: 0 0 0 5px var(--mint),   0 6px 24px rgba(132,217,166,.3); }
+.photos-grid .student-card:nth-child(4) img { box-shadow: 0 0 0 5px var(--sky),    0 6px 24px rgba(126,200,242,.3); }
+.photos-grid .student-card:nth-child(5) img { box-shadow: 0 0 0 5px #A78BFA,       0 6px 24px rgba(167,139,250,.3); }
+/* photo-block (slide 4, 15) - circular too */
+.photo-block img { border-radius: var(--r-lg); }
+
 </style>
 </head>
 <body>
 
 <!-- ===== TOP BRAND ===== -->
-<div class="top-brand">
-  <img src="images/logo.png" alt="Vinschool"/>
-  Lễ Tổng Kết · 4B02
-</div>
-
 <!-- ===== SIDE ARROWS ===== -->
 <button class="side-arrow left" id="sideLeft" aria-label="Slide trước">←</button>
 <button class="side-arrow right" id="sideRight" aria-label="Slide sau">→</button>
@@ -980,13 +1029,28 @@ p { margin: 0; }
     </section>
 
     <!-- 2: VĂN NGHỆ CHÀO MỪNG -->
-    <section class="slide slide-fullimg" data-title="Văn nghệ chào mừng">
-      <img src="images/slide2.jpg" alt="Văn nghệ chào mừng" class="fullimg">
+    <section class="slide" data-title="Văn nghệ chào mừng">
+      <div class="container-narrow" style="width:100%">
+        <div style="text-align:center;margin-bottom:28px">
+          <h2 style="font-size:clamp(28px,4vw,52px);color:var(--pink);letter-spacing:1px">VĂN NGHỆ CHÀO MỪNG</h2>
+          <p style="color:var(--muted);font-size:16px;margin-top:8px">Lời ca tiếng hát thay cho lời chào yêu thương đến đại gia đình 4B02</p>
+        </div>
+        <div class="photo-block" style="transform:none;max-width:760px;margin:0 auto">
+          <img src="images/slide2.jpg" alt="Văn nghệ chào mừng"/>
+        </div>
+      </div>
     </section>
 
     <!-- 3: VÈ 4B02 -->
-    <section class="slide slide-fullimg" data-title="Vè 4B02">
-      <img src="images/slide3.jpg" alt="Vè 4B02" class="fullimg">
+    <section class="slide" data-title="Vè 4B02">
+      <div class="container-narrow" style="width:100%">
+        <div style="text-align:center;margin-bottom:28px">
+          <h2 style="font-size:clamp(28px,4vw,52px);color:var(--gold-deep);letter-spacing:1px">VÈ 4B02</h2>
+        </div>
+        <div class="photo-block" style="transform:none;max-width:760px;margin:0 auto">
+          <img src="images/slide3.jpg" alt="Vè 4B02"/>
+        </div>
+      </div>
     </section>
 
     <!-- 4: KHI NGHE TIẾNG VE -->
@@ -1014,7 +1078,7 @@ Bao tình yêu thương.</div>
     <section class="slide" data-title="Điểm danh 01">
       <div class="container-wide two-col">
         <div class="text-block">
-          <h3>Vỹ An & Diệu Anh</h3>
+          <h3>Vỹ An & Diệu Anh</h3>
           <div class="poem">Xếp theo danh sách
 Vỹ An đứng đầu
 Học nhanh nhớ lâu
@@ -1052,7 +1116,7 @@ Mỗi lần sắp thi
     <section class="slide" data-title="Điểm danh 03">
       <div class="container-wide two-col">
         <div class="text-block">
-          <h3>Gia Huy · Vân Khánh · Linh Nga</h3>
+          <h3>Gia Huy · Vân Khánh · Linh Nga</h3>
           <div class="poem">Có tài ăn nói
 Học hành cũng chăm
 Được khen cả năm
@@ -1080,7 +1144,7 @@ MC — Linh Nga.</div>
     <section class="slide" data-title="Điểm danh 04">
       <div class="container-wide two-col reverse">
         <div class="text-block">
-          <h3>Trần Ngọc Phúc · Đăng Khoa · Minh Anh</h3>
+          <h3>Trần Ngọc Phúc · Đăng Khoa · Minh Anh</h3>
           <div class="poem">Tính hay bày trò
 Là Trần Ngọc Phúc
 Nhưng học nghiêm túc
@@ -1106,7 +1170,7 @@ Là một câu chuyện.</div>
     <section class="slide" data-title="Điểm danh 05">
       <div class="container-wide two-col">
         <div class="text-block">
-          <h3>Nhất Chi Mai · Minh Khang · Duy Khang</h3>
+          <h3>Nhất Chi Mai · Minh Khang · Duy Khang</h3>
           <div class="poem">Múa đẹp uyển chuyển
 Là Nhất Chi Mai
 Rất hay diễn hài
@@ -1129,7 +1193,7 @@ Thiên tài toán học.</div>
     <section class="slide" data-title="Điểm danh 06">
       <div class="container-wide two-col reverse">
         <div class="text-block">
-          <h3>Thanh Lan · Gia Linh · Minh Hiếu</h3>
+          <h3>Thanh Lan · Gia Linh · Minh Hiếu</h3>
           <div class="poem">Đồ đạc ngăn nắp
 Chăm chỉ làm gương
 Thanh Lan tinh tường
@@ -1157,7 +1221,7 @@ Trong môn Tin học.</div>
     <section class="slide" data-title="Điểm danh 07">
       <div class="container-wide two-col">
         <div class="text-block">
-          <h3>Tuấn Tú · Zelda · Minh Phương · Minh Nam</h3>
+          <h3>Tuấn Tú · Zelda · Minh Phương · Minh Nam</h3>
           <div class="poem">Không hề sợ nhọc
 Chàng trai — Tuấn Tú
 Có việc cứ hú
@@ -1188,7 +1252,7 @@ kêu luôn: “Ai hỏi”.</div>
     <section class="slide" data-title="Điểm danh 08">
       <div class="container-wide two-col reverse">
         <div class="text-block">
-          <h3>Quang Minh · Jeron · Như Kiên</h3>
+          <h3>Quang Minh · Jeron · Như Kiên</h3>
           <div class="poem">Toán — Khoa đều giỏi
 Là bạn Quang Minh
 Vẽ đẹp, thông minh
@@ -1211,7 +1275,7 @@ Lại hay giúp đỡ.</div>
     <section class="slide" data-title="Điểm danh 09">
       <div class="container-wide two-col">
         <div class="text-block">
-          <h3>Minh Thảo · Khánh Chi</h3>
+          <h3>Minh Thảo · Khánh Chi</h3>
           <div class="poem">Tính tình cởi mở
 Minh Thảo chứ ai
 Hát hay vẽ tài
@@ -1233,7 +1297,7 @@ Khánh Chi làm tốt.</div>
     <section class="slide" data-title="Điểm danh 10">
       <div class="container-wide two-col reverse">
         <div class="text-block">
-          <h3>Trúc Linh · Đức Vượng</h3>
+          <h3>Trúc Linh · Đức Vượng</h3>
           <div class="poem">Giải toán phút mốt
 Là bạn Trúc Linh
 Mắt tinh, thông minh
@@ -1283,8 +1347,8 @@ Dang tay chào đón.</div>
         </div>
         <div class="agenda-grid">
           <div class="agenda-card"><div class="agenda-num">01</div><h4>Kết quả hoạt động của Nhà trường</h4></div>
-          <div class="agenda-card"><div class="agenda-num">02</div><h4>Kết quả học tập và rèn luyện của lớp</h4></div>
-          <div class="agenda-card"><div class="agenda-num">03</div><h4>Chương trình hoạt động hè</h4></div>
+          <div class="agenda-card"><div class="agenda-num">02</div><h4>Kết quả học tập và<br>rèn luyện của lớp</h4></div>
+          <div class="agenda-card"><div class="agenda-num">03</div><h4>Chương trình<br>hoạt động hè</h4></div>
           <div class="agenda-card"><div class="agenda-num">04</div><h4>Ban phụ huynh</h4></div>
         </div>
       </div>
@@ -1295,7 +1359,7 @@ Dang tay chào đón.</div>
       <div class="container-wide">
         <div class="focus-card">
           <div>
-            <h3>Tiêu điểm <span class="accent">giáo dục</span></h3>
+            <h3 style="text-transform:uppercase;letter-spacing:0.02em">TIÊU ĐIỂM <span class="accent" style="display:block;font-size:1.2em">GIÁO DỤC</span></h3>
             <p class="quote">“Hành trình chinh phục và trưởng thành.”</p>
             <p class="meta">Năm học 2025 — 2026 · Lớp 4B02</p>
           </div>
@@ -1376,9 +1440,15 @@ Dang tay chào đón.</div>
 
     <!-- 23: VINH DANH HỌC SINH -->
     <section class="slide" data-title="Vinh danh Học sinh">
-      <div class="section-divider">
-        <h2>VINH DANH HỌC SINH</h2>
-        <p>Năm học 2025 — 2026</p>
+      <div class="vinh-danh-hs">
+        <div class="vinh-danh-deco vinh-danh-deco-1"></div>
+        <div class="vinh-danh-deco vinh-danh-deco-2"></div>
+        <div class="vinh-danh-deco vinh-danh-deco-3"></div>
+        <div class="vinh-danh-trophy">🏆</div>
+        <div class="vinh-danh-label">TRI ÂN · GHI NHẬN · TỰ HÀO</div>
+        <h2 class="vinh-danh-title">VINH DANH<br>HỌC SINH</h2>
+        <div class="vinh-danh-year">Năm học 2025 — 2026</div>
+        <div class="vinh-danh-stars">⭐⭐⭐⭐⭐</div>
       </div>
     </section>
 
